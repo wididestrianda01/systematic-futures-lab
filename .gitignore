@@ -2,3 +2,7 @@ AGENTS.md
 PLAN.md
 docs/agents/
 .scratch/
+.venv/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
