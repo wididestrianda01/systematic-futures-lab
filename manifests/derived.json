@@ -1,0 +1,486 @@
+{
+  "files": {
+    "basis/6B.parquet": {
+      "bytes": 328052,
+      "date_range": [
+        "1975-12-16",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "f3fd3d8acb8d00955883ca84b7d799932d5e39e2325fb95d1060964817b88b10"
+    },
+    "basis/6E.parquet": {
+      "bytes": 183199,
+      "date_range": [
+        "1999-06-15",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "207c82db5b685b8b7aa0fd1ffbe6eec82145d13a1aa8ef6395777cfe780bf8e7"
+    },
+    "basis/6J.parquet": {
+      "bytes": 359640,
+      "date_range": [
+        "1977-06-14",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "9dded0797b801f2bc05fafd0c1d061ce80cae2fb2227fef22bb2dcd13b32e4d3"
+    },
+    "basis/CL.parquet": {
+      "bytes": 219348,
+      "date_range": [
+        "1990-11-20",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "b6b75384249e47bd86b5a2280f0ad4f43658f64f6148fe799b3d18bb0d1d48c0"
+    },
+    "basis/ES.parquet": {
+      "bytes": 190174,
+      "date_range": [
+        "1982-12-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "b91cabaf000a2d971030c59c8d84420abf51632a6c89a4c9d20072060b410a4f"
+    },
+    "basis/GC.parquet": {
+      "bytes": 322557,
+      "date_range": [
+        "1975-04-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "d06b10892415ef4625f2ef9bf5cdb44b1a784ac5b039af435b551eaef489e87e"
+    },
+    "basis/HG.parquet": {
+      "bytes": 185739,
+      "date_range": [
+        "1995-09-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "abebad31e54d5c02b520c0fa4daab0c8803a6627c8616011c15b10d866544159"
+    },
+    "basis/NG.parquet": {
+      "bytes": 230187,
+      "date_range": [
+        "1990-07-26",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "4cf97ebc5fd5542b5faacf51d4ed2c4da27a79eda6924b264310360e15703828"
+    },
+    "basis/NQ.parquet": {
+      "bytes": 179265,
+      "date_range": [
+        "1999-12-17",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "0a73f5602b64516486af88fa71f4256c577f55aa6c6e8b1a6b4b045cb3dfb435"
+    },
+    "basis/SI.parquet": {
+      "bytes": 61948,
+      "date_range": [
+        "1970-09-02",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "b726ff349faaa3dc9be7d617bc0494bb9bfa2b4ac432b22de64257e0d6058e10"
+    },
+    "basis/YM.parquet": {
+      "bytes": 43167,
+      "date_range": [
+        "2002-09-03",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "257360d6ef67b4d313e51806cde366ab53f993cbf3d6382baeab69a19ce55603"
+    },
+    "basis/ZB.parquet": {
+      "bytes": 18065,
+      "date_range": [
+        "2010-06-02",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "bfd97abc8198909611324924ffc9cd7e0a31ca218f09a73ca878b3e46b1d39c3"
+    },
+    "basis/ZC.parquet": {
+      "bytes": 203253,
+      "date_range": [
+        "1973-09-11",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "bb50d8aa6e12eeb713b70c47782823b2a03956ec7bf3f2e928149237b23a3f43"
+    },
+    "basis/ZF.parquet": {
+      "bytes": 182958,
+      "date_range": [
+        "1989-05-31",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "3ef3fcf74fa8fb8085f6758da11cb721175f77fa3e0c6b8935646feccd90fa1a"
+    },
+    "basis/ZN.parquet": {
+      "bytes": 238326,
+      "date_range": [
+        "1982-08-30",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "11ad89598a3bb01da123b048d6fc338f462279a4397598eebcade00b43f5c33f"
+    },
+    "basis/ZW.parquet": {
+      "bytes": 145601,
+      "date_range": [
+        "1974-10-09",
+        "2024-03-28"
+      ],
+      "schema": {
+        "basis": "float64",
+        "date": "datetime64[us]",
+        "front_close": "float64",
+        "next_close": "float64",
+        "symbol": "str"
+      },
+      "sha256": "f80916688f142db7f903af88ec541ebaf3a3fb7b7d0e1277990489e3df7d37c6"
+    },
+    "continuous/6B.parquet": {
+      "bytes": 223946,
+      "date_range": [
+        "1975-12-16",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "ef20190faa607cac641d85102fc7a9b22211722ff6292d23b635cfb192399338"
+    },
+    "continuous/6E.parquet": {
+      "bytes": 115888,
+      "date_range": [
+        "1999-06-15",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "a29b8cd9d9b0da28d567c6657c96d968f3d7788c1340c3422d727e3bc501e82f"
+    },
+    "continuous/6J.parquet": {
+      "bytes": 217870,
+      "date_range": [
+        "1977-06-14",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "5e3983f83d451da5e73eb680cd499395fdb89a04699aba1cdbc01340e539bf9b"
+    },
+    "continuous/CL.parquet": {
+      "bytes": 152798,
+      "date_range": [
+        "1990-10-16",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "c09444b18585c2ea2c6a05d891227d89a78e737ab9f747ff4523fb298cf6bc3a"
+    },
+    "continuous/ES.parquet": {
+      "bytes": 196736,
+      "date_range": [
+        "1982-09-14",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "292a6c3b6c844f12244f10462e57629d8eac58f27c9b726903246694b610c7dc"
+    },
+    "continuous/GC.parquet": {
+      "bytes": 227101,
+      "date_range": [
+        "1975-04-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "a1d1f0252ccde602edb1c7a160bc5d0277413a4f7cc7c06073a1a50aa0b14695"
+    },
+    "continuous/HG.parquet": {
+      "bytes": 128291,
+      "date_range": [
+        "1995-09-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "cba2fa0c4bfb1049075cd713d4e3fd4d558def5f3f4759a1bbbeb8d31c618b4f"
+    },
+    "continuous/NG.parquet": {
+      "bytes": 161047,
+      "date_range": [
+        "1990-07-26",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "8f703a7d1a4cf8fc7ada075c519814f3364ded44785056fbc5d1746fa4a9f37c"
+    },
+    "continuous/NQ.parquet": {
+      "bytes": 116991,
+      "date_range": [
+        "1999-12-14",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "ad528ad512e75aafb1233fd3702c5c08ccbd5b07220db67ba8762a18fc943062"
+    },
+    "continuous/SI.parquet": {
+      "bytes": 137879,
+      "date_range": [
+        "1970-06-15",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "1e3888202ed00c86cb0010b7e93205821805455b1d5755447632ac41f288f6a9"
+    },
+    "continuous/YM.parquet": {
+      "bytes": 115038,
+      "date_range": [
+        "2002-06-12",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "9635bf3394e9acba9bb1faa7b5fb81d45b0f325e27db801f6667ed02ca7f5672"
+    },
+    "continuous/ZB.parquet": {
+      "bytes": 46542,
+      "date_range": [
+        "2010-03-03",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "966ad022c982ddce9d37f8a80b0bc012a4cce8da89dc8048f62739f1924f69ce"
+    },
+    "continuous/ZC.parquet": {
+      "bytes": 208006,
+      "date_range": [
+        "1972-10-18",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "b3849c62e51ca7dd9e93c365c633c2b1da4c80d128f8fb9079904f86cfbdbd56"
+    },
+    "continuous/ZF.parquet": {
+      "bytes": 155980,
+      "date_range": [
+        "1989-05-31",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "f59013ef702ab8c4437cc564750798a3f79869ee669e651b6ffcbe1e1120ceb0"
+    },
+    "continuous/ZN.parquet": {
+      "bytes": 185564,
+      "date_range": [
+        "1982-08-30",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "a53f0200348f15eec92f8ab374eec01cccc9d9fd001e85323aae6dad90060f4e"
+    },
+    "continuous/ZW.parquet": {
+      "bytes": 209204,
+      "date_range": [
+        "1973-12-19",
+        "2024-03-28"
+      ],
+      "schema": {
+        "close": "float64",
+        "contract": "int64",
+        "date": "datetime64[us]",
+        "symbol": "str"
+      },
+      "sha256": "c0b4987787eab7e6222d7d61a6c50b18657a508c5dfd238d42a8796dba125419"
+    },
+    "coverage_report.csv": {
+      "bytes": 807,
+      "sha256": "d9f1804ec4e8cfaf3bf3ed1a01f633ae4b30ddff63dd790c00ce924a31f08412"
+    },
+    "roll_calendar.parquet": {
+      "bytes": 395768,
+      "date_range": [
+        "1970-06-15",
+        "2024-03-28"
+      ],
+      "schema": {
+        "date": "datetime64[us]",
+        "front": "int64",
+        "next": "int64",
+        "symbol": "str"
+      },
+      "sha256": "dd4a2e624573c9765dcdf3a6fc20d4320753de0162046632124b78b0fe054505"
+    }
+  }
+}

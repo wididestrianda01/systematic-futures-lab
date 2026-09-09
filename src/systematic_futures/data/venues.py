@@ -1,41 +1,41 @@
-"""Venue map: the 17-symbol CME-only universe.
+"""Universe map: 16 CME roots → pysystemtrade instrument filenames.
 
-Amended 2026-09-09: Databento hit a credit-card wall; source is CME Group free EOD.
-The ICE softs (KC/SB/CC) are dropped — no free ICE EOD feed; recorded here so the
-boundary is visible in code, not just prose.
+Amended 2026-09-09 (free-only): source is pysystemtrade's raw-leg CSV snapshot
+(pinned commit; frozen 2024-03-28). The four dropped roots are recorded with
+reasons so the boundary is visible in code, not just prose.
 """
 
-DATASET = "CME-FREE-EOD"
-
-UNIVERSE = {
-    "ES": "S&P 500 E-mini",
-    "NQ": "Nasdaq-100 E-mini",
-    "YM": "Dow E-mini",
-    "ZN": "10Y T-Note",
-    "ZB": "30Y T-Bond",
-    "ZF": "5Y T-Note",
-    "GC": "Gold (COMEX)",
-    "SI": "Silver (COMEX)",
-    "HG": "Copper (COMEX)",
-    "CL": "WTI Crude (NYMEX)",
-    "BZ": "Brent Crude (NYMEX)",
-    "NG": "Natural Gas (NYMEX)",
-    "ZC": "Corn (CBOT)",
-    "ZW": "Wheat (CBOT)",
-    "6E": "Euro FX",
-    "6J": "Japanese Yen",
-    "6B": "British Pound",
+INSTRUMENTS = {
+    "ES": "SP500",
+    "NQ": "NASDAQ",
+    "YM": "DOW",
+    "ZN": "US10",
+    "ZB": "US30",
+    "ZF": "US5",
+    "GC": "GOLD",
+    "SI": "SILVER",
+    "HG": "COPPER",
+    "CL": "CRUDE_W",
+    "NG": "GAS_US",
+    "ZC": "CORN",
+    "ZW": "WHEAT",
+    "6E": "EUR",
+    "6J": "JPY",
+    "6B": "GBP",
 }
+
+UNIVERSE = INSTRUMENTS  # keys are the canonical roots
 
 DROPPED = {
-    "KC": "ICE soft — no free ICE EOD feed (universe trimmed 2026-09-09)",
-    "SB": "ICE soft — no free ICE EOD feed (universe trimmed 2026-09-09)",
-    "CC": "ICE soft — no free ICE EOD feed (universe trimmed 2026-09-09)",
+    "KC": "ICE soft — no free feed (universe trimmed 2026-09-09)",
+    "SB": "ICE soft — no free feed (universe trimmed 2026-09-09)",
+    "CC": "ICE soft — no free feed (universe trimmed 2026-09-09)",
+    "BZ": "Brent legs start 2020-08 — cannot fill the 2010–2019 develop window",
 }
 
 
-def dataset_for(symbol: str) -> str:
-    """Dataset for a universe root; KeyError on unknown symbols (hard-fail policy)."""
-    if symbol not in UNIVERSE:
-        raise KeyError(f"{symbol}: not in the 17-symbol CME universe (see DROPPED for pruned softs)")
-    return DATASET
+def instrument_for(root: str) -> str:
+    """Instrument filename stem for a universe root; hard-fails on unknowns and dropped roots."""
+    if root not in INSTRUMENTS:
+        raise KeyError(f"{root}: not in the 16-root universe (see DROPPED)")
+    return INSTRUMENTS[root]

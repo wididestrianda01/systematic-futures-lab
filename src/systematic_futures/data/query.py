@@ -1,4 +1,4 @@
-"""DuckDB query layer over the on-disk Parquet store (raw + derived)."""
+"""DuckDB query layer over the on-disk store (raw snapshot CSVs + derived Parquet)."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,20 +7,20 @@ import duckdb
 import pandas as pd
 
 VIEWS = {
-    "raw_ohlcv": "raw/*/ohlcv-1d/*.parquet",
-    "raw_definitions": "raw/*/definition/*.parquet",
-    "raw_statistics": "raw/*/statistics/*.parquet",
+    "multiple_prices": "raw/multiple_prices/*.csv",
     "roll_calendar": "derived/roll_calendar.parquet",
     "continuous": "derived/continuous/*.parquet",
     "basis": "derived/basis/*.parquet",
 }
 
 COVERAGE_QUERY = """
-select regexp_extract(filename, '([^/]+)\\.parquet$', 1) as root,
-       year(date) as year, count(*) as rows
-from raw_ohlcv
-group by 1, 2
-order by 1, 2
+select regexp_extract(filename, '([^/]+)\\.csv$', 1) as instrument,
+       min(cast(DATETIME as date)) as first_date,
+       max(cast(DATETIME as date)) as last_date,
+       count(*) as rows
+from multiple_prices
+group by 1
+order by 1
 """
 
 ROLL_COUNTS_QUERY = """
@@ -36,12 +36,11 @@ group by 1
 order by 1
 """
 
-OI_SUMMARY_QUERY = """
-select regexp_extract(filename, '([^/]+)\\.parquet$', 1) as root,
-       count(*) as days, avg(open_interest) as mean_oi, max(date) as last_date
-from raw_statistics
-group by 1
-order by 1
+CONTINUOUS_COVERAGE_QUERY = """
+select symbol, year(date) as year, count(*) as rows
+from continuous
+group by 1, 2
+order by 1, 2
 """
 
 
@@ -49,9 +48,10 @@ def register_views(con: duckdb.DuckDBPyConnection, data_dir: Path | str) -> None
     """Views over the frozen store; filename=true exposes the source path."""
     for name, rel in VIEWS.items():
         path = str(Path(data_dir) / rel).replace("'", "''")
+        read = "read_csv" if rel.endswith(".csv") else "read_parquet"
         con.execute(
             f"create or replace view {name} as "
-            f"select * from read_parquet('{path}', filename=true)"
+            f"select * from {read}('{path}', filename=true)"
         )
 
 

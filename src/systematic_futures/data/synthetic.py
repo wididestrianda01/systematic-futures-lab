@@ -1,10 +1,14 @@
-"""Synthetic OHLCV fixtures — deterministic, seeded; never real market data."""
+"""Synthetic fixtures — deterministic, seeded; never real market data."""
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 
 OHLCV_COLUMNS = ["date", "symbol", "open", "high", "low", "close", "volume"]
+MP_COLUMNS = [
+    "DATETIME", "CARRY", "CARRY_CONTRACT", "PRICE", "PRICE_CONTRACT",
+    "FORWARD", "FORWARD_CONTRACT",
+]
 
 
 def make_synthetic_ohlcv(
@@ -45,68 +49,60 @@ def make_synthetic_ohlcv(
     return pd.concat(frames, ignore_index=True)[OHLCV_COLUMNS]
 
 
-MONTH_CODES = "FGHJKMNQUVXZ"
-CONTRACT_COLUMNS = ["date", "raw_symbol", "open", "high", "low", "close", "volume"]
-
-
-def make_synthetic_definitions(
-    roots: tuple[str, ...] = ("ES",),
-    start: str = "2020-01",
-    n_months: int = 24,
-    roll_lag_bd: int = 10,
-) -> pd.DataFrame:
-    """Monthly contracts per root: raw symbol {root}{monthcode}{yy},
-    expiration = last business day of the month, last_trade_date = expiration − roll_lag_bd."""
-    start_period = pd.Period(start, freq="M")
-    rows = []
-    for root in roots:
-        for i in range(-1, n_months):
-            p = start_period + i
-            month_end = p.end_time.normalize()
-            expiration = pd.bdate_range(month_end - pd.Timedelta(days=5), month_end)[-1]
-            rows.append(
-                {
-                    "symbol": root,
-                    "raw_symbol": f"{root}{MONTH_CODES[p.month - 1]}{p.year % 100:02d}",
-                    "expiration": expiration,
-                    "last_trade_date": expiration - pd.tseries.offsets.BDay(roll_lag_bd),
-                }
-            )
-    return pd.DataFrame(rows)
-
-
-def make_synthetic_contract_prices(
-    definitions: pd.DataFrame,
+def make_synthetic_multiple_prices(
+    symbols: tuple[str, ...] = ("ES",),
     start: str = "2020-01-01",
-    end: str = "2021-12-31",
+    end: str = "2021-06-30",
+    premium: float = 0.02,
     seed: int = 42,
+    intraday: bool = True,
 ) -> pd.DataFrame:
-    """Contract-level daily OHLCV: one seeded underlying path per root;
-    each contract = underlying × (1 + 2% × years to expiry), so deferreds trade at a premium."""
+    """multiple_prices-format fixture: monthly contract IDs (YYYYMM00), three legs.
+
+    Front rolls on the first business day on/after the 18th (an observed
+    transition); carry = the prior month's contract, forward = the next month's.
+    Deferred legs trade at a decaying premium vs the underlying path. An
+    intraday duplicate (23:00) is appended per day when intraday=True, plus one
+    leading legacy row with a null front — both exercise the calendar builder.
+    """
     days = pd.bdate_range(start, end)
+    first_month = pd.Period(start, freq="M") - 1
     rows = []
-    for root, grp in definitions.groupby("symbol"):
-        rng = np.random.default_rng(seed + abs(hash(root)) % 1000)
+    for sym in symbols:
+        rng = np.random.default_rng(seed + abs(hash(sym)) % 1000)
         level = 100.0 * np.exp(np.cumsum(rng.normal(0.0002, 0.01, size=len(days))))
-        for c in grp.itertuples():
-            tte = np.clip((c.expiration - days).days / 365.25, 0, None)
-            close = level * (1 + 0.02 * tte)
-            spread = np.abs(rng.normal(0.004, 0.002, size=len(days))) + 1e-6
-            high = close * (1 + spread)
-            low = close * (1 - spread)
-            open_ = low + (high - low) * rng.random(len(days))
-            volume = rng.lognormal(10.0, 0.5, size=len(days)).astype("int64")
-            rows.append(
-                pd.DataFrame(
+        # leading legacy row: carry contract only, no front (like upstream's 1982 rows)
+        rows.append(
+            {
+                "DATETIME": days[0] - pd.Timedelta(days=1) + pd.Timedelta(hours=23),
+                "CARRY": None, "CARRY_CONTRACT": first_month.year * 10000 + first_month.month * 100,
+                "PRICE": None, "PRICE_CONTRACT": None,
+                "FORWARD": None, "FORWARD_CONTRACT": None,
+                "symbol": sym,
+            }
+        )
+        for d, lv in zip(days, level):
+            m = d.to_period("M")
+            cutoff = pd.bdate_range(d.replace(day=18), d.replace(day=22))[0]
+            front = m if d < cutoff else m + 1
+            ids = {
+                "CARRY": (front - 1).year * 10000 + (front - 1).month * 100,
+                "PRICE": front.year * 10000 + front.month * 100,
+                "FORWARD": (front + 1).year * 10000 + (front + 1).month * 100,
+            }
+            prices = {}
+            for leg_name, cid in ids.items():
+                c_period = pd.Period(year=cid // 10000, month=(cid // 100) % 100, freq="M")
+                mte = max((c_period.end_time - d).days / 30.44, 0.0)
+                prices[leg_name] = round(float(lv) * (1 + premium * mte), 4)
+            for hours in ((20,) if not intraday else (20, 23)):
+                rows.append(
                     {
-                        "date": days,
-                        "raw_symbol": c.raw_symbol,
-                        "open": open_,
-                        "high": high,
-                        "low": low,
-                        "close": close,
-                        "volume": volume,
+                        "DATETIME": d + pd.Timedelta(hours=int(hours)),
+                        "CARRY": prices["CARRY"], "CARRY_CONTRACT": ids["CARRY"],
+                        "PRICE": prices["PRICE"], "PRICE_CONTRACT": ids["PRICE"],
+                        "FORWARD": prices["FORWARD"], "FORWARD_CONTRACT": ids["FORWARD"],
+                        "symbol": sym,
                     }
                 )
-            )
-    return pd.concat(rows, ignore_index=True)[CONTRACT_COLUMNS]
+    return pd.DataFrame(rows)[["symbol"] + MP_COLUMNS]

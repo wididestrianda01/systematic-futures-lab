@@ -1,24 +1,25 @@
-"""Back-adjusted continuous contracts — ratio method, backward-cumulative.
+"""Back-adjusted continuous closes — ratio method, backward-cumulative.
 
-At each boundary day r (front flips to its successor), the stitch factor uses the
-LAST day the old front trades: f = close(next, r−1) / close(front, r−1). All prices
-before r carry the cumulative product of later f's (rolls processed newest→oldest),
-so the continuous series' daily return equals the held contract's return through
-every roll — no phantom roll gaps, no look-ahead (factors use data up to r−1 only).
+Upstream leg data carries daily closes only, so the continuous series is a close
+series (the engine needs nothing else at daily frequency). At each boundary day r
+(front flips to its successor), the stitch factor uses the LAST day the old front
+trades: f = close(next, r−1) / close(front, r−1). All closes before r carry the
+cumulative product of later f's (rolls processed newest→oldest), so the continuous
+series' daily return equals the held contract's return through every roll — no
+phantom roll gaps, no look-ahead (factors use data up to r−1 only).
 """
 from __future__ import annotations
 
 import pandas as pd
 
-CONTINUOUS_COLUMNS = ["date", "symbol", "contract", "open", "high", "low", "close", "volume"]
-OHLC = ["open", "high", "low", "close"]
+CONTINUOUS_COLUMNS = ["date", "symbol", "contract", "close"]
 
 
 def back_adjust(raw: pd.DataFrame, calendar: pd.DataFrame) -> pd.DataFrame:
-    """raw: [date, raw_symbol, open, high, low, close, volume]; calendar: [date, symbol, front, next].
+    """raw: [date, raw_symbol, close]; calendar: [date, symbol, front, next].
 
-    Returns [date, symbol, contract, open, high, low, close, volume] with the held
-    contract's OHLC ratio-adjusted; volume untouched.
+    Returns [date, symbol, contract, close] — the held contract's close,
+    ratio-adjusted across rolls.
     """
     parts = []
     for sym, cal in calendar.groupby("symbol"):
@@ -40,10 +41,12 @@ def back_adjust(raw: pd.DataFrame, calendar: pd.DataFrame) -> pd.DataFrame:
             raw, left_on=["date", "front"], right_on=["date", "raw_symbol"], how="inner"
         )
         assert held["date"].tolist() == cal["date"].tolist(), f"{sym}: raw missing held closes"
-        out = held[["date", "symbol"] + OHLC + ["volume"]].copy()
+        out = held[["date", "symbol"]].copy()
         out.insert(2, "contract", held["raw_symbol"].to_numpy())
-        out[OHLC] = out[OHLC].mul(factor.to_numpy(), axis=0)
+        out["close"] = held["close"].to_numpy() * factor.to_numpy()
         parts.append(out)
-    return pd.concat(parts, ignore_index=True)[CONTINUOUS_COLUMNS].sort_values(
-        ["symbol", "date"]
-    ).reset_index(drop=True)
+    return (
+        pd.concat(parts, ignore_index=True)[CONTINUOUS_COLUMNS]
+        .sort_values(["symbol", "date"])
+        .reset_index(drop=True)
+    )

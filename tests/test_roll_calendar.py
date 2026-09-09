@@ -1,53 +1,48 @@
 import pandas as pd
+import pytest
 
 from systematic_futures.data.roll_calendar import build_roll_calendar
-from systematic_futures.data.synthetic import make_synthetic_definitions
+from systematic_futures.data.synthetic import make_synthetic_multiple_prices
 
 
-def hand_definitions(n_days=30):
-    """4 contracts, LTDs on days[14]/[24]/[28]/[29]; n_bd=2 → rolls on days[12]/[22]/[26]/[27]."""
-    days = pd.bdate_range("2024-01-01", periods=n_days)
-    return days, pd.DataFrame(
-        {
-            "symbol": "A",
-            "raw_symbol": ["A1", "A2", "A3", "A4"],
-            "expiration": [days[16], days[26], days[29], days[29]],
-            "last_trade_date": [days[14], days[24], days[28], days[29]],
-        }
-    )
+def month_index(contract_id: int) -> int:
+    """YYYYMM00 → absolute month index (for successor checks across year ends)."""
+    return (contract_id // 10000) * 12 + (contract_id // 100) % 100
 
 
-def test_front_flips_on_roll_dates():
-    days, defs = hand_definitions()
-    cal = build_roll_calendar(defs, n_bd=2, start=days[5])
-    cal = cal.set_index("date")
-    # coverage: business days from days[5] through the last roll, while a successor exists
-    assert cal.index.min() == days[5]
-    assert cal.index.max() == days[25]  # last day strictly before the final roll
-    # flips happen exactly on the computed roll dates
-    assert cal.loc[days[11], "front"] == "A1" and cal.loc[days[12], "front"] == "A2"
-    assert cal.loc[days[21], "front"] == "A2" and cal.loc[days[22], "front"] == "A3"
-    assert cal.loc[days[12], "next"] == "A3" and cal.loc[days[5], "next"] == "A2"
-    # both legs always present
+def test_calendar_is_a_projection_of_observed_legs():
+    mp = make_synthetic_multiple_prices(("ES",), start="2020-01-01", end="2021-06-30")
+    cal = build_roll_calendar(mp)
+    days = pd.bdate_range("2020-01-01", "2021-06-30")
+    assert list(cal.columns) == ["date", "symbol", "front", "next"]
+    assert len(cal) == len(days)  # intraday dupes collapsed, legacy null-front row dropped
+    assert cal["date"].is_monotonic_increasing
     assert cal["front"].notna().all() and cal["next"].notna().all()
 
 
-def test_roll_dates_strictly_increasing():
-    _, defs = hand_definitions()
-    defs["symbol"] = "B"
-    try:
-        build_roll_calendar(defs.assign(last_trade_date=defs["last_trade_date"].iloc[::-1].to_numpy()), n_bd=2)
-    except ValueError as e:
-        assert "strictly increasing" in str(e)
-    else:
-        raise AssertionError("non-monotonic rolls must fail")
+def test_front_transitions_match_generator_rule():
+    mp = make_synthetic_multiple_prices(("A",), start="2020-01-01", end="2020-06-30")
+    cal = build_roll_calendar(mp)
+    by_date = cal.set_index("date")
+    # before the roll: front = January's contract; from the first bd ≥ Jan 18: February's
+    assert by_date.loc[pd.Timestamp("2020-01-17"), "front"] == 20200100
+    cutoff = pd.bdate_range("2020-01-18", "2020-01-22")[0]
+    assert by_date.loc[cutoff, "front"] == 20200200
+    # forward is always the front's successor month (year-boundary safe)
+    delta = by_date["next"].map(month_index) - by_date["front"].map(month_index)
+    assert (delta == 1).all()
 
 
-def test_generated_definitions_roundtrip():
-    defs = make_synthetic_definitions(("ES",), start="2020-01", n_months=6)
-    cal = build_roll_calendar(defs, n_bd=5)
-    flips = (cal["front"] != cal["front"].shift()).sum() - 1  # first row is not a flip
-    assert flips == len(defs) - 3  # first contract never front (grid starts at its roll), last has no successor
-    expected_rolls = (defs["last_trade_date"] - pd.tseries.offsets.BDay(5)).dt.normalize()
-    observed = cal["date"][cal["front"] != cal["front"].shift()].tolist()
-    assert observed[1:] == expected_rolls.sort_values().tolist()[1:5]
+def test_non_monotonic_front_raises():
+    mp = make_synthetic_multiple_prices(("A",), start="2020-01-01", end="2020-03-31", intraday=False)
+    bad = mp.iloc[:-20].copy()
+    bad.loc[bad.index[-1], "PRICE_CONTRACT"] = 20190100  # front jumps backwards
+    with pytest.raises(ValueError, match="non-decreasing"):
+        build_roll_calendar(bad)
+
+
+def test_legacy_null_front_row_dropped():
+    mp = make_synthetic_multiple_prices(("A",), start="2020-01-01", end="2020-02-29", intraday=False)
+    assert mp["PRICE_CONTRACT"].isna().sum() == 1  # the legacy leading row exists
+    cal = build_roll_calendar(mp)
+    assert cal["date"].min() == pd.Timestamp("2020-01-01")

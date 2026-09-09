@@ -9,7 +9,6 @@ dependencies = [
     "pandas>=2.2",
     "pyarrow>=17.0",
     "duckdb>=1.0",
-    "databento>=0.50",
 ]
 
 [dependency-groups]

@@ -1,0 +1,68 @@
+{
+  "files": {
+    "multiple_prices/COPPER.csv": {
+      "bytes": 3385082,
+      "sha256": "8c31c285cb11f85d08097398c3babe5a87ec555c0cbebf7b1cce9456ed71a2fb"
+    },
+    "multiple_prices/CORN.csv": {
+      "bytes": 2345568,
+      "sha256": "47183abccaa9e260e2c934acab3819ee0d4edcaf3fa7fc0c4a96abd933452e1c"
+    },
+    "multiple_prices/CRUDE_W.csv": {
+      "bytes": 2814629,
+      "sha256": "64a8c9f46998830eb242695d9d519f2547d20820d222b2c127ebd71f213958d1"
+    },
+    "multiple_prices/DOW.csv": {
+      "bytes": 4191619,
+      "sha256": "f9ba90e636f2ef9f557907c593416a0c96921b662472e53143d20c26522ce4d4"
+    },
+    "multiple_prices/EUR.csv": {
+      "bytes": 2880703,
+      "sha256": "eca74f7e539041b99311c8e407a451ccda28930a59c6ae8576866114becdf520"
+    },
+    "multiple_prices/GAS_US.csv": {
+      "bytes": 3847511,
+      "sha256": "8d1b2ad71db68931ace326244f3527ea893a63876e4c3eb21709ed696f1da7c6"
+    },
+    "multiple_prices/GBP.csv": {
+      "bytes": 4187302,
+      "sha256": "f61d177dba02bcef43b3f06143b86e5fecad03e03d202c3c7c6bca4c6edbecd6"
+    },
+    "multiple_prices/GOLD.csv": {
+      "bytes": 3379539,
+      "sha256": "5e02e932c5c17aa7e5807e942866a6a0f6f867c1bdca6698acf3609d05af6bdd"
+    },
+    "multiple_prices/JPY.csv": {
+      "bytes": 3889785,
+      "sha256": "bd93c15eb89d979cb60d0186dbe06619ddb9d94e42ebdac34ff190ef086c9b71"
+    },
+    "multiple_prices/NASDAQ.csv": {
+      "bytes": 3426195,
+      "sha256": "d865b923c091f140a984f61746b4bd59f88bada0c548d4bbfc2be11c2767972c"
+    },
+    "multiple_prices/SILVER.csv": {
+      "bytes": 4823157,
+      "sha256": "28cfb68f999378d35e53291debf0b818b3912cf70056063547e582f9c3731b04"
+    },
+    "multiple_prices/SP500.csv": {
+      "bytes": 2377012,
+      "sha256": "3373bd1e83a6d1297e7e56f543fe2df1397d9bfb67b276a7befbaa5c8b5aa670"
+    },
+    "multiple_prices/US10.csv": {
+      "bytes": 3317999,
+      "sha256": "bfe2cb8e457709261d5e4dc2578d73a8c36f814e4d109db15787a676125391b8"
+    },
+    "multiple_prices/US30.csv": {
+      "bytes": 3600757,
+      "sha256": "5d7bb19ad6381874b9a84304821d1dc4281986de96c058732ea47df1c008554b"
+    },
+    "multiple_prices/US5.csv": {
+      "bytes": 3139356,
+      "sha256": "362700c4d41be008af0ea25da659a3b7a9420c58a2374676db51d76ce23498fd"
+    },
+    "multiple_prices/WHEAT.csv": {
+      "bytes": 2954036,
+      "sha256": "a038800ee43cc86d30c0cf2989225f5190ebd9a2499dd10bca83528703ab912e"
+    }
+  }
+}

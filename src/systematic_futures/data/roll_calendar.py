@@ -1,41 +1,84 @@
-"""Roll calendar: front/next contract schedule from definition expiries.
+"""Roll calendar from raw leg data — the schedule is OBSERVED, not estimated.
 
-Rule (single knob): roll_date(c) = last_trade_date(c) − n_bd business days; on that day
-the front becomes c's expiry successor. Symbol strings are never parsed for logic —
-expiry knowledge comes only from definition data.
+In pysystemtrade's multiple_prices format each day carries the three active legs
+with their contract IDs: PRICE (front, what the position holds), FORWARD (the
+front's expiry successor), CARRY (the prior contract). The calendar is a
+projection of those legs: front flips exactly on observed transitions.
+Contract IDs are structured YYYYMM00 and are never parsed for logic beyond
+monotonicity checks.
 """
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
 CALENDAR_COLUMNS = ["date", "symbol", "front", "next"]
+MP_COLUMNS = [
+    "DATETIME", "CARRY", "CARRY_CONTRACT", "PRICE", "PRICE_CONTRACT",
+    "FORWARD", "FORWARD_CONTRACT",
+]
 
 
-def build_roll_calendar(
-    definitions: pd.DataFrame, n_bd: int = 5, start: str | None = None
-) -> pd.DataFrame:
-    """definitions: [symbol, raw_symbol, expiration, last_trade_date], one row per contract.
+def build_roll_calendar(mp: pd.DataFrame) -> pd.DataFrame:
+    """mp: multiple_prices legs frame (DATETIME + the leg columns), one symbol per frame.
 
-    Returns [date, symbol, front, next] for business days from `start` (default: the
-    first roll date) through the last roll date, keeping only days where a next
-    contract exists — both legs are alive on every calendar day by construction
-    (roll < last trade date < expiration).
+    The schedule is OBSERVED data: each day the position holds PRICE_CONTRACT; FORWARD_CONTRACT
+    is its expiry successor. Intraday snapshots are collapsed to the last priced row per day;
+    holiday rows (contract recorded, price null) and days with no successor are dropped.
+    Returns [date, symbol, front, next] — both legs alive on every calendar day.
     """
     parts = []
-    for sym, grp in definitions.groupby("symbol"):
-        g = grp.sort_values("expiration").reset_index(drop=True)
-        rolls = (g["last_trade_date"] - pd.tseries.offsets.BDay(n_bd)).dt.normalize()
-        if not rolls.is_monotonic_increasing:
-            raise ValueError(f"{sym}: roll dates not strictly increasing")
-        grid = pd.bdate_range(start or rolls.iloc[0], rolls.iloc[-1])
-        idx = np.searchsorted(rolls.to_numpy(), grid.to_numpy(), side="right")
-        keep = idx + 1 < len(g)  # next = front's expiry successor must exist
-        idx, days = idx[keep], grid[keep]
-        symbols = g["raw_symbol"].to_numpy()
-        parts.append(
-            pd.DataFrame({"date": days, "symbol": sym, "front": symbols[idx], "next": symbols[idx + 1]})
+    for sym, grp in mp.groupby("symbol"):
+        g = (
+            grp.sort_values("DATETIME")
+            .dropna(subset=["PRICE_CONTRACT", "PRICE"])
+            .assign(day=lambda d: d["DATETIME"].dt.normalize())
+            .groupby("day", sort=False)
+            .tail(1)
         )
-    return pd.concat(parts, ignore_index=True)[CALENDAR_COLUMNS].sort_values(
-        ["symbol", "date"]
-    ).reset_index(drop=True)
+        front = g["PRICE_CONTRACT"]
+        if not front.is_monotonic_increasing:
+            raise ValueError(f"{sym}: front contracts not non-decreasing over time")
+        keep = g["FORWARD_CONTRACT"].notna()
+        parts.append(
+            pd.DataFrame(
+                {
+                    "date": g.loc[keep, "day"].to_numpy(),
+                    "symbol": sym,
+                    "front": front[keep].astype("int64").to_numpy(),
+                    "next": g.loc[keep, "FORWARD_CONTRACT"].astype("int64").to_numpy(),
+                }
+            )
+        )
+    return (
+        pd.concat(parts, ignore_index=True)[CALENDAR_COLUMNS]
+        .sort_values(["symbol", "date"])
+        .reset_index(drop=True)
+    )
+
+
+def extract_contract_prices(mp: pd.DataFrame) -> pd.DataFrame:
+    """Melt the three legs into a long per-contract close panel
+    [date, raw_symbol, close] (one row per contract-day, latest snapshot wins)."""
+    out = []
+    for price_col, contract_col in (
+        ("PRICE", "PRICE_CONTRACT"),
+        ("FORWARD", "FORWARD_CONTRACT"),
+        ("CARRY", "CARRY_CONTRACT"),
+    ):
+        leg = mp[["DATETIME", price_col, contract_col]].dropna()
+        out.append(
+            pd.DataFrame(
+                {
+                    "date": leg["DATETIME"].dt.normalize(),
+                    "raw_symbol": leg[contract_col].astype("int64"),
+                    "close": leg[price_col].astype(float),
+                }
+            )
+        )
+    return (
+        pd.concat(out)
+        .sort_values("date")
+        .groupby(["date", "raw_symbol"], as_index=False)
+        .last()
+        .reset_index(drop=True)
+    )

@@ -1,21 +1,23 @@
-from systematic_futures.data.venues import DROPPED, UNIVERSE, dataset_for
+import pytest
+
+from systematic_futures.data.venues import DROPPED, INSTRUMENTS, instrument_for
 
 
 def test_universe_complete():
-    assert len(UNIVERSE) == 17
+    assert len(INSTRUMENTS) == 16
 
 
-def test_softs_dropped_with_reason():
-    assert set(DROPPED) == {"KC", "SB", "CC"}
-    assert all("no free ICE EOD" in why for why in DROPPED.values())
+def test_dropped_roots_recorded():
+    assert set(DROPPED) == {"KC", "SB", "CC", "BZ"}
+    assert all("no free feed" in why or "develop window" in why for why in DROPPED.values())
 
 
-def test_dataset_lookup_hard_fails_on_unknown():
-    assert dataset_for("ES") == "CME-FREE-EOD"
-    for symbol in ("XX", "KC"):  # unknown AND dropped softs hard-fail
-        try:
-            dataset_for(symbol)
-        except KeyError:
-            pass
-        else:
-            raise AssertionError(f"{symbol} must hard-fail")
+def test_instrument_mapping():
+    assert instrument_for("ES") == "SP500"
+    assert instrument_for("6B") == "GBP"
+
+
+def test_lookup_hard_fails():
+    for root in ("XX", "KC", "BZ"):  # unknown AND dropped roots hard-fail
+        with pytest.raises(KeyError):
+            instrument_for(root)

@@ -1,53 +1,64 @@
 import pandas as pd
 
 from systematic_futures.data.query import (
+    CONTINUOUS_COVERAGE_QUERY,
     COVERAGE_QUERY,
-    OI_SUMMARY_QUERY,
     ROLL_COUNTS_QUERY,
     query,
 )
 
+MP_COLUMNS = [
+    "DATETIME", "CARRY", "CARRY_CONTRACT", "PRICE", "PRICE_CONTRACT",
+    "FORWARD", "FORWARD_CONTRACT",
+]
+
+
+def mp_row(day, front_id, front_px):
+    return {
+        "DATETIME": f"{day:%Y-%m-%d %H:%M:%S}",
+        "CARRY": front_px - 1, "CARRY_CONTRACT": front_id - 100,
+        "PRICE": front_px, "PRICE_CONTRACT": front_id,
+        "FORWARD": front_px + 2, "FORWARD_CONTRACT": front_id + 100,
+    }
+
 
 def build_store(tmp_path):
     dates = pd.bdate_range("2020-01-01", periods=5)
-    ohl = pd.DataFrame(
-        {"date": dates, "raw_symbol": "ESH0", "open": 1.0, "high": 1.0, "low": 1.0,
-         "close": 1.0, "volume": 1}
+    mp = pd.DataFrame(
+        [mp_row(d, 20200100, 100.0) for d in dates[:4]]
+        + [mp_row(d, 20200200, 101.0) for d in dates[4:]]  # front rolls on the last day
     )
-    (tmp_path / "raw" / "glbx" / "ohlcv-1d").mkdir(parents=True)
-    ohl.to_parquet(tmp_path / "raw" / "glbx" / "ohlcv-1d" / "ES.parquet")
-    (tmp_path / "raw" / "iceus" / "ohlcv-1d").mkdir(parents=True)
-    ohl.to_parquet(tmp_path / "raw" / "iceus" / "ohlcv-1d" / "KC.parquet")
-    (tmp_path / "raw" / "glbx" / "statistics").mkdir(parents=True)
+    mp["symbol"] = "ES"
+    mp = mp[MP_COLUMNS + ["symbol"]]
+    (tmp_path / "raw" / "multiple_prices").mkdir(parents=True)
+    mp.to_csv(tmp_path / "raw" / "multiple_prices" / "SP500.csv", index=False)
+    (tmp_path / "raw" / "roll_calendars").mkdir(parents=True)
     pd.DataFrame(
-        {"date": dates, "raw_symbol": "ESH0", "open_interest": [10, 11, 12, 13, 14]}
-    ).to_parquet(tmp_path / "raw" / "glbx" / "statistics" / "ES.parquet")
-    (tmp_path / "raw" / "glbx" / "definition").mkdir(parents=True)
-    pd.DataFrame(
-        {"raw_symbol": ["ESH0"], "expiration": [dates[0]], "last_trade_date": [dates[0]]}
-    ).to_parquet(tmp_path / "raw" / "glbx" / "definition" / "ES.parquet")
+        {"contract": [20200100, 20200200], "roll_date": [str(dates[4].date()), ""]}
+    ).to_csv(tmp_path / "raw" / "roll_calendars" / "SP500_rollcalendar.csv", index=False)
     (tmp_path / "derived").mkdir()
     pd.DataFrame(
         {"date": dates, "symbol": "ES",
-         "front": ["ESH0"] * 4 + ["ESH1"], "next": ["ESH1"] * 4 + ["ESH2"]}
+         "front": [20200100] * 4 + [20200200], "next": [20200200] * 4 + [20200300]}
     ).to_parquet(tmp_path / "derived" / "roll_calendar.parquet")
     (tmp_path / "derived" / "continuous").mkdir()
     pd.DataFrame(
-        {"date": dates, "symbol": "ES", "contract": "ESH0", "open": 1.0, "high": 1.0,
-         "low": 1.0, "close": 1.0, "volume": 1}
-    ).to_parquet(tmp_path / "derived" / "continuous" / "ES.parquet")
+        {"date": dates, "symbol": "ES", "contract": 20200100, "close": 1.0}
+    ).to_parquet(tmp_path / "derived" / "continuous" / "SP500.parquet")
     (tmp_path / "derived" / "basis").mkdir()
     pd.DataFrame(
-        {"date": dates, "symbol": "ES", "front_close": 1.0, "next_close": 2.0, "basis": 1.0}
-    ).to_parquet(tmp_path / "derived" / "basis" / "ES.parquet")
+        {"date": dates, "symbol": "ES", "front_close": 100.0, "next_close": 102.0, "basis": 0.02}
+    ).to_parquet(tmp_path / "derived" / "basis" / "SP500.parquet")
     return tmp_path
 
 
-def test_coverage_per_root_and_year(tmp_path):
+def test_coverage_per_instrument(tmp_path):
     store = build_store(tmp_path)
     df = query(store, COVERAGE_QUERY)
-    assert set(df["root"]) == {"ES", "KC"}
-    assert (df["rows"] == 5).all()
+    assert df.loc[0, "instrument"] == "SP500"
+    assert df.loc[0, "rows"] == 5
+    assert str(df.loc[0, "first_date"])[:10] == "2020-01-01"
+    assert str(df.loc[0, "last_date"])[:10] == "2020-01-07"
 
 
 def test_roll_counts(tmp_path):
@@ -56,8 +67,8 @@ def test_roll_counts(tmp_path):
     assert df.set_index("symbol").at["ES", "rolls"] == 1
 
 
-def test_oi_summary(tmp_path):
+def test_continuous_coverage(tmp_path):
     store = build_store(tmp_path)
-    df = query(store, OI_SUMMARY_QUERY)
-    assert df.loc[0, "root"] == "ES"
-    assert df.loc[0, "mean_oi"] == 12.0
+    df = query(store, CONTINUOUS_COVERAGE_QUERY)
+    assert df.loc[0, "year"] == 2020
+    assert df.loc[0, "rows"] == 5
