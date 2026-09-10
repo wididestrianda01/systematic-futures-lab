@@ -1,4 +1,5 @@
 """DuckDB query layer over the on-disk store (raw snapshot CSVs + derived Parquet)."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -50,8 +51,7 @@ def register_views(con: duckdb.DuckDBPyConnection, data_dir: Path | str) -> None
         path = str(Path(data_dir) / rel).replace("'", "''")
         read = "read_csv" if rel.endswith(".csv") else "read_parquet"
         con.execute(
-            f"create or replace view {name} as "
-            f"select * from {read}('{path}', filename=true)"
+            f"create or replace view {name} as select * from {read}('{path}', filename=true)"
         )
 
 

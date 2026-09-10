@@ -11,9 +11,12 @@ def hand_mp():
     return pd.DataFrame(
         {
             "DATETIME": [ts],
-            "CARRY": [99.0], "CARRY_CONTRACT": [20231200],
-            "PRICE": [100.0], "PRICE_CONTRACT": [20240100],
-            "FORWARD": [102.0], "FORWARD_CONTRACT": [20240200],
+            "CARRY": [99.0],
+            "CARRY_CONTRACT": [20231200],
+            "PRICE": [100.0],
+            "PRICE_CONTRACT": [20240100],
+            "FORWARD": [102.0],
+            "FORWARD_CONTRACT": [20240200],
             "symbol": "X",
         }
     )
@@ -34,7 +37,9 @@ def test_missing_leg_excluded():
     gap["DATETIME"] = pd.Timestamp("2024-01-03 23:00")
     gap["FORWARD"] = np.nan  # next leg missing that day
     gap["FORWARD_CONTRACT"] = np.nan
-    basis = compute_basis(extract_contract_prices(pd.concat([mp, gap])), build_roll_calendar(pd.concat([mp, gap])))
+    basis = compute_basis(
+        extract_contract_prices(pd.concat([mp, gap])), build_roll_calendar(pd.concat([mp, gap]))
+    )
     assert len(basis) == 1  # the gap day is excluded, never zero-filled
     assert basis["basis"].notna().all()
 

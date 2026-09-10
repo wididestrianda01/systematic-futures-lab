@@ -34,7 +34,9 @@ def test_front_transitions_match_generator_rule():
 
 
 def test_non_monotonic_front_raises():
-    mp = make_synthetic_multiple_prices(("A",), start="2020-01-01", end="2020-03-31", intraday=False)
+    mp = make_synthetic_multiple_prices(
+        ("A",), start="2020-01-01", end="2020-03-31", intraday=False
+    )
     bad = mp.iloc[:-20].copy()
     bad.loc[bad.index[-1], "PRICE_CONTRACT"] = 20190100  # front jumps backwards
     with pytest.raises(ValueError, match="non-decreasing"):
@@ -42,7 +44,9 @@ def test_non_monotonic_front_raises():
 
 
 def test_legacy_null_front_row_dropped():
-    mp = make_synthetic_multiple_prices(("A",), start="2020-01-01", end="2020-02-29", intraday=False)
+    mp = make_synthetic_multiple_prices(
+        ("A",), start="2020-01-01", end="2020-02-29", intraday=False
+    )
     assert mp["PRICE_CONTRACT"].isna().sum() == 1  # the legacy leading row exists
     cal = build_roll_calendar(mp)
     assert cal["date"].min() == pd.Timestamp("2020-01-01")

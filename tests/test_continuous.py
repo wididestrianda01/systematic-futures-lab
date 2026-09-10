@@ -25,7 +25,8 @@ def naive_returns(raw, cal):
     """Unadjusted stitch: pct_change of whatever contract the calendar holds that day."""
     held = cal.merge(
         raw[["date", "raw_symbol", "close"]],
-        left_on=["date", "front"], right_on=["date", "raw_symbol"],
+        left_on=["date", "front"],
+        right_on=["date", "raw_symbol"],
     ).sort_values("date")
     return held["close"].pct_change().iloc[1:].reset_index(drop=True), held
 

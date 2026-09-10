@@ -7,14 +7,20 @@ projection of those legs: front flips exactly on observed transitions.
 Contract IDs are structured YYYYMM00 and are never parsed for logic beyond
 monotonicity checks.
 """
+
 from __future__ import annotations
 
 import pandas as pd
 
 CALENDAR_COLUMNS = ["date", "symbol", "front", "next"]
 MP_COLUMNS = [
-    "DATETIME", "CARRY", "CARRY_CONTRACT", "PRICE", "PRICE_CONTRACT",
-    "FORWARD", "FORWARD_CONTRACT",
+    "DATETIME",
+    "CARRY",
+    "CARRY_CONTRACT",
+    "PRICE",
+    "PRICE_CONTRACT",
+    "FORWARD",
+    "FORWARD_CONTRACT",
 ]
 
 

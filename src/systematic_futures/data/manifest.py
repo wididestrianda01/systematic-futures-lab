@@ -69,8 +69,10 @@ def verify_manifest(data_dir: Path, manifest_path: Path | None = None) -> None:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     if len(argv) != 2 or argv[0] not in {"write", "verify"}:
-        print("usage: python -m systematic_futures.data.manifest {write|verify} DATA_DIR",
-              file=sys.stderr)
+        print(
+            "usage: python -m systematic_futures.data.manifest {write|verify} DATA_DIR",
+            file=sys.stderr,
+        )
         return 2
     data_dir = Path(argv[1])
     if argv[0] == "write":

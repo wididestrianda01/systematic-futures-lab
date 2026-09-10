@@ -8,17 +8,25 @@ from systematic_futures.data.query import (
 )
 
 MP_COLUMNS = [
-    "DATETIME", "CARRY", "CARRY_CONTRACT", "PRICE", "PRICE_CONTRACT",
-    "FORWARD", "FORWARD_CONTRACT",
+    "DATETIME",
+    "CARRY",
+    "CARRY_CONTRACT",
+    "PRICE",
+    "PRICE_CONTRACT",
+    "FORWARD",
+    "FORWARD_CONTRACT",
 ]
 
 
 def mp_row(day, front_id, front_px):
     return {
         "DATETIME": f"{day:%Y-%m-%d %H:%M:%S}",
-        "CARRY": front_px - 1, "CARRY_CONTRACT": front_id - 100,
-        "PRICE": front_px, "PRICE_CONTRACT": front_id,
-        "FORWARD": front_px + 2, "FORWARD_CONTRACT": front_id + 100,
+        "CARRY": front_px - 1,
+        "CARRY_CONTRACT": front_id - 100,
+        "PRICE": front_px,
+        "PRICE_CONTRACT": front_id,
+        "FORWARD": front_px + 2,
+        "FORWARD_CONTRACT": front_id + 100,
     }
 
 
@@ -38,13 +46,17 @@ def build_store(tmp_path):
     ).to_csv(tmp_path / "raw" / "roll_calendars" / "SP500_rollcalendar.csv", index=False)
     (tmp_path / "derived").mkdir()
     pd.DataFrame(
-        {"date": dates, "symbol": "ES",
-         "front": [20200100] * 4 + [20200200], "next": [20200200] * 4 + [20200300]}
+        {
+            "date": dates,
+            "symbol": "ES",
+            "front": [20200100] * 4 + [20200200],
+            "next": [20200200] * 4 + [20200300],
+        }
     ).to_parquet(tmp_path / "derived" / "roll_calendar.parquet")
     (tmp_path / "derived" / "continuous").mkdir()
-    pd.DataFrame(
-        {"date": dates, "symbol": "ES", "contract": 20200100, "close": 1.0}
-    ).to_parquet(tmp_path / "derived" / "continuous" / "SP500.parquet")
+    pd.DataFrame({"date": dates, "symbol": "ES", "contract": 20200100, "close": 1.0}).to_parquet(
+        tmp_path / "derived" / "continuous" / "SP500.parquet"
+    )
     (tmp_path / "derived" / "basis").mkdir()
     pd.DataFrame(
         {"date": dates, "symbol": "ES", "front_close": 100.0, "next_close": 102.0, "basis": 0.02}

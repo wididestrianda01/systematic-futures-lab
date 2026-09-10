@@ -8,6 +8,7 @@ cumulative product of later f's (rolls processed newest→oldest), so the contin
 series' daily return equals the held contract's return through every roll — no
 phantom roll gaps, no look-ahead (factors use data up to r−1 only).
 """
+
 from __future__ import annotations
 
 import pandas as pd
