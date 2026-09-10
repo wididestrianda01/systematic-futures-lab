@@ -13,8 +13,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "plotly<6",
     "pytest>=8.0",
     "ruff>=0.6",
+    "vectorbt>=1.1.0",
 ]
 
 [build-system]

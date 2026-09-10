@@ -1,13 +1,21 @@
 """Synthetic fixtures — deterministic, seeded; never real market data."""
+
 from __future__ import annotations
+
+import zlib
 
 import numpy as np
 import pandas as pd
 
 OHLCV_COLUMNS = ["date", "symbol", "open", "high", "low", "close", "volume"]
 MP_COLUMNS = [
-    "DATETIME", "CARRY", "CARRY_CONTRACT", "PRICE", "PRICE_CONTRACT",
-    "FORWARD", "FORWARD_CONTRACT",
+    "DATETIME",
+    "CARRY",
+    "CARRY_CONTRACT",
+    "PRICE",
+    "PRICE_CONTRACT",
+    "FORWARD",
+    "FORWARD_CONTRACT",
 ]
 
 
@@ -69,15 +77,18 @@ def make_synthetic_multiple_prices(
     first_month = pd.Period(start, freq="M") - 1
     rows = []
     for sym in symbols:
-        rng = np.random.default_rng(seed + abs(hash(sym)) % 1000)
+        rng = np.random.default_rng(seed + zlib.crc32(sym.encode()) % 1000)
         level = 100.0 * np.exp(np.cumsum(rng.normal(0.0002, 0.01, size=len(days))))
         # leading legacy row: carry contract only, no front (like upstream's 1982 rows)
         rows.append(
             {
                 "DATETIME": days[0] - pd.Timedelta(days=1) + pd.Timedelta(hours=23),
-                "CARRY": None, "CARRY_CONTRACT": first_month.year * 10000 + first_month.month * 100,
-                "PRICE": None, "PRICE_CONTRACT": None,
-                "FORWARD": None, "FORWARD_CONTRACT": None,
+                "CARRY": None,
+                "CARRY_CONTRACT": first_month.year * 10000 + first_month.month * 100,
+                "PRICE": None,
+                "PRICE_CONTRACT": None,
+                "FORWARD": None,
+                "FORWARD_CONTRACT": None,
                 "symbol": sym,
             }
         )
@@ -95,13 +106,16 @@ def make_synthetic_multiple_prices(
                 c_period = pd.Period(year=cid // 10000, month=(cid // 100) % 100, freq="M")
                 mte = max((c_period.end_time - d).days / 30.44, 0.0)
                 prices[leg_name] = round(float(lv) * (1 + premium * mte), 4)
-            for hours in ((20,) if not intraday else (20, 23)):
+            for hours in (20,) if not intraday else (20, 23):
                 rows.append(
                     {
                         "DATETIME": d + pd.Timedelta(hours=int(hours)),
-                        "CARRY": prices["CARRY"], "CARRY_CONTRACT": ids["CARRY"],
-                        "PRICE": prices["PRICE"], "PRICE_CONTRACT": ids["PRICE"],
-                        "FORWARD": prices["FORWARD"], "FORWARD_CONTRACT": ids["FORWARD"],
+                        "CARRY": prices["CARRY"],
+                        "CARRY_CONTRACT": ids["CARRY"],
+                        "PRICE": prices["PRICE"],
+                        "PRICE_CONTRACT": ids["PRICE"],
+                        "FORWARD": prices["FORWARD"],
+                        "FORWARD_CONTRACT": ids["FORWARD"],
                         "symbol": sym,
                     }
                 )
