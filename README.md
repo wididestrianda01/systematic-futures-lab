@@ -6,9 +6,10 @@ six classic futures method families and two LightGBM variants compared on real C
 supported by an executable walkthrough, per-method governance docs, a condensed report and an
 interview brief.
 
-**Status:** complete — Phases 0–5 built, results committed, tagged `results.2` (the review-pass
-revision; `results.1` is the preceding one, whose tables carry the summed-across-sleeves turnover
-column). Market data never enters this repository: only derived artifacts (code, configs, checksums,
+**Status:** complete — Phases 0–5 built, results committed, tagged `replication.1` (the revision
+that adds the external replication; `results.2` is the review-pass revision it builds on, and
+`results.1` the one before that, whose tables carry the summed-across-sleeves turnover column).
+Market data never enters this repository: only derived artifacts (code, configs, checksums,
 signals, statistics) are committed.
 
 ## What it is for
@@ -157,7 +158,7 @@ only. The dataset is fetched from the pinned upstream commit and verified agains
 manifest; re-runs without network work off the frozen local store.
 
 ```bash
-git checkout results.2
+git checkout replication.1
 uv sync
 uv run python scripts/fetch_raw.py        # writes data/raw/, manifest-gated
 uv run python scripts/build_derived.py    # writes data/derived/, manifest-verified
