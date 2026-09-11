@@ -21,8 +21,13 @@ BASE = f"https://raw.githubusercontent.com/robcarver17/pysystemtrade/{SNAPSHOT_S
 DATA_DIR = Path("data/raw")
 MANIFESTS = Path("manifests")
 MP_COLUMNS = [
-    "DATETIME", "CARRY", "CARRY_CONTRACT", "PRICE", "PRICE_CONTRACT",
-    "FORWARD", "FORWARD_CONTRACT",
+    "DATETIME",
+    "CARRY",
+    "CARRY_CONTRACT",
+    "PRICE",
+    "PRICE_CONTRACT",
+    "FORWARD",
+    "FORWARD_CONTRACT",
 ]
 
 

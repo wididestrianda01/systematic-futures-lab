@@ -7,3 +7,4 @@ docs/agents/
 .ruff_cache/
 __pycache__/
 /data/
+CONTEXT.md
