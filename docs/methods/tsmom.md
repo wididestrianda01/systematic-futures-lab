@@ -36,6 +36,27 @@ book, which M2 names as the performance driver; and the cost-to-gross ratio, whi
 family's sign. Any change to the horizon set, the vol scalar, the overlay parameters or the universe
 is a material change under RTS 6 framing and requires a re-run, not an adjustment.
 
+**External check — the source's own construction, on free data.** `results/replication/` runs M1's
+Eq. (5) verbatim (EWMA volatility with a 60-day centre of mass scaled by 261, sign of the trailing
+twelve months, 40% volatility per instrument, monthly rebalance) on the 52 instruments the free
+snapshot can supply from M1's Table 1, and `results/replication/FINDINGS.md` carries the numbers.
+Three of them matter here:
+
+- The paper's risk and Sharpe claims reproduce on free data: the diversified factor comes out at
+  13.7% annualised volatility and gross Sharpe 1.20 over 1985–2009, against the paper's stated 12%
+  and "greater than one".
+- The 2010–2016 sub-window — the regime this family's out-of-sample read sits inside — comes out at
+  0.58 gross / 0.56 net, bracketing the 0.41 *net* figure Hurst, Ooi & Pedersen publish for the same
+  regime. This family's weak OOT numbers are therefore the published regime and the cost model, not
+  an implementation failure.
+- **The published levels are construction-specific, and this repo's construction is a different one.**
+  M1 chains the most liquid contract's daily return, so the price gap at each roll enters its series;
+  this repo's ratio back-adjustment makes the return the held contract's own, roll days included.
+  On the commodity class the difference is worth a factor of 2.6 in the mean monthly return (0.500%/mo
+  under the paper's splice, 1.317%/mo under the roll-adjusted one, published 0.59%/mo). Quoting M1's
+  numbers as a level for this lab's series therefore compares two different objects; they are a
+  regime and Sharpe reference, not a level target.
+
 **Open questions.** The 2010–2019 weakness is the family's most interesting number and it is a
 reading, owed to the memo (M1/M2, plus S5 for crash framing once read). The suite of sleeves was
 adopted at ticket authoring, before these numbers, and is not re-tuned here.

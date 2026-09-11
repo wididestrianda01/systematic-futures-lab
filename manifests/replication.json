@@ -1,0 +1,888 @@
+{
+  "files": {
+    "multiple_prices/AEX.csv": {
+      "bytes": 4994948,
+      "date_range": [
+        "2009-08-18",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "b1a4e8ae07aa5e23ca8f421ac644a42e9da221f546bf568272feffcf5423fd0c"
+    },
+    "multiple_prices/ALUMINIUM_LME.csv": {
+      "bytes": 153738,
+      "date_range": [
+        "2023-06-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "a985bf57d488c6b12d1087fb075a34e88b9f191600c711d3f3dfd7d11f797c99"
+    },
+    "multiple_prices/AUD.csv": {
+      "bytes": 3213669,
+      "date_range": [
+        "1987-06-16",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "56a8f1efdeab622890c8685e23d2ad64079110735884ab75edc4cf042dc5440d"
+    },
+    "multiple_prices/BOBL.csv": {
+      "bytes": 7880060,
+      "date_range": [
+        "2008-03-05",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "08e6bbc06ae666f7b6a4d998a66a55434608bb2dab0d18514ec00da2e548b057"
+    },
+    "multiple_prices/BRENT_W.csv": {
+      "bytes": 4210451,
+      "date_range": [
+        "1989-08-11",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "40725d00c7074ebac6a1249acd179238b78c492b3bc82c3f78c854cc97061cb7"
+    },
+    "multiple_prices/BUND.csv": {
+      "bytes": 10894103,
+      "date_range": [
+        "2006-12-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "73814080f7f3558398ab979bf09550c2a6f67a134ee030b31594e451e552cc25"
+    },
+    "multiple_prices/BUXL.csv": {
+      "bytes": 909119,
+      "date_range": [
+        "2015-12-03",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "76f262d782e07899c3e9bb3d5aa8a1260144131387ffb42c42fd89b265a90488"
+    },
+    "multiple_prices/CAC.csv": {
+      "bytes": 7976087,
+      "date_range": [
+        "2009-04-16",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "9c423b2f8c645d992f60a2ce2145d676452ddda937ad0554814004248328fbad"
+    },
+    "multiple_prices/CAD.csv": {
+      "bytes": 5545555,
+      "date_range": [
+        "1972-09-14",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "27162d51813c0538054de3a9f474cb4d90afc6c5a4c80b14f655419c085dc030"
+    },
+    "multiple_prices/CAD10.csv": {
+      "bytes": 2272783,
+      "date_range": [
+        "1993-05-21",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "acafc5c1784e8871bc1f05c1bcd26f3ce2084c024155434de9d23eb15bed6241"
+    },
+    "multiple_prices/CHF.csv": {
+      "bytes": 5324936,
+      "date_range": [
+        "1972-09-14",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "7361c5d0e61a439000c0761058ec4b9048cd9c9ea35fa1ffa191ceabc25ae92a"
+    },
+    "multiple_prices/COCOA.csv": {
+      "bytes": 2657750,
+      "date_range": [
+        "1970-03-25",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "d21d949f2b97291ffa9a4ecf0b584db095cb823cc4a0a510f24f936e42b4577a"
+    },
+    "multiple_prices/COFFEE.csv": {
+      "bytes": 458053,
+      "date_range": [
+        "2007-02-20",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "3252a6b89fc32187ac1a427cd7ba99f7c65d64e3e8e5a03ca58aca9f6ff40264"
+    },
+    "multiple_prices/COPPER.csv": {
+      "bytes": 3385082,
+      "date_range": [
+        "1995-09-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "8c31c285cb11f85d08097398c3babe5a87ec555c0cbebf7b1cce9456ed71a2fb"
+    },
+    "multiple_prices/CORN.csv": {
+      "bytes": 2345568,
+      "date_range": [
+        "1972-10-18",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "47183abccaa9e260e2c934acab3819ee0d4edcaf3fa7fc0c4a96abd933452e1c"
+    },
+    "multiple_prices/COTTON2.csv": {
+      "bytes": 3823878,
+      "date_range": [
+        "1970-03-10",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "7dc0fdb5b433100c94fd722fa192e67c745bf0d781afe37096e6306e49eca457"
+    },
+    "multiple_prices/CRUDE_W.csv": {
+      "bytes": 2814629,
+      "date_range": [
+        "1990-10-16",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "64a8c9f46998830eb242695d9d519f2547d20820d222b2c127ebd71f213958d1"
+    },
+    "multiple_prices/DAX.csv": {
+      "bytes": 3538051,
+      "date_range": [
+        "2000-03-13",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "9151d24bf5886eecb3934e6ecc5865ebfb6bc85650f5dd9012b702d059d22acf"
+    },
+    "multiple_prices/EUR.csv": {
+      "bytes": 2880703,
+      "date_range": [
+        "1999-06-15",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "eca74f7e539041b99311c8e407a451ccda28930a59c6ae8576866114becdf520"
+    },
+    "multiple_prices/FTSE100.csv": {
+      "bytes": 3157453,
+      "date_range": [
+        "1984-05-21",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "803befd82f0eaa7fe38b374c3565656a1193001a0d484786ab9739f8fb2bba16"
+    },
+    "multiple_prices/GASOIL.csv": {
+      "bytes": 4452165,
+      "date_range": [
+        "1986-06-16",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "2d3d948de328aeb2ca56691e8ec97e8e21c9cb684b87fa6d7df1e520deb2a043"
+    },
+    "multiple_prices/GASOILINE.csv": {
+      "bytes": 5345082,
+      "date_range": [
+        "1985-01-15",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "f318010f57b22d38e482b3ca03f0232c7b2a4b0a7a188086fe6e0ebc8b04397a"
+    },
+    "multiple_prices/GAS_US.csv": {
+      "bytes": 3847511,
+      "date_range": [
+        "1990-07-26",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "8d1b2ad71db68931ace326244f3527ea893a63876e4c3eb21709ed696f1da7c6"
+    },
+    "multiple_prices/GBP.csv": {
+      "bytes": 4187302,
+      "date_range": [
+        "1975-12-16",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "f61d177dba02bcef43b3f06143b86e5fecad03e03d202c3c7c6bca4c6edbecd6"
+    },
+    "multiple_prices/GILT.csv": {
+      "bytes": 2476667,
+      "date_range": [
+        "1983-03-25",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "849f279faab9f7be8f8ae00e10bb6354e76d76b2ce37eda5626fb2ed77def1e1"
+    },
+    "multiple_prices/GOLD.csv": {
+      "bytes": 3379539,
+      "date_range": [
+        "1975-04-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "5e02e932c5c17aa7e5807e942866a6a0f6f867c1bdca6698acf3609d05af6bdd"
+    },
+    "multiple_prices/HEATOIL.csv": {
+      "bytes": 4099881,
+      "date_range": [
+        "1980-02-19",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "7ec8e0d1a69927e58a990f9f05f4e1f07ea53dd6a28b70a5bc7b844888e414da"
+    },
+    "multiple_prices/IBEX.csv": {
+      "bytes": 682938,
+      "date_range": [
+        "1992-10-07",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "43c496da38b4fa4cc8f56239f2484939e8a5e59f907a56d9514d8cac274c5737"
+    },
+    "multiple_prices/JGB.csv": {
+      "bytes": 1250986,
+      "date_range": [
+        "2001-12-04",
+        "2024-03-29"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "2f12c32c5430ea740b56ab8379a57682626c3fb2f1a5ed05337d584a9548e9da"
+    },
+    "multiple_prices/JPY.csv": {
+      "bytes": 3889785,
+      "date_range": [
+        "1977-06-14",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "bd93c15eb89d979cb60d0186dbe06619ddb9d94e42ebdac34ff190ef086c9b71"
+    },
+    "multiple_prices/LEANHOG.csv": {
+      "bytes": 1976900,
+      "date_range": [
+        "1974-07-22",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "3e352e00b054bb5135121463be52680c12f5d6c39c106359c2fcd716ac0dd4d8"
+    },
+    "multiple_prices/LIVECOW.csv": {
+      "bytes": 2511852,
+      "date_range": [
+        "1971-10-21",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "6ce89008d010338e9779e6c31d83de150669284903ca4671edd3a49cc016151a"
+    },
+    "multiple_prices/MIB.csv": {
+      "bytes": 198393,
+      "date_range": [
+        "2022-09-19",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "313af27e34c3657b29dd176719929c27ebb875c62e10ee77013da54725103c69"
+    },
+    "multiple_prices/NICKEL_LME.csv": {
+      "bytes": 47230,
+      "date_range": [
+        "2023-06-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "0d7e32add633cef9357e7d06c6eaaa30ffcf71914727f4c0a32115f955089d9f"
+    },
+    "multiple_prices/NOK.csv": {
+      "bytes": 1611142,
+      "date_range": [
+        "2002-06-14",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "1ea6ae8057ec8657ca9ceb505d9ac048cd7d021526460160153240ca4ed9b2ce"
+    },
+    "multiple_prices/NZD.csv": {
+      "bytes": 3222668,
+      "date_range": [
+        "2003-03-11",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "ae9ccf53f34820abaae6b76d157cffaec34ade3e2046a2e170cb553a0645e830"
+    },
+    "multiple_prices/SEK.csv": {
+      "bytes": 2251892,
+      "date_range": [
+        "2002-06-14",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "7b79484347bdaefc842717a8ef2c284565a8beb1f6688a4998d7d98a1f3238f2"
+    },
+    "multiple_prices/SHATZ.csv": {
+      "bytes": 3130464,
+      "date_range": [
+        "2007-12-05",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "efee23bd0e42840df3ddf55219d71542af1f375f5ac4039ba5043cd95f90ed84"
+    },
+    "multiple_prices/SILVER.csv": {
+      "bytes": 4823157,
+      "date_range": [
+        "1970-06-15",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "28cfb68f999378d35e53291debf0b818b3912cf70056063547e582f9c3731b04"
+    },
+    "multiple_prices/SOYBEAN.csv": {
+      "bytes": 2236196,
+      "date_range": [
+        "1985-09-20",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "911a09de70eca193a756bf88a12eca98eb195a248f3007ade5573c029f0b1bf4"
+    },
+    "multiple_prices/SOYMEAL.csv": {
+      "bytes": 4059543,
+      "date_range": [
+        "1970-05-05",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "00486aea8d0bf7253f70e249c039ba9d590d3f647009d95dcb7f39619aa3f218"
+    },
+    "multiple_prices/SOYOIL.csv": {
+      "bytes": 3854444,
+      "date_range": [
+        "1970-02-03",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "ee1f0aaa9289764be5ece8e1a0261aa25a7ae269d2cd66d14deb69a3544714a6"
+    },
+    "multiple_prices/SP500.csv": {
+      "bytes": 2377012,
+      "date_range": [
+        "1982-09-14",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "3373bd1e83a6d1297e7e56f543fe2df1397d9bfb67b276a7befbaa5c8b5aa670"
+    },
+    "multiple_prices/SPI200.csv": {
+      "bytes": 321716,
+      "date_range": [
+        "2022-08-22",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "3993615797b92c81189caf9a66154b1e2de657baf5ad223343555a82aa6c55e4"
+    },
+    "multiple_prices/SUGAR11.csv": {
+      "bytes": 2653048,
+      "date_range": [
+        "1970-02-16",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "a6d626bd104d15b782a0cc9a0b5ecd7467e3068cae0e9a36970e6abdab429258"
+    },
+    "multiple_prices/TOPIX.csv": {
+      "bytes": 1153119,
+      "date_range": [
+        "2010-03-11",
+        "2024-03-29"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "f14de280b37097bf2e2de9998146b36ad7296c5f202ae29f77b41d8e928c34d1"
+    },
+    "multiple_prices/US10.csv": {
+      "bytes": 3317999,
+      "date_range": [
+        "1982-08-30",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "bfe2cb8e457709261d5e4dc2578d73a8c36f814e4d109db15787a676125391b8"
+    },
+    "multiple_prices/US2.csv": {
+      "bytes": 2298938,
+      "date_range": [
+        "2000-03-02",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "a0ad3b69e0afe568236f553f700b8474b364ec537a087b45244e3f6d87f1c303"
+    },
+    "multiple_prices/US30.csv": {
+      "bytes": 3600757,
+      "date_range": [
+        "2010-03-03",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "5d7bb19ad6381874b9a84304821d1dc4281986de96c058732ea47df1c008554b"
+    },
+    "multiple_prices/US5.csv": {
+      "bytes": 3139356,
+      "date_range": [
+        "1989-05-31",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "362700c4d41be008af0ea25da659a3b7a9420c58a2374676db51d76ce23498fd"
+    },
+    "multiple_prices/WHEAT.csv": {
+      "bytes": 2954036,
+      "date_range": [
+        "1973-12-19",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "a038800ee43cc86d30c0cf2989225f5190ebd9a2499dd10bca83528703ab912e"
+    },
+    "multiple_prices/ZINC_LME.csv": {
+      "bytes": 104534,
+      "date_range": [
+        "2023-06-01",
+        "2024-03-28"
+      ],
+      "schema": {
+        "CARRY": "float64",
+        "CARRY_CONTRACT": "int64",
+        "DATETIME": "str",
+        "FORWARD": "float64",
+        "FORWARD_CONTRACT": "int64",
+        "PRICE": "float64",
+        "PRICE_CONTRACT": "int64"
+      },
+      "sha256": "7d228fdf9b64bad04abf279a5de22bbcfaced4a0ccb7aa34c835ace5ad9ef273"
+    }
+  }
+}

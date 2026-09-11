@@ -339,6 +339,21 @@ that made the baseline strong in develop+validate (0.41 at 2 bps) was not availa
 
 - **One universe, one protocol, one out-of-sample window.** 16 CME roots, 2010 → 2024Q1, one read.
   The out-of-time reversal is one draw of a regime, not a law.
+- **The external reference is construction-matched, not level-matched.** The paper this benchmark
+  follows (M1) was replicated on the same free snapshot (`results/replication/`, `FINDINGS.md`): its
+  Eq. (5) run verbatim on the 52 instruments the source can supply puts the diversified factor at
+  13.7% annualised volatility and gross Sharpe 1.20 over 1985–2009 — the paper states 12% and
+  "greater than one" — and 0.58 gross / 0.56 net over 2010–2016, against the 0.41 *net* figure the
+  trend literature publishes for that regime. This project's weak out-of-time trend numbers are
+  therefore the published regime and its own cost model, not an implementation failure. What is *not*
+  matched is the level: M1 chains the most liquid contract's daily return, so its series carries the
+  price gap at each roll, while this repo's continuous series is roll-adjusted — on the commodity
+  class that is worth a factor of 2.6 in the mean monthly return (0.500%/mo under the paper's splice,
+  1.317%/mo roll-adjusted, published 0.59%/mo). And the paper's own 58-instrument universe is not
+  rebuildable on free data (no LME metals before 2023, no Bund before 2006, no DAX before 2000, no
+  CAC/AEX before 2009, no euro before 1999), so no like-for-like class level exists at this breadth.
+  Per-instrument volatility is the one quantity that *is* directly comparable, and it lands within
+  ±30% of the paper's table for the twelve instruments whose free history overlaps its sample.
 - **A linear, constant cost model.** 0/5/10 bps sensitivity is a ladder, not a market-impact model;
   no bid/ask, no volume-dependent slippage. Volume exists in the source data but is informational
   only.
