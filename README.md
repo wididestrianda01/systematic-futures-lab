@@ -169,7 +169,8 @@ uv run python scripts/carry_frequency_diagnostic.py  # results/out_of_sample/car
 uv run python scripts/build_report_figures.py        # docs/report/figures/equity.pdf
 uv run pytest                             # 101 tests
 uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb
-(cd docs/report && pdflatex -interaction=nonstopmode report.tex)   # report.pdf
+(cd docs/report && rm -f report.aux report.log report.out && \
+   pdflatex -interaction=nonstopmode report.tex)   # report.pdf, reproducible from a clean build
 ```
 
 The phase scripts write the same tables that are committed. Regeneration is deterministic by

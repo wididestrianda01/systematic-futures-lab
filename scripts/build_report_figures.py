@@ -46,7 +46,8 @@ def main() -> int:
     fig.tight_layout()
 
     out = FIGURES / "equity.pdf"
-    fig.savefig(out)
+    # No embedded creation date: the committed figure must rebuild byte-for-byte.
+    fig.savefig(out, metadata={"CreationDate": None})
     print(f"wrote {out}")
     return 0
 

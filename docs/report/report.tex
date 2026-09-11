@@ -1,4 +1,8 @@
 \documentclass[11pt,a4paper]{article}
+% Reproducible build: no embedded dates and a fixed trailer id, so re-running pdflatex on the same
+% sources yields the same bytes (the committed report.pdf is checked with diff, like the tables).
+\pdfinfoomitdate=1
+\pdftrailerid{}
 \usepackage[margin=2.4cm]{geometry}
 \usepackage{booktabs}
 \usepackage{graphicx}
