@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 from conftest import continuous_wide
 
-from systematic_futures.engine import account, run
+from systematic_futures.engine import account, curve, run
 from systematic_futures.engine.metrics import ANN, max_drawdown, sharpe, sortino
 from systematic_futures.engine.sizing import vol_target_positions
 
@@ -107,7 +107,24 @@ def test_date_mask_evaluates_on_those_days_only():
     full_mask = run(sig, wide, dates=wide.index)
     pd.testing.assert_frame_equal(full_mask, run(sig, wide))
 
-    # --- golden seam outputs -----------------------------------------------------
+
+def test_curve_reads_the_same_accounting_as_run():
+    """The notebook's plot input and the table's Sharpe are one accounting path: the curve at a
+    cost level is exactly the daily return series whose Sharpe `run` reports, masked the same way."""
+    wide = continuous_wide(("ES",), seed=17)
+    sig = constant_long(wide)
+    daily = curve(sig, wide, vol_target=0.10, bps=2.0)
+    assert np.isclose(sharpe(daily), run(sig, wide, vol_target=0.10).loc[2.0, "sharpe"])
+
+    mask = wide.index[-20:]
+    masked = curve(sig, wide, vol_target=0.10, bps=2.0, dates=mask)
+    assert np.isclose(
+        sharpe(masked), run(sig, wide, vol_target=0.10, dates=mask).loc[2.0, "sharpe"]
+    )
+    assert masked.index.equals(mask)
+
+
+# --- golden seam outputs -----------------------------------------------------
 
 
 def test_golden_seam_outputs():

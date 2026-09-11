@@ -16,11 +16,13 @@ import pandas as pd
 import pytest
 
 from systematic_futures.data.panels import (
+    VALIDATE_END,
     consecutive_returns,
     develop_validate,
     forward_return,
     held_positions,
     monthly_to_daily,
+    oot_window,
     trailing_mean,
     trailing_return,
     trailing_std,
@@ -130,3 +132,17 @@ def test_develop_validate_bounds_both_ends():
         develop_validate(pd.DataFrame({"X": 1.0}, index=pd.bdate_range("2010-01-04", "2021-12-31")))
     with pytest.raises(ValueError, match="OOT window"):
         develop_validate(pd.DataFrame({"X": 1.0}, index=pd.bdate_range("2005-01-03", "2021-12-31")))
+
+
+def test_oot_window_starts_where_validate_ends():
+    """The single out-of-sample read: no develop+validate date leaks in and the window runs to
+    the frozen panel's own last date — and a panel with no tail past the boundary is an error,
+    not an empty read that would silently report nothing."""
+    panel = pd.DataFrame({"X": 1.0}, index=pd.bdate_range("2005-01-03", "2024-03-28"))
+    window = oot_window(panel)
+    assert window.index.min() > VALIDATE_END
+    assert window.index.max() == panel.index.max()
+    assert len(window) == int((panel.index > VALIDATE_END).sum())
+
+    with pytest.raises(ValueError, match="no OOT window"):
+        oot_window(pd.DataFrame({"X": 1.0}, index=pd.bdate_range("2005-01-03", "2021-12-31")))

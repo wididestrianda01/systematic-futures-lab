@@ -64,6 +64,49 @@ def _signals(method, closes: pd.DataFrame) -> pd.DataFrame:
     return sig
 
 
+def _exposure(
+    method,
+    closes: pd.DataFrame,
+    *,
+    vol_target: float | None,
+    cap: float,
+    vol_lookback: int,
+) -> pd.DataFrame:
+    """Signals in, exposure fractions out — the one place the overlay is applied.
+
+    `vol_target=None` is the raw-signal path (clipped to caps); otherwise the
+    shared annualized-vol overlay sizes every method identically. Private and
+    shared by `run` and `curve`, so a plotted curve and a reported metric cannot
+    come from different exposure arithmetic.
+    """
+    sig = _signals(method, closes)
+    if vol_target is None:
+        return sig.clip(-cap, cap)
+    return vol_target_positions(sig, closes, vol_target, cap, vol_lookback)
+
+
+def curve(
+    method,
+    closes: pd.DataFrame,
+    *,
+    vol_target: float | None = None,
+    cap: float = 1.0,
+    vol_lookback: int = 30,
+    bps: float = 0.0,
+    dates: pd.DatetimeIndex | None = None,
+) -> pd.Series:
+    """Daily portfolio return series at one cost level — the same accounting path as `run`.
+
+    The engine owns the overlay, the held path and the cost charge once, so an
+    equity curve drawn from this cannot disagree with the Sharpe in the table it
+    sits beside. `dates` masks the reported days exactly as `run` does; the
+    exposure behind them is still computed on the full panel.
+    """
+    exposure = _exposure(method, closes, vol_target=vol_target, cap=cap, vol_lookback=vol_lookback)
+    returns = account(exposure, closes, bps).mean(axis=1)
+    return returns.reindex(dates) if dates is not None else returns
+
+
 def run(
     method,
     closes: pd.DataFrame,
@@ -89,11 +132,7 @@ def run(
     The exposure and its trailing windows are still computed on the full panel,
     so the window semantics never change with the mask.
     """
-    sig = _signals(method, closes)
-    if vol_target is None:
-        exposure = sig.clip(-cap, cap)
-    else:
-        exposure = vol_target_positions(sig, closes, vol_target, cap, vol_lookback)
+    exposure = _exposure(method, closes, vol_target=vol_target, cap=cap, vol_lookback=vol_lookback)
     rows = {}
     held = held_positions(exposure, closes)
     traded = traded_notional(held)

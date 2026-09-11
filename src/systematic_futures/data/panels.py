@@ -31,6 +31,7 @@ MANIFEST = Path("manifests/derived.json")
 # The split contract (CONTEXT.md): develop 2010–2019, validate 2020–2021, OOT 2022 → 2024Q1.
 DEVELOP_START = pd.Timestamp("2010-01-01")
 VALIDATE_END = pd.Timestamp("2021-12-31")
+OOT_START = pd.Timestamp("2022-01-01")
 
 
 def to_wide(frame: pd.DataFrame, value: str = "close") -> pd.DataFrame:
@@ -77,6 +78,18 @@ def develop_validate(panel: pd.DataFrame) -> pd.DataFrame:
     if panel.index.max() <= VALIDATE_END:
         raise ValueError(f"panel ends {panel.index.max().date()}, the OOT window must stay intact")
     return panel.loc[DEVELOP_START:VALIDATE_END]
+
+
+def oot_window(panel: pd.DataFrame) -> pd.DataFrame:
+    """Slice a panel to the single out-of-sample window — the frozen snapshot's end is its bound.
+
+    The mirror of `develop_validate`: that one refuses a panel whose OOT tail is gone, this one
+    refuses a panel with no tail to read. Stated here once, so no phase script types the
+    boundary itself and two scripts cannot disagree about where 2022 starts.
+    """
+    if panel.index.max() <= VALIDATE_END:
+        raise ValueError(f"panel ends {panel.index.max().date()}, there is no OOT window to read")
+    return panel.loc[OOT_START:]
 
 
 def _per_symbol(panel: pd.DataFrame, measure) -> pd.DataFrame:
