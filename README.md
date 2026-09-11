@@ -168,16 +168,17 @@ uv run python scripts/sweep_tsmom.py      # results/trend_sweep/tsmom_sweep.csv
 uv run python scripts/carry_frequency_diagnostic.py  # results/out_of_sample/carry_frequency.csv
 uv run python scripts/build_report_figures.py        # docs/report/figures/equity.pdf
 uv run pytest                             # 101 tests
-uv run jupyter nbconvert --to notebook --execute --inplace \
-  --ExecutePreprocessor.record_timing=False notebooks/analysis.ipynb
+uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb
 (cd docs/report && rm -f report.aux report.log report.out && \
    pdflatex -interaction=nonstopmode report.tex)   # report.pdf, reproducible from a clean build
 ```
 
 The phase scripts write the same tables that are committed. Regeneration is deterministic by
-construction: seeded fixture demos, frozen inputs, and committed outputs. `diff -r` against the
-committed `results/` tree is the check — the tables, decision records and return series rebuild
-byte-for-byte.
+construction: seeded fixture demos, frozen inputs, committed outputs, and no wall-clock anywhere in
+the tables. `diff -r` against the committed `results/` tree is the check — the tables, decision
+records and return series rebuild byte-for-byte, as do the report figure and the report PDF. The
+executed notebook is deterministic in *content*: every printed number matches, but the kernel stamps
+cell timings and may split one stdout stream into two, so compare its outputs rather than its bytes.
 
 ## Repository layout
 
