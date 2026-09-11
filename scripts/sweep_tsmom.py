@@ -15,11 +15,8 @@ from __future__ import annotations
 from functools import partial
 from pathlib import Path
 
-import pandas as pd
-
 from systematic_futures.data.panels import develop_validate, load_frozen
-from systematic_futures.engine import run
-from systematic_futures.harness import BENCHMARK, VOL_TARGET
+from systematic_futures.harness import BENCHMARK, table_for
 from systematic_futures.methods.tsmom import TSMOM_HORIZONS, horizon_signal, tsmom
 
 RESULTS = Path("results/phase2")
@@ -32,12 +29,7 @@ def main() -> int:
     methods = {f"sleeve_{h}d": partial(horizon_signal, lookback=h) for h in TSMOM_HORIZONS}
     methods[BENCHMARK] = tsmom
 
-    frames = []
-    for name, method in methods.items():
-        table = run(method, window, vol_target=VOL_TARGET)
-        table["method"] = name
-        frames.append(table.reset_index().rename(columns={"index": "bps"}))
-    sweep = pd.concat(frames, ignore_index=True)
+    sweep = table_for(methods, window)
 
     RESULTS.mkdir(parents=True, exist_ok=True)
     sweep.to_csv(RESULTS / "tsmom_sweep.csv", index=False)

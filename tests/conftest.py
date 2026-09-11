@@ -1,9 +1,9 @@
 """Shared test helpers — panel construction pinned in one place."""
 
 from systematic_futures.data.continuous import back_adjust
+from systematic_futures.data.panels import to_wide
 from systematic_futures.data.roll_calendar import build_roll_calendar, extract_contract_prices
 from systematic_futures.data.synthetic import make_synthetic_multiple_prices
-from systematic_futures.engine import to_wide
 
 
 def continuous_wide(symbols=("ES", "GC"), seed=42, start="2020-01-01", end="2021-06-30"):

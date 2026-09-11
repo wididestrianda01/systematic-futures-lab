@@ -24,6 +24,7 @@ import pandas as pd
 from systematic_futures.data.panels import (
     consecutive_returns,
     forward_return,
+    monthly_to_daily,
     trailing_mean,
     trailing_return,
     trailing_std,
@@ -78,17 +79,10 @@ def feature_panel(
     cols["mom_rank"] = centered_rank(cols["ret_252"])
     cols["basis"] = basis_wide
     cols["basis_rank"] = centered_rank(basis_wide)
-    cols["season"] = _daily_season_score(closes, season_window)
+    cols["season"] = monthly_to_daily(month_score(closes, window=season_window), closes)
 
     tidy = pd.concat({name: cols[name].stack() for name in FEATURES}, axis=1)
     return tidy.rename_axis(_INDEX_NAMES)
-
-
-def _daily_season_score(closes: pd.DataFrame, window: int) -> pd.DataFrame:
-    """The monthly same-calendar-month score, reindexed onto every trading day."""
-    score = month_score(closes, window=window).reindex(closes.index.to_period("M"))
-    score.index = closes.index
-    return score
 
 
 def forward_label(

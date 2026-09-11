@@ -20,6 +20,7 @@ from systematic_futures.data.panels import (
     develop_validate,
     forward_return,
     held_positions,
+    monthly_to_daily,
     trailing_mean,
     trailing_return,
     trailing_std,
@@ -97,6 +98,23 @@ def test_forward_return_spans_each_symbols_own_observations():
     # the date after the hole's return, not the hole's calendar neighbour.
     assert np.isclose(ahead["B"].iloc[19], closes["B"].iloc[24] / closes["B"].iloc[19] - 1.0)
     assert ahead["B"].iloc[20:23].isna().all()  # B has no observation there, so no return
+
+
+def test_monthly_to_daily_maps_only_each_months_own_days():
+    """The score is monthly, the signal is daily: a day takes its own month's score, and a
+    month without one stays NaN — never carried over from the month before it."""
+    closes = ragged_panel(n=60)
+    monthly = pd.DataFrame(
+        {"A": [1.0, np.nan], "B": [np.nan, -1.0]},
+        index=pd.period_range("2020-01", periods=2, freq="M"),
+    )
+    daily = monthly_to_daily(monthly, closes)
+
+    assert daily.index.equals(closes.index)  # the close panel's own (union) grid
+    assert (daily.loc["2020-01", "A"] == 1.0).all()
+    assert daily.loc["2020-01", "B"].isna().all()
+    assert (daily.loc["2020-02", "B"] == -1.0).all()
+    assert daily.loc["2020-02", "A"].isna().all()
 
 
 def test_develop_validate_bounds_both_ends():

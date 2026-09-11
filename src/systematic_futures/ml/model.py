@@ -32,9 +32,7 @@ import optuna
 import pandas as pd
 from lightgbm import LGBMRegressor
 
-from systematic_futures.engine.core import account
-from systematic_futures.engine.metrics import sharpe
-from systematic_futures.engine.sizing import vol_target_positions
+from systematic_futures.engine.core import run
 from systematic_futures.methods.ranking import centered_rank
 from systematic_futures.ml.cv import Fold, purged_walk_forward
 from systematic_futures.ml.features import FEATURES, feature_panel, forward_label
@@ -59,6 +57,40 @@ DEFAULT_PARAMS = {
 _LEARNER = {"deterministic": True, "force_row_wise": True, "num_threads": 1, "verbose": -1}
 
 Fit = Callable[[pd.DataFrame, pd.DataFrame, Fold], pd.DataFrame]
+FitFor = Callable[[pd.DataFrame], Fit]
+
+
+def _walk_forward(
+    fit_for: FitFor,
+    basis: pd.DataFrame | None,
+    *,
+    horizon: int,
+    n_splits: int,
+    embargo: int,
+    min_train_rows: int,
+    trials: int,
+):
+    """The walk-forward scaffold every ML variant is: folds in, out-of-fold signals out.
+
+    The variant supplies only its fit; the fold loop, the out-of-fold-only
+    guarantee and the trial count that feeds the Deflated Sharpe Ratio are wired
+    here once. `fit_for` is called per invocation, so a variant's learner state
+    never leaks between calls.
+    """
+
+    def method(closes: pd.DataFrame) -> pd.DataFrame:
+        return _signals(
+            closes,
+            basis,
+            fit_for(closes),
+            horizon=horizon,
+            n_splits=n_splits,
+            embargo=embargo,
+            min_train_rows=min_train_rows,
+        )
+
+    method.trials = trials
+    return method
 
 
 def lgbm_defaults(
@@ -72,7 +104,7 @@ def lgbm_defaults(
 ):
     """Variant 6a: sensible defaults, no search. Returns a method with `trials` = 1."""
 
-    def method(closes: pd.DataFrame) -> pd.DataFrame:
+    def fit_for(closes: pd.DataFrame) -> Fit:
         learner = LGBMRegressor(
             n_estimators=STAGES[-1], random_state=seed, **_LEARNER, **DEFAULT_PARAMS
         )
@@ -81,18 +113,17 @@ def lgbm_defaults(
             learner.fit(train[FEATURES], train["label"])
             return _wide(learner.predict(test[FEATURES]), test.index, closes)
 
-        return _signals(
-            closes,
-            basis,
-            fit,
-            horizon=horizon,
-            n_splits=n_splits,
-            embargo=embargo,
-            min_train_rows=min_train_rows,
-        )
+        return fit
 
-    method.trials = 1
-    return method
+    return _walk_forward(
+        fit_for,
+        basis,
+        horizon=horizon,
+        n_splits=n_splits,
+        embargo=embargo,
+        min_train_rows=min_train_rows,
+        trials=1,
+    )
 
 
 def lgbm_tuned(
@@ -113,7 +144,7 @@ def lgbm_tuned(
     """
     optuna.logging.set_verbosity(optuna.logging.WARNING)
 
-    def method(closes: pd.DataFrame) -> pd.DataFrame:
+    def fit_for(closes: pd.DataFrame) -> Fit:
         def fit(train: pd.DataFrame, test: pd.DataFrame, fold: Fold) -> pd.DataFrame:
             inner = inner_split(fold, horizon=horizon, embargo=embargo)
             dates = train.index.get_level_values("date")
@@ -123,18 +154,17 @@ def lgbm_tuned(
             params = _tune(closes, inner_train, inner_valid, n_trials=n_trials, seed=seed)
             return _fit_full(closes, train, test, params, seed)
 
-        return _signals(
-            closes,
-            basis,
-            fit,
-            horizon=horizon,
-            n_splits=n_splits,
-            embargo=embargo,
-            min_train_rows=min_train_rows,
-        )
+        return fit
 
-    method.trials = n_splits * n_trials
-    return method
+    return _walk_forward(
+        fit_for,
+        basis,
+        horizon=horizon,
+        n_splits=n_splits,
+        embargo=embargo,
+        min_train_rows=min_train_rows,
+        trials=n_splits * n_trials,
+    )
 
 
 def inner_split(fold: Fold, *, horizon: int, embargo: int) -> Fold:
@@ -218,7 +248,7 @@ def _tune(
             )
             trained = stage
             pred = _wide(booster.predict(inner_valid[FEATURES]), inner_valid.index, closes)
-            score = _score(pred, closes, inner_valid)
+            score = _score(pred, closes)
             trial.report(score, stage)
             if trial.should_prune():
                 raise optuna.TrialPruned()
@@ -263,19 +293,22 @@ def _fit_full(
     return _wide(booster.predict(test[FEATURES]), test.index, closes)
 
 
-def _score(pred: pd.DataFrame, closes: pd.DataFrame, valid: pd.DataFrame) -> float:
-    """Sharpe of the ranked, vol-targeted, 2 bps-costed signal on the validation block.
+def _score(pred: pd.DataFrame, closes: pd.DataFrame) -> float:
+    """Sharpe of the ranked signal on the predicted dates — through the pipeline seam.
 
-    Same pipeline as the harness (engine overlay + engine accounting), so the
-    tuning objective is the metric the decision rule uses — restricted to the
-    fold's inner validation window.
+    The tuning objective crosses the same interface the comparison tables do: the
+    ranked predictions go to `engine.run` with the predicted dates as the mask and
+    the tuning cost as the one bps level, so the search that picks the parameters
+    and the metric the decision rule reads cannot drift apart. A flat window scores
+    NaN at the seam, and -inf here: the pruner must never compare against NaN.
     """
-    signal = centered_rank(pred)
+    signal = centered_rank(pred).fillna(0.0)
     if signal.empty:
         return float("-inf")
     window = closes.loc[: signal.index.max()]
-    panel = pd.DataFrame(0.0, index=window.index, columns=closes.columns)
-    panel.loc[signal.index, signal.columns] = signal.fillna(0.0)
-    path = account(vol_target_positions(panel, window, VOL_TARGET, CAP), window, TUNING_BPS)
-    value = sharpe(path.mean(axis=1).reindex(signal.index).dropna())
+    panel = signal.reindex(index=window.index).fillna(0.0)
+    table = run(
+        panel, window, vol_target=VOL_TARGET, cap=CAP, bps_grid=(TUNING_BPS,), dates=signal.index
+    )
+    value = float(table.loc[TUNING_BPS, "sharpe"])
     return value if np.isfinite(value) else float("-inf")

@@ -35,16 +35,10 @@ from systematic_futures.engine.metrics import (
 from systematic_futures.engine.sizing import vol_target_positions
 
 
-def to_wide(continuous: pd.DataFrame) -> pd.DataFrame:
-    """[date, symbol, contract, close] -> wide close panel (date x symbol)."""
-    return continuous.pivot(index="date", columns="symbol", values="close").sort_index()
-
-
 def account(
     exposure: pd.DataFrame,
     closes: pd.DataFrame,
     bps: float = 0.0,
-    held: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Daily per-symbol strategy returns from an exposure path.
 
@@ -54,12 +48,11 @@ def account(
     (`consecutive_returns`). The first day enters from flat (|E(t0)| is charged as
     the entry trade) and earns nothing (no prior close to measure a return against).
 
-    `held` is the already-resolved position path: `run` passes the frame it
-    charges turnover on, so the trade the cost model charges is provably the
-    trade the reported turnover counts.
+    The held path is derived here, never supplied: the trade charged and the trade
+    `run` reports turnover on are both `traded_notional(held_positions(...))` of the
+    same exposure, so they cannot disagree.
     """
-    if held is None:
-        held = held_positions(exposure, closes)
+    held = held_positions(exposure, closes)
     pnl = (held.shift(1) * consecutive_returns(closes)).fillna(0.0)
     return pnl - bps / 1e4 * traded_notional(held)
 
@@ -105,7 +98,7 @@ def run(
     held = held_positions(exposure, closes)
     traded = traded_notional(held)
     for bps in bps_grid:
-        daily = account(exposure, closes, bps, held)
+        daily = account(exposure, closes, bps)
         if dates is None:
             charged = traded
         else:

@@ -15,7 +15,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 
 from systematic_futures.data.panels import (
     DEVELOP_START,
@@ -23,12 +22,12 @@ from systematic_futures.data.panels import (
     develop_validate,
     load_frozen,
 )
-from systematic_futures.engine import run
 from systematic_futures.harness import (
     BENCHMARK,
     HEADLINE_BPS,
     VOL_TARGET,
     classic_set,
+    headline_rows,
     table_for,
 )
 
@@ -43,10 +42,6 @@ GATE = (
 )
 
 
-def headline(tables: pd.DataFrame, method: str, bps: float = HEADLINE_BPS) -> pd.Series:
-    return tables[(tables["method"] == method) & (tables["bps"] == bps)].iloc[0]
-
-
 def main() -> int:
     wide, basis_wide = load_frozen()
     window = develop_validate(wide)
@@ -55,11 +50,10 @@ def main() -> int:
     RESULTS.mkdir(parents=True, exist_ok=True)
     tables.to_csv(RESULTS / "tables.csv", index=False)
 
-    season = headline(tables, "seasonality")
-    season_free = headline(tables, "seasonality", 0.0)
-    trend = headline(tables, BENCHMARK)
-    trend_free = headline(tables, BENCHMARK, 0.0)
-    xs = headline(tables, "xs_momentum")
+    rows, free = headline_rows(tables), headline_rows(tables, 0.0)
+    season, season_free = rows.loc["seasonality"], free.loc["seasonality"]
+    trend, trend_free = rows.loc[BENCHMARK], free.loc[BENCHMARK]
+    xs = rows.loc["xs_momentum"]
     dies = season["sharpe"] < trend["sharpe"]
 
     (RESULTS / "FINDINGS.md").write_text(
@@ -91,17 +85,16 @@ def main() -> int:
             else "No other family beats the benchmark on this window.\n"
         )
     )
-    inverse_sharpe = run(
-        np.sign(basis_wide.reindex(index=window.index, columns=window.columns)),
+    inverted = table_for(
+        {"carry_inverted": np.sign(basis_wide.reindex(index=window.index, columns=window.columns))},
         window,
-        vol_target=VOL_TARGET,
-        bps_grid=(HEADLINE_BPS,),
-    ).iloc[0]["sharpe"]
+    )
+    inverse_sharpe = headline_rows(inverted).loc["carry_inverted", "sharpe"]
     (RESULTS / "FINDINGS.md").open("a").write(
         "\n## Carry: the sign convention decides (failed challenger under the literature sign)\n\n"
         "Numbers: the KMPV convention (long backwardated / short contangoed, i.e. carry = "
         "front−next over next) posts Sharpe "
-        f"{headline(tables, 'carry')['sharpe']:.2f} "
+        f"{rows.loc['carry', 'sharpe']:.2f} "
         f"at {HEADLINE_BPS:.0f} bps on develop+validate, while the inverted sign — long "
         f"contangoed — posts {inverse_sharpe:.2f}, against the benchmark's "
         f"{trend['sharpe']:.2f}. The literature convention stays in the tables.\n\n"

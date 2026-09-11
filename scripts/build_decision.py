@@ -38,7 +38,14 @@ from systematic_futures.data.panels import (
     develop_validate,
     load_frozen,
 )
-from systematic_futures.harness import BENCHMARK, HEADLINE_BPS, classic_set, table_for
+from systematic_futures.decision import require_same_verdict, verdict
+from systematic_futures.harness import (
+    BENCHMARK,
+    HEADLINE_BPS,
+    classic_set,
+    headline_rows,
+    table_for,
+)
 from systematic_futures.ml import leakage_violations, lgbm_defaults, lgbm_tuned, purged_walk_forward
 
 RESULTS = Path("results/phase4")
@@ -76,19 +83,6 @@ skipped for lack of data.
 **Scope.** One comparison set, one accounting path, two reads of it. The applied
 outcome is `DECISION.md`; the interpretation stays with ticket 34 (M7-gated).
 """
-
-
-def apply_rule(table: pd.DataFrame, bps: float = HEADLINE_BPS) -> dict:
-    """The pre-declared rule, applied to one table at the headline cost level."""
-    rows = table[table["bps"] == bps].set_index("method")
-    benchmark = rows.loc[BENCHMARK]
-    return {
-        "benchmark_sharpe": float(benchmark["sharpe"]),
-        "benchmark_dsr": float(benchmark["dsr"]),
-        "beats": {v: bool(rows.loc[v, "dsr"] > benchmark["dsr"]) for v in ML_VARIANTS},
-        "variant_sharpe": {v: float(rows.loc[v, "sharpe"]) for v in ML_VARIANTS},
-        "variant_dsr": {v: float(rows.loc[v, "dsr"]) for v in ML_VARIANTS},
-    }
 
 
 def outcome_doc(primary: dict, sensitivity: dict[str, dict]) -> str:
@@ -179,24 +173,18 @@ def main() -> int:
     like_tables = pd.concat(like, ignore_index=True)
     like_tables.to_csv(RESULTS / "tables_like_for_like.csv", index=False)
 
-    primary = apply_rule(full)
+    primary = verdict(headline_rows(full), ML_VARIANTS)
     sensitivity = {
-        variant: apply_rule(like_tables[like_tables["window"] == variant])
+        variant: verdict(headline_rows(like_tables[like_tables["window"] == variant]), ML_VARIANTS)
         for variant in ML_VARIANTS
     }
-    for variant, read in sensitivity.items():
-        assert read["beats"] == primary["beats"], (
-            f"{variant}: primary and like-for-like reads disagree on the rule's verdict — "
-            "the decision surface must not depend on the read"
-        )
+    require_same_verdict(primary, sensitivity)
 
     (RESULTS / "DECISION_RULE.md").write_text(RULE)
     (RESULTS / "DECISION.md").write_text(outcome_doc(primary, sensitivity))
 
-    headline = full[full["bps"] == HEADLINE_BPS][
-        ["method", "sharpe", "dsr", "trials", "signal_coverage"]
-    ]
-    print(headline.to_string(index=False))
+    headline = headline_rows(full)[["sharpe", "dsr", "trials", "signal_coverage"]]
+    print(headline.to_string())
     print(f"\nwrote {RESULTS}/tables.csv, tables_like_for_like.csv, DECISION_RULE.md, DECISION.md")
     return 0
 

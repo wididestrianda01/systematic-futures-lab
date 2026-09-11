@@ -15,6 +15,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from systematic_futures.data.panels import to_wide
+
 
 def carry(basis: pd.DataFrame):
     """Bind a basis panel and return a seam-compatible method.
@@ -22,11 +24,7 @@ def carry(basis: pd.DataFrame):
     basis: long [date, symbol, ..., basis] (the data layer's compute_basis output)
     or an already-wide date x symbol basis frame.
     """
-    wide = (
-        basis.pivot(index="date", columns="symbol", values="basis")
-        if "basis" in basis.columns
-        else basis
-    )
+    wide = to_wide(basis, "basis") if "basis" in basis.columns else basis
 
     def method(closes: pd.DataFrame) -> pd.DataFrame:
         aligned = wide.reindex(index=closes.index, columns=closes.columns)

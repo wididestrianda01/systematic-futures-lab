@@ -39,6 +39,16 @@ def classic_set(basis: pd.DataFrame) -> dict[str, object]:
     }
 
 
+def headline_rows(tables: pd.DataFrame, bps: float = HEADLINE_BPS) -> pd.DataFrame:
+    """The comparison table's one read: one row per method at one cost level, indexed by method.
+
+    Every consumer of the table — the phase scripts, the notebooks, the decision
+    rule — reads it this way, so the shape (a `bps` level, a `method` column) is
+    known here and nowhere else.
+    """
+    return tables[tables["bps"] == bps].set_index("method")
+
+
 def table_for(
     methods: dict[str, object],
     closes: pd.DataFrame,

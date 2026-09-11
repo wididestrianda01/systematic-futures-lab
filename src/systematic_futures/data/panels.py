@@ -1,4 +1,5 @@
-"""Frozen-panel loading and measurement — the one place panels are read and returns defined.
+"""Frozen-panel loading, shaping and measurement — the one place a panel is read, put on
+the close grid, and measured.
 
 Both phase scripts (the families read tables, the decision read ML harness) read the same two wide
 panels: the back-adjusted continuous closes the seam runs on, and the raw-leg
@@ -32,14 +33,28 @@ DEVELOP_START = pd.Timestamp("2010-01-01")
 VALIDATE_END = pd.Timestamp("2021-12-31")
 
 
+def to_wide(frame: pd.DataFrame, value: str = "close") -> pd.DataFrame:
+    """Long [date, symbol, ..., value] frame -> wide date x symbol panel, rows sorted."""
+    return frame.pivot(index="date", columns="symbol", values=value).sort_index()
+
+
 def wide_panel(path: Path, value: str) -> pd.DataFrame:
     """Concatenate one derived sub-store's Parquet files into a date x symbol panel."""
     frames = [pd.read_parquet(p) for p in sorted(path.glob("*.parquet"))]
-    return (
-        pd.concat(frames, ignore_index=True)
-        .pivot(index="date", columns="symbol", values=value)
-        .sort_index()
-    )
+    return to_wide(pd.concat(frames, ignore_index=True), value)
+
+
+def monthly_to_daily(monthly: pd.DataFrame, closes: pd.DataFrame) -> pd.DataFrame:
+    """Reindex a monthly-grid panel (index = calendar periods) onto the close panel's days.
+
+    The same-calendar-month score is the lab's one monthly-grid object; every
+    consumer maps it onto the days it applies to here, so which month a day
+    belongs to — and that a month without a score stays NaN instead of being
+    carried forward — is stated once.
+    """
+    daily = monthly.reindex(closes.index.to_period("M"))
+    daily.index = closes.index
+    return daily
 
 
 def load_frozen(

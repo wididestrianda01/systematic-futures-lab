@@ -15,7 +15,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from systematic_futures.data.panels import consecutive_returns
+from systematic_futures.data.panels import consecutive_returns, monthly_to_daily
 from systematic_futures.methods.tsmom import tsmom
 
 WINDOW = 60  # trailing months of same-calendar-month history
@@ -52,9 +52,7 @@ def seasonality(closes: pd.DataFrame) -> pd.DataFrame:
     so no current-month data ever informs the position.
     """
     score = month_score(closes)
-    per_day = score.reindex(closes.index.to_period("M"))
-    per_day.index = closes.index
-    return np.sign(per_day)
+    return np.sign(monthly_to_daily(score, closes))
 
 
 def seasonal_tilt(closes: pd.DataFrame) -> pd.DataFrame:
@@ -66,7 +64,6 @@ def seasonal_tilt(closes: pd.DataFrame) -> pd.DataFrame:
     """
     trend = tsmom(closes)
     score = month_score(closes)
-    per_day = score.reindex(closes.index.to_period("M"))
-    per_day.index = closes.index
+    per_day = monthly_to_daily(score, closes)
     mult = (1.0 + TILT * np.sign(per_day)).where(per_day.notna(), 1.0)
     return (trend * mult).clip(-1.0, 1.0)

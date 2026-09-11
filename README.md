@@ -13,7 +13,8 @@ enters this repo — only derived artifacts (code, configs, checksums, signals, 
 ## Layout
 
 - `src/systematic_futures/` — package-first source; `harness.py` defines the comparison set
-  and the window contract every phase script runs on
+  and the window contract every phase script runs on, and `decision.py` applies the
+  pre-declared rule to that table
 - `scripts/` — thin runners: ingest, derived build, phase tables, sweeps, query demo
 - `notebooks/` — thin experiment notebooks over the package
 - `results/` — committed derived output (tables, findings, decision docs); no market data

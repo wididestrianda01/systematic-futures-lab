@@ -23,6 +23,7 @@ from systematic_futures.ml import (
 )
 
 HORIZON, SPLITS, EMBARGO = 5, 3, 10
+N_TUNED_TRIALS = 2
 N = 2400
 
 
@@ -55,9 +56,27 @@ def walk_forward_cut(closes: pd.DataFrame) -> pd.Timestamp:
     return folds[1].test[-1]
 
 
-def test_defaults_predict_out_of_fold_only():
+@pytest.mark.parametrize(
+    ("build", "expected_trials"),
+    [
+        (lambda basis: lgbm_defaults(basis, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO), 1),
+        (
+            lambda basis: lgbm_tuned(
+                basis, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO, n_trials=N_TUNED_TRIALS
+            ),
+            SPLITS * N_TUNED_TRIALS,
+        ),
+    ],
+    ids=["6a defaults", "6b tuned"],
+)
+def test_every_variant_predicts_out_of_fold_only_and_counts_its_trials(build, expected_trials):
+    """The contract both variants get from the one walk-forward scaffold: flat outside
+    the folds' own test blocks, and a trial count that counts every configuration the
+    variant's selection actually evaluated."""
     closes, basis = fixture()
-    method = lgbm_defaults(basis, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO)
+    method = build(basis)
+    assert method.trials == expected_trials
+
     signals = method(closes)
     cut = walk_forward_cut(closes)
     assert (signals.loc[:cut] != 0).any().any(), "fixture must yield out-of-fold signals"
@@ -99,20 +118,12 @@ def test_defaults_run_through_the_seam_deterministically():
     assert not signals.isna().any().any()
 
 
-def test_tuned_variant_reports_honest_trials_and_never_tunes_on_its_test_block():
+def test_the_tuned_search_is_deterministic():
     closes, basis = fixture()
-    n_trials = 2
-    method = lgbm_tuned(basis, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO, n_trials=n_trials)
-    assert method.trials == SPLITS * n_trials  # every fold runs a full study
-
-    signals = method(closes)
-    cut = walk_forward_cut(closes)
-    assert (signals.loc[:cut] != 0).any().any(), "fixture must yield tuned out-of-fold signals"
-
-    perturbed = closes.copy()
-    perturbed.loc[closes.index > cut] *= 1.5
-    pd.testing.assert_frame_equal(signals.loc[:cut], method(perturbed).loc[:cut])
-    pd.testing.assert_frame_equal(signals, method(closes))  # seeded search is deterministic
+    method = lgbm_tuned(
+        basis, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO, n_trials=N_TUNED_TRIALS
+    )
+    pd.testing.assert_frame_equal(method(closes), method(closes))  # seeded search is reproducible
 
 
 def test_inner_tuning_split_stays_inside_the_fold_training_set():
