@@ -43,15 +43,17 @@ def max_drawdown(returns) -> float:
     return float((equity / equity.cummax() - 1.0).min())
 
 
+def traded_notional(exposure: pd.DataFrame) -> pd.DataFrame:
+    """Per-day traded notional |E(t) - E(t-1)|; first day enters from flat, so |E(t0)| counts as the entry trade."""
+    return exposure.diff().abs().fillna(exposure.abs())
+
+
 def turnover(exposure: pd.DataFrame) -> float:
     """Mean daily traded notional: sum over symbols of |dE|, averaged over days.
 
-    The first day enters from flat, so |E(t0)| counts as the entry trade — the
-    same convention the cost model charges.
+    Same convention the cost model charges (both use traded_notional).
     """
-    traded = exposure.diff().abs().fillna(exposure.abs())
-    traded = exposure.diff().abs().fillna(exposure.abs())
-    return float(traded.sum(axis=1).mean())
+    return float(traded_notional(exposure).sum(axis=1).mean())
 
 
 def deflated_sharpe(returns, trials: int = 1) -> float:

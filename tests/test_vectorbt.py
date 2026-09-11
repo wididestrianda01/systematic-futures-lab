@@ -10,17 +10,10 @@ is inherent to the two conventions; exact equality is not the contract.
 import numpy as np
 import pandas as pd
 import pytest
+from conftest import continuous_wide
 
-from systematic_futures.data.continuous import back_adjust
-from systematic_futures.data.roll_calendar import build_roll_calendar, extract_contract_prices
-from systematic_futures.data.synthetic import make_synthetic_multiple_prices
-from systematic_futures.engine import account, to_wide
+from systematic_futures.engine import account
 from systematic_futures.engine.sizing import vol_target_positions
-
-
-def continuous_wide(symbols=("ES", "GC"), seed=11):
-    mp = make_synthetic_multiple_prices(symbols, seed=seed)
-    return to_wide(back_adjust(extract_contract_prices(mp), build_roll_calendar(mp)))
 
 
 def crossover_signals(closes, window=10):
@@ -33,7 +26,7 @@ def crossover_signals(closes, window=10):
 
 def test_engine_account_matches_vectorbt_with_overlay_and_costs():
     vbt = pytest.importorskip("vectorbt")
-    wide = continuous_wide()
+    wide = continuous_wide(seed=11)
     e = vol_target_positions(crossover_signals(wide), wide, vol_target=0.10, cap=1.0, lookback=30)
     r_engine = account(e, wide, bps=2.0)
     pf = vbt.Portfolio.from_orders(

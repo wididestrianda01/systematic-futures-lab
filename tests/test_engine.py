@@ -5,20 +5,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+from conftest import continuous_wide
 
-from systematic_futures.data.continuous import back_adjust
-from systematic_futures.data.roll_calendar import build_roll_calendar, extract_contract_prices
-from systematic_futures.data.synthetic import make_synthetic_multiple_prices
-from systematic_futures.engine import account, run, to_wide
+from systematic_futures.engine import account, run
 from systematic_futures.engine.metrics import ANN, max_drawdown, sharpe, sortino
 from systematic_futures.engine.sizing import vol_target_positions
 
 GOLDEN = Path(__file__).parent / "golden" / "engine_core.json"
-
-
-def continuous_wide(symbols=("ES", "GC"), seed=42, start="2020-01-01", end="2021-06-30"):
-    mp = make_synthetic_multiple_prices(symbols, start=start, end=end, seed=seed)
-    return to_wide(back_adjust(extract_contract_prices(mp), build_roll_calendar(mp)))
 
 
 def constant_long(closes):
@@ -102,6 +95,8 @@ def test_cost_sensitivity_rows():
 
     # --- golden seam outputs -----------------------------------------------------
 
+
+def test_golden_seam_outputs():
     wide = continuous_wide()
     cl = constant_long(wide)
     calls = {

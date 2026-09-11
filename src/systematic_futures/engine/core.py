@@ -25,6 +25,7 @@ from systematic_futures.engine.metrics import (
     max_drawdown,
     sharpe,
     sortino,
+    traded_notional,
     turnover,
 )
 from systematic_futures.engine.sizing import vol_target_positions
@@ -44,7 +45,7 @@ def account(exposure: pd.DataFrame, closes: pd.DataFrame, bps: float = 0.0) -> p
     """
     rets = closes.pct_change()
     pnl = (exposure.shift(1) * rets).fillna(0.0)
-    traded = exposure.diff().abs().fillna(exposure.abs())
+    traded = traded_notional(exposure)
     return pnl - bps / 1e4 * traded
 
 
