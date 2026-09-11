@@ -93,6 +93,20 @@ def test_cost_sensitivity_rows():
     assert table["sharpe"].is_monotonic_decreasing
     assert table["turnover"].nunique() == 1  # turnover independent of cost level
 
+
+def test_date_mask_evaluates_on_those_days_only():
+    """The like-for-like read: metrics on a subset of days, same accounting path."""
+    wide = continuous_wide(("ES",), seed=13)
+    sig = constant_long(wide)
+    mask = wide.index[-20:]
+
+    masked = run(sig, wide, dates=mask)
+    manual = sharpe(account(sig, wide).mean(axis=1).reindex(mask))
+    assert np.isclose(masked.loc[0.0, "sharpe"], manual)
+    assert not np.isclose(masked.loc[0.0, "sharpe"], run(sig, wide).loc[0.0, "sharpe"])
+    full_mask = run(sig, wide, dates=wide.index)
+    pd.testing.assert_frame_equal(full_mask, run(sig, wide))
+
     # --- golden seam outputs -----------------------------------------------------
 
 

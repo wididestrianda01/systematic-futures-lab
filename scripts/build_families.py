@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from systematic_futures.data.manifest import verify_manifest
+from systematic_futures.data.panels import load_frozen
 from systematic_futures.engine import run
 from systematic_futures.methods import (
     baseline,
@@ -24,33 +24,16 @@ from systematic_futures.methods import (
     xs_momentum,
 )
 
-DERIVED = Path("data/derived")
-MANIFEST = Path("manifests/derived.json")
 RESULTS = Path("results/phase3")
 VALIDATE_END = "2021-12-31"  # develop+validate window end; OOT starts 2022
 VOL_TARGET = 0.10
 HEADLINE_BPS = 2.0
 
 
-def load_frozen() -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Wide continuous panel + wide basis panel, manifest-gated."""
-    verify_manifest(DERIVED, MANIFEST)
-    cont = pd.concat(
-        [pd.read_parquet(p) for p in sorted((DERIVED / "continuous").glob("*.parquet"))],
-        ignore_index=True,
-    )
-    wide = cont.pivot(index="date", columns="symbol", values="close").sort_index()
-    basis = pd.concat(
-        [pd.read_parquet(p) for p in sorted((DERIVED / "basis").glob("*.parquet"))],
-        ignore_index=True,
-    )
-    basis_wide = basis.pivot(index="date", columns="symbol", values="basis").sort_index()
-    return wide, basis_wide
-
-
 def main() -> int:
     wide, basis_wide = load_frozen()
     window = wide.loc[:VALIDATE_END]
+    assert wide.index.max() > pd.Timestamp(VALIDATE_END), "loader must return the full panel"
     assert window.index.max() <= pd.Timestamp(VALIDATE_END), "OOT window must stay untouched"
 
     methods = {
@@ -72,25 +55,38 @@ def main() -> int:
     tables.to_csv(RESULTS / "tables.csv", index=False)
 
     season = tables[(tables["method"] == "seasonality") & (tables["bps"] == HEADLINE_BPS)].iloc[0]
+    season_free = tables[(tables["method"] == "seasonality") & (tables["bps"] == 0.0)].iloc[0]
     trend = tables[(tables["method"] == "tsmom") & (tables["bps"] == HEADLINE_BPS)].iloc[0]
+    trend_free = tables[(tables["method"] == "tsmom") & (tables["bps"] == 0.0)].iloc[0]
     dies = season["sharpe"] < trend["sharpe"]
+    xs = tables[(tables["method"] == "xs_momentum") & (tables["bps"] == HEADLINE_BPS)].iloc[0]
+    xs_beats = bool(xs["sharpe"] > trend["sharpe"])
     (RESULTS / "FINDINGS.md").write_text(
         "# the families read findings\n\n"
-        "Window: develop+validate (2010-01-01 → 2021-12-31), frozen panel, "
+        f"Window: develop+validate (2010-01-01 → {VALIDATE_END}), frozen panel, "
         f"{VOL_TARGET:.0%} vol target, 16 CME roots; OOT (2022+) untouched.\n\n"
-        "## Seasonality standalone dies after costs (expected finding)\n\n"
-        f"At the {HEADLINE_BPS:.0f} bps default, standalone seasonality posts "
-        f"Sharpe {season['sharpe']:.2f} (turnover {season['turnover']:.2f}) against "
-        f"the TSMOM benchmark's {trend['sharpe']:.2f} "
+        "## Seasonality standalone loses (expected finding)\n\n"
+        f"Standalone seasonality: Sharpe {season_free['sharpe']:.2f} before costs, "
+        f"{season['sharpe']:.2f} after {HEADLINE_BPS:.0f} bps "
+        f"(turnover {season['turnover']:.2f}), against the TSMOM benchmark's "
+        f"{trend_free['sharpe']:.2f} / {trend['sharpe']:.2f} "
         f"(turnover {trend['turnover']:.2f}). "
         + (
-            "Confirmed: the seasonal flip is a high-turnover, low-edge strategy and it "
-            "loses to the trend benchmark after costs — reported as a failed challenger.\n"
+            "Confirmed, and the failure is edge rather than churn: the signal is already "
+            "negative before costs, and its turnover is *below* the benchmark's — so cost "
+            "drag alone does not explain it. Reported as a failed challenger.\n"
             if dies
             else "Not confirmed on this window — investigate before reporting.\n"
         )
         + "\nFull per-method, per-bps metrics in `tables.csv` "
-        "(Sharpe, Sortino, max DD, turnover, DSR).\n"
+        "(Sharpe, Sortino, max DD, turnover, DSR). "
+        + (
+            f"The cross-sectional family is the other side of this story: it posts Sharpe "
+            f"{xs['sharpe']:.2f} against the benchmark's {trend['sharpe']:.2f} after "
+            f"{HEADLINE_BPS:.0f} bps.\n"
+            if xs_beats
+            else "No other family beats the benchmark on this window.\n"
+        )
     )
     inverse_sharpe = run(
         np.sign(basis_wide.reindex(index=window.index, columns=window.columns)),
@@ -99,14 +95,16 @@ def main() -> int:
         bps_grid=(HEADLINE_BPS,),
     ).iloc[0]["sharpe"]
     (RESULTS / "FINDINGS.md").open("a").write(
-        "\n## Carry is weak on this window (failed challenger candidate)\n\n"
+        "\n## Carry: the sign convention decides (failed challenger under the literature sign)\n\n"
         "The KMPV convention (long backwardated / short contangoed, i.e. carry = "
         "front−next over next) posts Sharpe "
         f"{tables[(tables['method'] == 'carry') & (tables['bps'] == HEADLINE_BPS)].iloc[0]['sharpe']:.2f} "
-        f"at {HEADLINE_BPS:.0f} bps on develop+validate. The inverted convention loses less "
-        f"({inverse_sharpe:.2f}) but also fails — carry is weak on this universe/window "
-        "under either sign, not a convention artifact. Keep the literature convention; "
-        "the reading-canon interpretation pass (gated, the out-of-sample read) owns the explanation.\n"
+        f"at {HEADLINE_BPS:.0f} bps on develop+validate, while the inverted sign — long "
+        f"contangoed — posts {inverse_sharpe:.2f}. A sign flip of that size is not a "
+        "measurement artifact to average away: on this universe and window the literature "
+        "sign loses and its inverse is positive, close to the benchmark. Keep the literature "
+        "convention in the tables; the reading-canon interpretation pass (gated, the out-of-sample read) "
+        "owns what the flip means (M3 carry, M4 commodity term structure).\n"
     )
     print(tables.to_string(index=False))
     print(f"wrote {RESULTS / 'tables.csv'} and {RESULTS / 'FINDINGS.md'}")

@@ -2,12 +2,12 @@
 
 Window: develop+validate (2010-01-01 → 2021-12-31), frozen panel, 10% vol target, 16 CME roots; OOT (2022+) untouched.
 
-## Seasonality standalone dies after costs (expected finding)
+## Seasonality standalone loses (expected finding)
 
-At the 2 bps default, standalone seasonality posts Sharpe -0.24 (turnover 0.24) against the TSMOM benchmark's 0.51 (turnover 0.37). Confirmed: the seasonal flip is a high-turnover, low-edge strategy and it loses to the trend benchmark after costs — reported as a failed challenger.
+Standalone seasonality: Sharpe -0.26 before costs, -0.31 after 2 bps (turnover 0.35), against the TSMOM benchmark's 0.74 / 0.51 (turnover 1.24). Confirmed, and the failure is edge rather than churn: the signal is already negative before costs, and its turnover is *below* the benchmark's — so cost drag alone does not explain it. Reported as a failed challenger.
 
-Full per-method, per-bps metrics in `tables.csv` (Sharpe, Sortino, max DD, turnover, DSR).
+Full per-method, per-bps metrics in `tables.csv` (Sharpe, Sortino, max DD, turnover, DSR). The cross-sectional family is the other side of this story: it posts Sharpe 0.60 against the benchmark's 0.51 after 2 bps.
 
-## Carry is weak on this window (failed challenger candidate)
+## Carry: the sign convention decides (failed challenger under the literature sign)
 
-The KMPV convention (long backwardated / short contangoed, i.e. carry = front−next over next) posts Sharpe -0.14 at 2 bps on develop+validate. The inverted convention loses less (-0.06) but also fails — carry is weak on this universe/window under either sign, not a convention artifact. Keep the literature convention; the reading-canon interpretation pass (gated, the out-of-sample read) owns the explanation.
+The KMPV convention (long backwardated / short contangoed, i.e. carry = front−next over next) posts Sharpe -0.73 at 2 bps on develop+validate, while the inverted sign — long contangoed — posts 0.41. A sign flip of that size is not a measurement artifact to average away: on this universe and window the literature sign loses and its inverse is positive, close to the benchmark. Keep the literature convention in the tables; the reading-canon interpretation pass (gated, the out-of-sample read) owns what the flip means (M3 carry, M4 commodity term structure).

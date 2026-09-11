@@ -15,6 +15,7 @@ from math import sqrt
 import numpy as np
 import pandas as pd
 
+from systematic_futures.data.panels import consecutive_returns, trailing_return, trailing_std
 from systematic_futures.engine.metrics import ANN
 
 VOL_SCALAR = 0.40  # HOP-style sleeve vol scalar; the ensemble averages sleeves
@@ -29,11 +30,14 @@ TSMOM_HORIZONS = SLEEVES + (21, 63, 252)  # 5/10/20d sleeves + 1m/3m/12m
 def horizon_signal(closes: pd.DataFrame, lookback: int) -> pd.DataFrame:
     """Sleeve signal: sign(trailing `lookback`-day return) * 0.40 / sigma_ann.
 
-    As-of convention: uses closes through t only. NaN until the lookback
-    window fills — the engine treats NaN as flat (no warmup fabrication).
+    As-of convention: uses closes through t only. Both the trailing return and
+    the trailing vol are measured over the symbol's own `lookback` observations
+    (`data.panels`), so a quote hole neither shifts the horizon nor breaks the
+    window. NaN until the lookback window fills — the engine treats NaN as flat
+    (no warmup fabrication).
     """
-    past = closes.pct_change(lookback)
-    vol = closes.pct_change().rolling(lookback).std(ddof=1) * sqrt(ANN)
+    past = trailing_return(closes, lookback)
+    vol = trailing_std(consecutive_returns(closes), lookback) * sqrt(ANN)
     sig = np.sign(past) * (VOL_SCALAR / vol)
     return sig.clip(-1.0, 1.0)
 

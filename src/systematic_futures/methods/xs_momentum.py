@@ -11,16 +11,16 @@ from __future__ import annotations
 
 import pandas as pd
 
+from systematic_futures.data.panels import trailing_return
+from systematic_futures.methods.ranking import centered_rank
+
 LOOKBACK = 252  # trading days ≈ 12 months
 
 
 def xs_momentum(closes: pd.DataFrame, lookback: int = LOOKBACK) -> pd.DataFrame:
     """Centered cross-sectional rank signal in [-1, 1].
 
-    As-of convention: uses closes through t only.
+    As-of convention: uses closes through t only, with the trailing window
+    measured over each symbol's own `lookback` observations.
     """
-    past = closes.pct_change(lookback)
-    rank = past.rank(axis=1)  # average ranks on ties; NaN symbols skipped
-    n = past.notna().sum(axis=1)
-    center = rank.sub(n.add(1.0).div(2.0), axis=0).div(n.sub(1.0).div(2.0), axis=0)
-    return center
+    return centered_rank(trailing_return(closes, lookback))

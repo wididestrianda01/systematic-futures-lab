@@ -15,6 +15,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from systematic_futures.data.panels import consecutive_returns
 from systematic_futures.methods.tsmom import tsmom
 
 WINDOW = 60  # trailing months of same-calendar-month history
@@ -26,8 +27,13 @@ def month_score(
     closes: pd.DataFrame, window: int = WINDOW, min_years: int = MIN_YEARS
 ) -> pd.DataFrame:
     """Monthly-grid score: same-calendar-month mean daily return from prior
-    years only, NaN until `min_years` priors fall inside the window."""
-    rets = closes.pct_change()
+    years only, NaN until `min_years` priors fall inside the window.
+
+    Daily returns are per symbol over that symbol's own observations
+    (`data.panels`), and the monthly mean ignores the days a root did not
+    quote rather than treating them as zero-return days.
+    """
+    rets = consecutive_returns(closes)
     monthly = rets.groupby(rets.index.to_period("M")).mean()
     lags = range(12, window + 1, 12)
     arr = np.stack([monthly.shift(k).to_numpy() for k in lags])  # (lag, month, symbol)

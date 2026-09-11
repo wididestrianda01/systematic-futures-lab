@@ -1,8 +1,8 @@
 """Portfolio metrics computed on daily strategy returns (fraction of capital).
 
-Every function takes a daily return series (or an exposure panel for turnover)
-and returns a float. Conventions are fixed here so all method families are
-compared on identical definitions.
+Every function takes a daily return series (or a traded-notional panel for
+turnover) and returns a float. Conventions are fixed here so all method families
+are compared on identical definitions.
 """
 
 from __future__ import annotations
@@ -48,12 +48,13 @@ def traded_notional(exposure: pd.DataFrame) -> pd.DataFrame:
     return exposure.diff().abs().fillna(exposure.abs())
 
 
-def turnover(exposure: pd.DataFrame) -> float:
-    """Mean daily traded notional: sum over symbols of |dE|, averaged over days.
+def turnover(traded: pd.DataFrame) -> float:
+    """Mean daily traded notional from a `traded_notional` panel.
 
-    Same convention the cost model charges (both use traded_notional).
+    The same base the cost model charges, so reporting and charging can never
+    drift apart (both take the frame `traded_notional` returns).
     """
-    return float(traded_notional(exposure).sum(axis=1).mean())
+    return float(traded.sum(axis=1).mean())
 
 
 def deflated_sharpe(returns, trials: int = 1) -> float:
