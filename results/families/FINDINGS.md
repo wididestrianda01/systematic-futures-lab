@@ -10,7 +10,7 @@ the out-of-sample read interpretation pass owns it.
 
 ## Seasonality standalone loses (expected finding)
 
-Numbers: standalone seasonality Sharpe -0.03 before costs, -0.09 after 2 bps (turnover 0.40), against the TSMOM benchmark's 0.20 / -0.08 (turnover 1.65). Reported as a failed challenger.
+Numbers: standalone seasonality Sharpe -0.03 before costs, -0.09 after 2 bps (turnover 0.02), against the TSMOM benchmark's 0.20 / -0.08 (turnover 0.10). Reported as a failed challenger.
 
 Provisional reading: the failure is edge rather than churn — the signal is already negative before costs and its turnover is *below* the benchmark's, so cost drag alone does not explain it.
 

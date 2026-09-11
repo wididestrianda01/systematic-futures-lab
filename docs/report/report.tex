@@ -56,10 +56,17 @@ Seasonality & sign of same-calendar-month trailing score; and a $\pm50\%$ tilt o
 
 \section{Evaluation protocol}
 One accounting path (\texttt{engine.run}) for every family and every parameter search: signals in
-$[-1,1]$ per symbol per day, a 10\% annualized volatility target overlay with $\pm1$ notional caps
-applied identically, a linear cost charge of $b$ basis points per side on traded notional, and
-metrics reported at $b \in \{0,2,5,10\}$ with $b=2$ the headline level a decision is read at. A
-signal formed with data through day $t$ drives the position held from $t$ to $t+1$; a regression test
+$[-1,1]$ per symbol per day, a shared sizing overlay that scales \emph{each symbol} to a 10\% annualized
+volatility target with $\pm1$ notional caps applied identically, a linear cost charge of $b$ basis points
+per side on traded notional, and metrics reported at $b \in \{0,2,5,10\}$ with $b=2$ the headline level a
+decision is read at. Turnover is book-level --- mean daily traded notional per unit of capital, the base
+the charge is taken on --- so $b$ costs $\text{turnover} \times b \times 252 \times 10^{-4}$ of annual
+return. Sharpe is annualized at $\sqrt{252}$ in both windows as a stated convention: the frozen panel
+carries 309.6 sessions per year before 2022 and 258.4 after, so the two windows' Sharpe \emph{levels} are
+not strictly comparable, while the DSR the rule reads is a probability and is unaffected. Sizing per
+symbol is not sizing per book --- realized book volatility runs 0.9--3.0\% in develop+validate and
+1.5--4.6\% out of time --- so the families are like-for-like in rule and cost, not in delivered risk.
+A signal formed with data through day $t$ drives the position held from $t$ to $t+1$; a regression test
 fails on a look-ahead implementation and passes on the correct convention. Develop 2010--2019 and
 validate 2020--2021 form the decision window; the out-of-sample window 2022--2024Q1 is read exactly
 once, at the end, by one script, with the walk-forward schedule extended across the whole panel so
@@ -121,28 +128,31 @@ per trade changes. Trend, the tilt and both ML variants flip sign between gross 
 
 \section{Findings}
 \begin{enumerate}
-\item \textbf{Costs select strategies.} At 5\bps only XS momentum, the baseline and out-of-sample
-seasonality remain positive; the trend benchmark, the seasonal tilt and both ML variants flip sign
-between gross and headline.
-\item \textbf{A null model is a real competitor.} Vol-targeted buy-and-hold earns 0.408 at 2\bps on
-turnover of 0.112 --- the diversification return, which any signal must beat before claiming edge.
+\item \textbf{Costs select strategies.} At $5\bps$ the survivors differ by window: develop+validate
+leaves the baseline, XS momentum and the tuned variant positive, while the out-of-sample window leaves
+XS momentum, seasonality, the trend benchmark and the tilt. Trend and the tilt flip sign between gross
+and the headline level; both ML variants stay positive on both, at a cost of most of their signal.
+\item \textbf{A null model is a real competitor.} Vol-targeted buy-and-hold earns 0.408 at $2\bps$ on
+book turnover of 0.007 --- the diversification return, which any signal must beat before claiming edge.
 \item \textbf{The ML result is the honest one.} In-window winners (DSR 0.9989 / 0.9999 against the
 benchmark's 0.3726), out-of-time failures (0.5433 / 0.0261 against 0.7966). The in-window advantage is
 concentrated in 2015--2019 and 2020--2021 --- the periods the benchmark lost money --- while 6a was
 $-0.80$ in 2010--2014 and 6b had no coverage there at all. Out of time, cost consumes 6a's signal:
-0.759 gross, 0.072 net, turnover 3.18 per day.
+0.759 gross, 0.072 net, book turnover 0.199 per day.
 \item \textbf{Purge and embargo guarantee no label leakage, not generalisation.} The folds are clean
 by construction and asserted on every run; the features are a non-linear re-expression of the same
 premia, so the protocol could not create persistence the premia do not have. A naive-split
 counterfactual was deliberately not run: the size of what the protocol prevented is argued, not
 measured.
-\item \textbf{Standalone seasonality fails on signal, not cost} ($-0.027$ gross at turnover 0.400,
-below the benchmark's 1.654), on a score backed by five priors per calendar month.
-\item \textbf{Carry's result is about the implementation under test.} The published construction is a
-slope magnitude with rank weighting, monthly rebalancing and a 12-month-mean variant; what ran here is
-the sign of the current basis, rebalanced daily (turnover 2.820, the highest of the classic set). The
-sign convention is \emph{not} resolved by adopting the profitable direction; the carry premium is
-neither confirmed nor refuted by these numbers.
+\item \textbf{Standalone seasonality fails on signal, not cost} ($-0.027$ gross at book turnover 0.025,
+a quarter of the benchmark's 0.103), on a score backed by five priors per calendar month.
+\item \textbf{Carry's number is a frequency artefact.} The published construction is a slope magnitude
+with rank weighting and monthly rebalancing; what ran here is the sign of the current basis, refreshed
+daily, and that sign moves with the front leg's own price. Holding the identical signal from each
+month's first session earns $+0.163$ where the daily refresh earns $-3.614$, and inverting the daily
+rule earns $+2.807$ (\texttt{results/out_of_sample/carry\_frequency.csv}). The sign convention is \emph{not}
+resolved by adopting the profitable direction, and the carry premium is neither confirmed nor refuted
+by these numbers.
 \item \textbf{2023 is the year nobody earned.} Out of time, every family sits at or below zero in 2023
 except seasonality, while 2022 and 2024Q1 pay trend and XS momentum. The passive book loses in all
 three, so what generalised was cross-sectional selection, not exposure.

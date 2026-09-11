@@ -8,7 +8,7 @@ model, one evaluation protocol, and a single out-of-sample window read once at t
 interpreting any backtest result (`docs/reading/README.md`). At the time of writing, M1–M6 and M8 are
 read and closed; M7 (AFML ch. 7, 11–12) and the two SHOULD papers S5/S9 exist as agent-drafted
 scaffolding in `docs/reading/notes.md`, explicitly marked *not read*. Every claim below is traceable
-to a committed table; the three places where a reading rests on the scaffolding rather than on a
+to a committed table; the two places where a reading rests on the scaffolding rather than on a
 completed read are flagged inline as **[scaffolded]**. The memo is written so that a reader can
 strike those flags' claims without disturbing the rest.
 
@@ -27,9 +27,9 @@ Five conclusions survived it.
    low-turnover families (baseline, XS momentum) barely move. Turnover, not signal cleverness, is
    what separates these families in a 2 bps world.
 2. **A null model is a real competitor.** The vol-targeted buy-and-hold book earns Sharpe 0.41 at
-   2 bps in develop+validate on turnover of 0.11 — beating the trend benchmark, the seasonal tilt
-   and standalone seasonality after costs. Any signal has to beat the diversification return before
-   it has demonstrated anything.
+   2 bps in develop+validate on book turnover of 0.007 — beating the trend benchmark, the seasonal
+   tilt and standalone seasonality after costs. Any signal has to beat the diversification return
+   before it has demonstrated anything.
 3. **The ML variants won the comparison that was declared and lost the window that was not.** 6a and
    6b beat the benchmark on the pre-declared decision rule inside develop+validate (DSR 0.9989 and
    0.9999 against 0.3726) and both fail it on the single out-of-sample read (0.5433 and 0.0261
@@ -37,9 +37,8 @@ Five conclusions survived it.
    rather than retuned away.
 4. **Two classic findings are cheap and permanent.** Standalone seasonality is negative *before*
    costs with turnover well below the benchmark's — the failure is the signal, not churn. Carry, as
-   implemented here, is the worst family in both windows; the reading attributes that to the
-   implementation under test deviating from the published carry construction, not to the carry
-   premium (section 7).
+   implemented here, is the worst family in both windows; the diagnostic in section 7 shows that
+   number belongs to rebalancing a basis-derived sign daily, not to the carry premium.
 5. **What generalised out of time is what did not need to time the regime.** XS momentum is positive
    in every sub-period and both windows (0.41 / 1.17 at 2 bps); the passive book lost money
    out of time while the timing families earned it — 2022 and 2024Q1 paid the trend and momentum
@@ -67,12 +66,24 @@ manifest.
 **Windows.** Develop 2010–2019, validate 2020–2021 (COVID stress), used jointly as the decision
 window for the ML rule; **out-of-sample 2022 → 2024Q1**, read exactly once.
 
-**Protocol.** One engine (`engine.run`) for every family and every parameter search; a 10% annualized
-volatility target overlay with ±1 notional caps applied identically; a linear cost charge of `bps` per
-side on traded notional at 0/2/5/10 bps, 2 bps headline; Sharpe, Sortino, max drawdown, turnover and
-the Deflated Sharpe Ratio reported per method per cost level. Two reads of each table: the primary
-read on the identical window, and a like-for-like read re-measuring each ML variant on its own
-covered dates, with the run asserting both return the same verdict.
+**Protocol.** One engine (`engine.run`) for every family and every parameter search; a shared sizing
+overlay that scales **each symbol** to a 10% annualized volatility target and clips it to ±1 notional;
+a linear cost charge of `bps` per side on traded notional at 0/2/5/10 bps, 2 bps headline; Sharpe,
+Sortino, max drawdown, turnover and the Deflated Sharpe Ratio reported per method per cost level.
+Two reads of each table: the primary read on the identical window, and a like-for-like read
+re-measuring each ML variant on its own covered dates, with the run asserting both return the same
+verdict.
+
+**Reading the numbers.** Turnover is book-level — mean daily traded notional per unit of capital,
+which is the base the charge is taken on — so `turnover × bps × 252 × 1e-4` is the annual return a
+cost level costs. Sharpe is annualized at √252 in both windows as a stated convention, not because
+the panel has 252 sessions a year: the frozen data carries 309.6 sessions per year in
+develop+validate (it includes Sunday bars through 2021) and 258.4 from 2022, so the develop+validate
+Sharpes are ~11% higher annualized on their own session density, and the two windows' Sharpe
+*levels* are not strictly comparable. The DSR the rule reads is a probability and is unaffected.
+Sizing per symbol does not equalize book risk either: realized book volatility is 0.9–3.0% in
+develop+validate and 1.5–4.6% out of time (baseline 4.6%, `ml_defaults` 1.5%), so the families are
+apples-to-apples in rule and cost, not in delivered risk.
 
 **Test discipline.** A regression test fails on a look-ahead implementation and passes on the correct
 as-of convention (`signal(t)` drives the position held from t to t+1). The roll invariant is pinned
@@ -106,14 +117,14 @@ Per-family construction, parameters, monitoring triggers and failure modes:
 
 | family | Sharpe | DSR | turnover | notes |
 |---|---|---|---|---|
-| `baseline` | 0.408 | 0.9403 | 0.112 | the null model |
-| `xs_momentum` | 0.406 | 0.9397 | 0.789 | |
-| `tsmom` (benchmark) | -0.085 | 0.3726 | 1.654 | +0.200 gross |
-| `seasonality` | -0.088 | 0.3683 | 0.400 | -0.027 gross |
-| `seasonal_tilt` | -0.116 | 0.3284 | 1.537 | +0.163 gross |
-| `carry` | -3.614 | 0.0000 | 2.820 | -3.214 gross |
-| `ml_defaults` (6a) | 0.799 | 0.9989 | 2.107 | trials 1, coverage 60.5% |
-| `ml_tuned` (6b) | 1.550 | 0.9999 | 1.622 | trials 100, coverage 46.5% |
+| `baseline` | 0.408 | 0.9403 | 0.007 | the null model |
+| `xs_momentum` | 0.406 | 0.9397 | 0.049 | |
+| `tsmom` (benchmark) | -0.085 | 0.3726 | 0.103 | +0.200 gross |
+| `seasonality` | -0.088 | 0.3683 | 0.025 | -0.027 gross |
+| `seasonal_tilt` | -0.116 | 0.3284 | 0.096 | +0.163 gross |
+| `carry` | -3.614 | 0.0000 | 0.176 | -3.214 gross |
+| `ml_defaults` (6a) | 0.799 | 0.9989 | 0.132 | trials 1, coverage 60.5% |
+| `ml_tuned` (6b) | 1.550 | 0.9999 | 0.101 | trials 100, coverage 46.5% |
 
 The like-for-like read agrees: on 6a's own dates the benchmark's DSR is 0.4253, on 6b's it is
 0.3651, and both variants still clear it — the verdict is not an artefact of the variants sitting
@@ -123,14 +134,14 @@ flat on days they do not cover.
 
 | family | Sharpe | DSR | turnover |
 |---|---|---|---|
-| `xs_momentum` | 1.174 | 0.9611 | 0.737 |
-| `seasonality` | 0.770 | 0.8793 | 0.556 |
-| `tsmom` (benchmark) | 0.551 | 0.7966 | 1.914 |
-| `seasonal_tilt` | 0.407 | 0.7304 | 1.836 |
-| `ml_tuned` (6b) | 0.390 | 0.0261 | 2.077 |
-| `ml_defaults` (6a) | 0.072 | 0.5433 | 3.183 |
-| `baseline` | -0.694 | 0.1470 | 0.143 |
-| `carry` | -1.756 | 0.0041 | 2.646 |
+| `xs_momentum` | 1.174 | 0.9611 | 0.046 |
+| `seasonality` | 0.770 | 0.8793 | 0.035 |
+| `tsmom` (benchmark) | 0.551 | 0.7966 | 0.120 |
+| `seasonal_tilt` | 0.407 | 0.7304 | 0.115 |
+| `ml_tuned` (6b) | 0.390 | 0.0261 | 0.130 |
+| `ml_defaults` (6a) | 0.072 | 0.5433 | 0.199 |
+| `baseline` | -0.694 | 0.1470 | 0.009 |
+| `carry` | -1.756 | 0.0041 | 0.165 |
 
 **The pre-declared rule, applied as written:** both ML variants fail it out of time. The decision-read
 verdict stands as decided; this is evidence about it, and it is not retuned.
@@ -151,9 +162,13 @@ verdict stands as decided; this is evidence about it, and it is not retuned.
 (develop+validate / out-of-sample. Turnover is identical across a row by construction — only the
 price per trade changes.)
 
-Three families have a *sign-flipping* cost profile: trend, the seasonal tilt and both ML variants are
-profitable gross and unprofitable net at the headline level in at least one window. A 5 bps world
-leaves only XS momentum, the baseline and out-of-sample seasonality standing.
+Two families have a *sign-flipping* cost profile, both in develop+validate: the trend benchmark
+(+0.200 gross → −0.085 at the headline) and the seasonal tilt (+0.163 → −0.116). Both ML variants
+stay positive gross *and* net at the headline level in both windows — 6a 0.759 → 0.072 and 6b
+0.798 → 0.390 out of time — so what cost takes from them is most of the signal, not its sign. At
+5 bps the survivors differ by window: develop+validate leaves the baseline (0.390), XS momentum
+(0.172) and `ml_tuned` (0.753) positive; out of time leaves XS momentum (0.994), seasonality (0.683),
+the trend benchmark (0.208) and the tilt (0.054).
 
 ---
 
@@ -206,9 +221,9 @@ moving-average distance, basis and seasonality scores is a non-linear re-express
 premia the classic families trade; when the benchmark's regime turns, that re-expression has nothing
 extra to lean on.
 
-**Out of time.** 6a's gross Sharpe is 0.759 and its net Sharpe at 2 bps is 0.072 on turnover of 3.18
-per day — the cost charge consumes essentially the whole signal. 6b holds 0.390 net, with a DSR of
-0.0261 under its 100-trial deflation, below the benchmark's 0.7966.
+**Out of time.** 6a's gross Sharpe is 0.759 and its net Sharpe at 2 bps is 0.072 on book turnover of
+0.199 per day — the cost charge consumes essentially the whole signal. 6b holds 0.390 net, with a DSR
+of 0.0261 under its 100-trial deflation, below the benchmark's 0.7966.
 
 **What the purged/embargoed protocol bought, and what it did not.** It bought a structural guarantee:
 with a 5-session label and daily overlapping samples, a shuffled or plain k-fold split leaks by
@@ -231,26 +246,38 @@ generalize. DSR is a discipline on selection bias, not a promise about the next 
 ## 7. Two findings worth more than the losers
 
 **Standalone seasonality fails on the signal, not on cost.** It is negative *before* costs in
-develop+validate (-0.027) with turnover of 0.40 — well below the benchmark's 1.65 — so cost drag is
-not the explanation. The score's statistical base is thin by construction: a 60-month window holds
-five priors per calendar month, so the estimate is noisy and its sign is not stable across windows
-(out of time the same family earns +0.828 gross). Its intended use in this project was always the
-tilt on trend, and the tilt inherits trend's turnover and hence trend's cost problem. Reading: a
+develop+validate (-0.027) with book turnover of 0.025 — a quarter of the benchmark's 0.103 — so cost
+drag is not the explanation. The score's statistical base is thin by construction: a 60-month window
+holds five priors per calendar month, so the estimate is noisy and its sign is not stable across
+windows (out of time the same family earns +0.828 gross). Its intended use in this project was always
+the tilt on trend, and the tilt inherits trend's turnover and hence trend's cost problem. Reading: a
 documented failed challenger, reported as the spec required, and not evidence against commodity
 seasonality as such (S4).
 
-**Carry's result is about the implementation under test.** The published construction (M3) is a
-slope *magnitude* — `(F1 − F2) / (F2 · ΔT)` per month — with rank weighting, monthly rebalancing, and
-a 12-month-mean carry variant recommended precisely because current-slope carry is seasonal. What
-this project ran is the *sign* of the current basis, rebalanced daily. The tell is turnover: 2.82 per
-day, the highest of the classic set, on a signal whose published form is rebalanced monthly. The
-family is therefore trading the seasonal noise of the basis rather than the carry premium, which is
-consistent with it being the worst performer in both windows — and with it being catastrophic
-precisely in 2015–2019 (-5.85 Sharpe). The sign convention is *not* resolved by preferring the
-profitable direction: adopting the inverted sign after seeing it win is the selection bias the DSR
-exists to catch. The honest conclusion is that the tables measure "naive daily sign carry", M3's
-recommended construction has not been tested here, and the carry premium is neither confirmed nor
-refuted by these numbers.
+**Carry's result belongs to the rebalancing frequency, not to the carry premium.** The published
+construction (M3) is a slope *magnitude* — `(F1 − F2) / (F2 · ΔT)` per month — rank-weighted,
+rebalanced monthly, with a 12-month-mean variant recommended precisely because current-slope carry is
+seasonal. What this project ran is the *sign* of the current basis refreshed every session. That sign
+moves with the front leg's own price as much as with the term structure, so at daily frequency the
+family trades the basis's own noise — and the diagnostic in `results/out_of_sample/carry_frequency.csv`
+measures exactly that, through the same seam, on the same windows:
+
+| construction | dev+validate | out-of-sample | turnover (dev) |
+|---|---|---|---|
+| daily `sign(-basis)` — the committed row | -3.614 | -1.756 | 0.176 |
+| the same rule, held from each month's first session | +0.163 | +0.001 | 0.016 |
+| daily `sign(basis)` — the committed rule inverted | +2.807 | +1.269 | 0.176 |
+
+Holding the identical signal, rebalanced monthly instead of daily, moves develop+validate from -3.614
+to +0.163; inverting the daily rule earns +2.807. No term-structure premium has a Sharpe of 3.6, and
+the literature's version of this rule — long positive carry, short negative, equal-weighted, monthly —
+reports a positive Sharpe of order 0.5–1 (M3; the diversified carry factor in Koijen, Moskowitz,
+Pedersen & Vrugt 2018 is 1.10). So the tables measure "naive daily sign carry": the family's losses
+are the churn of a basis-derived sign, which is also why they concentrate in 2015–2019 (-5.85). The
+sign convention is *not* resolved by preferring the profitable direction — adopting the inverted sign
+after seeing it win is the selection bias the DSR exists to catch — but neither is it left hanging:
+the frequency diagnostic explains the number's sign and size, and M3's recommended construction
+remains untested here. The carry premium is neither confirmed nor refuted by these tables.
 
 ---
 
@@ -290,11 +317,12 @@ that made the baseline strong in develop+validate (0.41 at 2 bps) was not availa
   skew and kurtosis. It is a multiple-testing correction, and its input — the trial count — is
   self-reported work. Two corrections are therefore worth more than the number: the log is
   committed, and the out-of-sample window is read once.
-- **Turnover 1.654/day** means: mean daily traded notional per unit of capital, charged at `bps` per
-  side. Cost drag is approximately `turnover × bps × 252 × 1e-4` per year in return terms; at 2 bps
-  and turnover 1.65 that is roughly 0.83%/yr, which is the difference between the benchmark's +0.20
-  gross and -0.085 net Sharpe. Cost sensitivity is therefore the second-order term everyone checks
-  and the first-order term that decides this comparison.
+- **Turnover 0.103/day** means: mean daily traded notional **per unit of book capital** — the book's
+  traded notional, averaged across the sixteen equal-capital sleeves, which is the same base the
+  `bps` charge is taken on. Cost drag is `turnover × bps × 252 × 1e-4` per year in return terms; at
+  2 bps and turnover 0.103 that is 0.52%/yr, and against the benchmark's 1.8% book volatility it is
+  the 0.28 Sharpe between its +0.20 gross and -0.085 net. Cost sensitivity is therefore the
+  second-order term everyone checks and the first-order term that decides this comparison.
 - **Coverage 46.5%** means: the share of the evaluation window on which the family holds a
   non-constructed position. A Sharpe measured on a partially flat series is diluted by roughly
   √coverage, which is why the like-for-like read exists and why both reads are committed.
@@ -316,8 +344,17 @@ that made the baseline strong in develop+validate (0.41 at 2 bps) was not availa
   only.
 - **No CSCV/PBO diagnostic** (section 5) and **no naive-split counterfactual** (section 6): the two
   places where the multiple-testing story rests on argument rather than measurement.
+- **Risk is not equalized across families.** The overlay targets 10% annualized volatility *per
+  symbol*, not per book, so realized book volatility runs 0.9–3.0% in develop+validate and 1.5–4.6%
+  out of time. Sharpe comparisons are like-for-like in rule and cost; drawdown and return levels are
+  not (section 2).
+- **Annualization is a stated convention, not a property of the panel.** Sharpe is reported at √252
+  in both windows while the data carries 309.6 sessions per year before 2022 and 258.4 after, so the
+  two windows' Sharpe *levels* are not strictly comparable — the develop+validate column is ~11%
+  higher on its own session density. The DSR the rule reads is a probability and is unaffected
+  (section 2).
 - **Two SHOULD readings are scaffolded, not read** (S5, S9), and the M7 book chapters are not read;
-  the three claims flagged **[scaffolded]** are the ones a reader should hold loosely.
+  the two claims flagged **[scaffolded]** are the ones a reader should hold loosely.
 - **The ML result is specific.** It does not say "machine learning does not work on futures". It says
   this feature set, this label horizon, this fold geometry, this cost level and this window produced
   an in-sample winner that did not generalize.
@@ -356,7 +393,8 @@ Deliberate, with reasons — the boundary is a research judgement, not a gap in 
   `docs/methods/`.
 - Reading canon and notes: `docs/reading/`.
 - Committed numbers: `results/families/`, `results/decision/`, `results/out_of_sample/`; decision records
-  `results/decision/DECISION_RULE.md`, `DECISION.md`, `results/out_of_sample/OOT.md`.
+  `results/decision/DECISION_RULE.md`, `DECISION.md`, `results/out_of_sample/OOT.md`; and the carry frequency
+  diagnostic `results/out_of_sample/carry_frequency.csv` (`scripts/carry_frequency_diagnostic.py`).
 - The executable version of this memo's story: `notebooks/analysis.ipynb`.
 
 **Market facts used in the framing:** the Danish systematic shop is Alipes Capital (Copenhagen); Da

@@ -15,8 +15,8 @@ nothing.
 
 | window | Sharpe 0 bps | Sharpe 2 bps | DSR | turnover |
 |---|---|---|---|---|
-| develop+validate | 0.419 | 0.408 | 0.9403 | 0.112 |
-| out-of-sample | -0.685 | -0.694 | 0.1470 | 0.143 |
+| develop+validate | 0.419 | 0.408 | 0.9403 | 0.007 |
+| out-of-sample | -0.685 | -0.694 | 0.1470 | 0.009 |
 
 **Failure modes (documented, mechanical).** Turnover is an order of magnitude below the signal
 families, so cost is not what moves this family: its out-of-sample reading is the book's return, not
@@ -26,10 +26,12 @@ work — mechanically, a rebalanced equal-capital book of imperfectly correlated
 (M4, read).
 
 **Monitoring.** Rolling Sharpe of the equal-capital book; rolling realized vol against the 10%
-target; the diversification contribution (mean cross-sectional dispersion and average pairwise
-correlation) — thinning diversification is the first sign that this baseline's free lunch is
-shrinking. A change to the universe, the overlay's vol target or lookback, or the cost level read is
-a material change under RTS 6 framing and invalidates this table until re-run.
+per-symbol target (the book's own realized vol is lower — 0.9% in develop+validate, 4.6% out of time
+— because the overlay sizes each root, not the book); the diversification contribution (mean
+cross-sectional dispersion and average pairwise correlation) — thinning diversification is the first
+sign that this baseline's free lunch is shrinking. A change to the universe, the overlay's vol target
+or lookback, or the cost level read is a material change under RTS 6 framing and invalidates this
+table until re-run.
 
 **Open questions.** Whether daily vol targeting is the right comparison point for a monthly
 literature baseline, and how much of the family's develop+validate Sharpe survives a monthly

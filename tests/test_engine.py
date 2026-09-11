@@ -94,6 +94,23 @@ def test_cost_sensitivity_rows():
     assert table["turnover"].nunique() == 1  # turnover independent of cost level
 
 
+def test_turnover_prices_the_cost_column():
+    """The reported turnover is the base the charge is taken on, per unit of book capital:
+    the mean daily return given up between two cost levels is exactly `turnover x bps x 1e-4`.
+    Summing traded notional across symbols instead of averaging it reports `n_symbols` times
+    the drag the column explains (16x on the project panel)."""
+    wide = continuous_wide()
+    cl = constant_long(wide)
+    table = run(cl, wide, bps_grid=(0.0, 2.0))
+    drag = curve(cl, wide, bps=0.0).mean() - curve(cl, wide, bps=2.0).mean()
+    assert abs(drag - table.loc[2.0, "turnover"] * 2e-4) < 1e-15
+
+    # and in Sharpe terms, to the accuracy of the (slightly different) cost-level stds
+    ann_vol = curve(cl, wide).std(ddof=1) * sqrt(ANN)
+    implied = (table.loc[0.0, "sharpe"] - table.loc[2.0, "sharpe"]) * ann_vol / (2e-4 * ANN)
+    assert abs(implied / table.loc[2.0, "turnover"] - 1.0) < 0.02
+
+
 def test_date_mask_evaluates_on_those_days_only():
     """The like-for-like read: metrics on a subset of days, same accounting path."""
     wide = continuous_wide(("ES",), seed=13)

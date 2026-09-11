@@ -15,20 +15,28 @@ flat — never zero-filled.
 
 | window | Sharpe 0 bps | Sharpe 2 bps | DSR | turnover |
 |---|---|---|---|---|
-| develop+validate | -3.214 | -3.614 | 0.0000 | 2.820 |
-| out-of-sample | -1.513 | -1.756 | 0.0041 | 2.646 |
+| develop+validate | -3.214 | -3.614 | 0.0000 | 0.176 |
+| out-of-sample | -1.513 | -1.756 | 0.0041 | 0.165 |
 
 **Failure modes (documented, mechanical).** Under the literature's sign convention this is the worst
-family in both windows **and** the highest-turnover classic (2.82/day), so cost amplifies an already
+family in both windows **and** the highest-turnover classic (0.176/day), so cost amplifies an already
 negative gross signal rather than causing it. M3 names two hazards that apply directly: the basis
 series is seasonal, so a current-slope signal is noisy (M3's own robustness variant is a 12-month mean
-carry), and extreme basis spreads are distress indicators rather than richer signals.
+carry), and extreme basis spreads are distress indicators rather than richer signals. The third, and
+the one that dominates, is frequency: the same signal held from each month's first session earns
+**+0.163** in develop+validate where the daily refresh earns -3.614, and inverting the daily rule
+earns +2.807 — `results/out_of_sample/carry_frequency.csv` (built by
+`scripts/carry_frequency_diagnostic.py`) is the committed evidence. No term-structure premium has a
+Sharpe of 3.6 in either direction, so the committed row measures the churn of a basis-derived sign,
+not carry.
 
 **Open question — the largest one in the table.** Whether the sign convention is right for this
 universe and window. The committed tables keep the literature sign; the inverted sign is *not*
 adopted on the strength of its backtest, because choosing the profitable direction after seeing the
-result is precisely the selection the Deflated Sharpe Ratio exists to catch. This is resolved by the
-reading pass (M3, M4), not by preferring the better number.
+result is precisely the selection the Deflated Sharpe Ratio exists to catch. The frequency diagnostic
+above explains why the number is so large without settling the premium, and M3's published
+construction — slope magnitude, rank-weighted, monthly — is untested here. Resolving the premium is
+the reading pass's job (M3, M4), not the backtest's.
 
 **Monitoring.** Rolling Sharpe; the share of roots in backwardation (a regime statistic, and the
 family's exposure); basis-rank dispersion; turnover; and the gap between current-slope and 12-month-mean

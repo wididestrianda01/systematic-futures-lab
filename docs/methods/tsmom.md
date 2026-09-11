@@ -19,10 +19,10 @@ family as the literature's 1/3/12-month core.
 
 | window | Sharpe 0 bps | Sharpe 2 bps | DSR | turnover |
 |---|---|---|---|---|
-| develop+validate | 0.200 | -0.085 | 0.3726 | 1.654 |
-| out-of-sample | 0.780 | 0.551 | 0.7966 | 1.914 |
+| develop+validate | 0.200 | -0.085 | 0.3726 | 0.103 |
+| out-of-sample | 0.780 | 0.551 | 0.7966 | 0.120 |
 
-**Failure modes (documented, mechanical).** Cost is the first: turnover of 1.65/day flips
+**Failure modes (documented, mechanical).** Cost is the first: book turnover of 0.103/day flips
 develop+validate Sharpe from +0.20 gross to -0.085 at 2 bps, and the same turnover takes 0.23 of
 Sharpe out of the out-of-sample window. The second is the payoff shape M1 names — the strategy is
 straddle-like, strongest in sustained moves and weakest in sharp reversals, so a sideways,

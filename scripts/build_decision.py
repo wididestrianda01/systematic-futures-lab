@@ -30,8 +30,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pandas as pd
-
 from systematic_futures.data.panels import (
     DEVELOP_START,
     VALIDATE_END,
@@ -42,17 +40,19 @@ from systematic_futures.decision import require_same_verdict, verdict
 from systematic_futures.harness import (
     BENCHMARK,
     HEADLINE_BPS,
-    classic_set,
+    LABELS,
+    ML_VARIANTS,
+    N_TRIALS,
+    SPLITS,
+    full_set,
     headline_rows,
+    like_for_like,
+    protocol_meta,
     table_for,
+    walk_forward_folds,
 )
-from systematic_futures.ml import leakage_violations, lgbm_defaults, lgbm_tuned, purged_walk_forward
 
 RESULTS = Path("results/phase4")
-HORIZON, SPLITS, EMBARGO = 5, 5, 10
-N_TRIALS = 20
-ML_VARIANTS = ("ml_defaults", "ml_tuned")
-LABELS = {"ml_defaults": "6a", "ml_tuned": "6b"}
 
 RULE = f"""# the decision read decision rule (pre-declared in the spec, before this phase's numbers existed)
 
@@ -135,42 +135,18 @@ def main() -> int:
     wide, basis_wide = load_frozen()
     window = develop_validate(wide)
 
-    folds = purged_walk_forward(window.index, n_splits=SPLITS, horizon=HORIZON, embargo=EMBARGO)
-    problems = leakage_violations(folds, window.index, horizon=HORIZON, embargo=EMBARGO)
-    assert not problems, f"splitter leaks on the frozen window: {problems[:3]}"
+    walk_forward_folds(window.index)
 
-    methods = {
-        **classic_set(basis_wide),
-        "ml_defaults": lgbm_defaults(basis_wide, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO),
-        "ml_tuned": lgbm_tuned(
-            basis_wide, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO, n_trials=N_TRIALS
-        ),
-    }
+    methods = full_set(basis_wide)
     signals = {name: method(window) for name, method in methods.items()}
     trials = {name: getattr(method, "trials", 1) for name, method in methods.items()}
-    meta = pd.DataFrame(
-        {
-            name: {
-                "trials": trials[name],
-                "signal_coverage": float((signals[name] != 0).any(axis=1).mean()),
-            }
-            for name in methods
-        }
-    ).T
+    meta = protocol_meta(signals, trials)
 
     RESULTS.mkdir(parents=True, exist_ok=True)
-    full = table_for(methods, window, trials=trials).join(meta, on="method")
+    full = table_for(signals, window, trials=trials).join(meta, on="method")
     full.to_csv(RESULTS / "tables.csv", index=False)
 
-    like = []
-    for variant in ML_VARIANTS:
-        dates = signals[variant].index[(signals[variant] != 0).any(axis=1)]
-        table = table_for(methods, window, trials=trials, dates=dates)
-        table["window"] = variant
-        table["window_dates"] = len(dates)
-        like.append(table)
-        print(f"like-for-like window ({variant}): {len(dates)} dates")
-    like_tables = pd.concat(like, ignore_index=True)
+    like_tables = like_for_like(signals, window, signals, trials, window.index)
     like_tables.to_csv(RESULTS / "tables_like_for_like.csv", index=False)
 
     primary = verdict(headline_rows(full), ML_VARIANTS)

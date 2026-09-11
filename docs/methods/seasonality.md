@@ -21,10 +21,10 @@ quote hole does not become a zero-return day.
 
 | variant | window | Sharpe 0 bps | Sharpe 2 bps | DSR | turnover |
 |---|---|---|---|---|---|
-| `seasonality` | develop+validate | -0.027 | -0.088 | 0.3683 | 0.400 |
-| `seasonality` | out-of-sample | 0.828 | 0.770 | 0.8793 | 0.556 |
-| `seasonal_tilt` | develop+validate | 0.163 | -0.116 | 0.3284 | 1.537 |
-| `seasonal_tilt` | out-of-sample | 0.644 | 0.407 | 0.7304 | 1.836 |
+| `seasonality` | develop+validate | -0.027 | -0.088 | 0.3683 | 0.025 |
+| `seasonality` | out-of-sample | 0.828 | 0.770 | 0.8793 | 0.035 |
+| `seasonal_tilt` | develop+validate | 0.163 | -0.116 | 0.3284 | 0.096 |
+| `seasonal_tilt` | out-of-sample | 0.644 | 0.407 | 0.7304 | 0.115 |
 
 **Failure modes (documented, mechanical).** In develop+validate the standalone signal is negative
 *before* costs (-0.027) while its turnover is *below* the trend benchmark's — so churn is not what

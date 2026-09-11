@@ -85,6 +85,17 @@ def _exposure(
     return vol_target_positions(sig, closes, vol_target, cap, vol_lookback)
 
 
+def _book(daily: pd.DataFrame, dates: pd.DatetimeIndex | None) -> pd.Series:
+    """Per-symbol daily returns -> the book's daily return series, `dates`-masked if asked.
+
+    The one place the equal-capital mean across symbols is taken, shared by `run`
+    and `curve`, so a plotted series and a reported metric cannot come from
+    different aggregation.
+    """
+    book = daily.mean(axis=1)
+    return book.reindex(dates) if dates is not None else book
+
+
 def curve(
     method,
     closes: pd.DataFrame,
@@ -95,16 +106,15 @@ def curve(
     bps: float = 0.0,
     dates: pd.DatetimeIndex | None = None,
 ) -> pd.Series:
-    """Daily portfolio return series at one cost level — the same accounting path as `run`.
+    """Daily book return series at one cost level — the same accounting path as `run`.
 
-    The engine owns the overlay, the held path and the cost charge once, so an
-    equity curve drawn from this cannot disagree with the Sharpe in the table it
-    sits beside. `dates` masks the reported days exactly as `run` does; the
-    exposure behind them is still computed on the full panel.
+    The engine owns the overlay, the held path and the cost charge once, so a
+    series drawn from this cannot disagree with the Sharpe in the table it sits
+    beside. `dates` masks the reported days exactly as `run` does; the exposure
+    behind them is still computed on the full panel.
     """
     exposure = _exposure(method, closes, vol_target=vol_target, cap=cap, vol_lookback=vol_lookback)
-    returns = account(exposure, closes, bps).mean(axis=1)
-    return returns.reindex(dates) if dates is not None else returns
+    return _book(account(exposure, closes, bps), dates)
 
 
 def run(
@@ -133,16 +143,12 @@ def run(
     so the window semantics never change with the mask.
     """
     exposure = _exposure(method, closes, vol_target=vol_target, cap=cap, vol_lookback=vol_lookback)
-    rows = {}
     held = held_positions(exposure, closes)
     traded = traded_notional(held)
+    charged = traded if dates is None else traded.reindex(dates)
+    rows = {}
     for bps in bps_grid:
-        daily = account(exposure, closes, bps)
-        if dates is None:
-            charged = traded
-        else:
-            daily, charged = daily.reindex(dates), traded.reindex(dates)
-        r = daily.mean(axis=1)
+        r = _book(account(exposure, closes, bps), dates)
         rows[bps] = {
             "sharpe": sharpe(r),
             "sortino": sortino(r),

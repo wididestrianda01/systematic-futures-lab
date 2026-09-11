@@ -48,18 +48,22 @@ verdict as decided.
 
 Four further readings, argued in the memo:
 
-- **Costs select strategies rather than shading them.** At 5 bps only cross-sectional momentum, the
-  baseline and out-of-sample seasonality remain positive; trend, the seasonal tilt and both ML
-  variants flip sign between gross and headline cost.
-- **The null model is a real competitor.** Vol-targeted buy-and-hold earns 0.408 at 2 bps on turnover
-  of 0.112 — the diversification return, which a signal has to beat before it has shown anything.
+- **Costs select strategies rather than shading them.** At 5 bps the survivors differ by window: the
+  decision window leaves the baseline, cross-sectional momentum and the tuned variant positive, while
+  the out-of-sample window leaves cross-sectional momentum, seasonality, the trend benchmark and the
+  tilt. Trend and the seasonal tilt flip sign between gross and headline cost; both ML variants stay
+  positive gross and net, with cost taking most of the signal rather than its sign.
+- **The null model is a real competitor.** Vol-targeted buy-and-hold earns 0.408 at 2 bps on book
+  turnover of 0.007 — the diversification return, which a signal has to beat before it has shown
+  anything.
 - **What generalised is what did not need to time the regime.** Cross-sectional momentum is positive
   in every sub-period and both windows; the passive book lost money in all three out-of-sample years
   while the timing families earned it.
 - **Two honest-failure results.** Standalone seasonality is negative before costs at turnover below
-  the benchmark's (so churn is not the explanation), and carry's result traces to the implementation
-  under test — a daily sign of the current basis where the published construction is a monthly,
-  rank-weighted slope magnitude — so the carry premium is neither confirmed nor refuted here.
+  the benchmark's (so churn is not the explanation), and carry's number belongs to rebalancing a
+  basis-derived sign daily — the same rule held monthly earns +0.163 where the daily refresh earns
+  -3.614, and the published construction is a monthly, rank-weighted slope magnitude — so the carry
+  premium is neither confirmed nor refuted here. Evidence: `results/out_of_sample/carry_frequency.csv`.
 
 ## The dataset
 
@@ -95,10 +99,18 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
 - **One accounting path** (ADR 0001): every method is a callable `closes → signals`; the engine owns
   sizing, P&L, costs and metrics. The arithmetic that tunes a model and the arithmetic that publishes
   a table cannot drift apart, and a test pins the equivalence.
-- **Shared overlay**: signals scaled to a 10% annualized volatility target on trailing realized vol,
-  clipped to ±1 notional per symbol — identically for every family.
+- **Shared overlay**: signals scaled to a 10% annualized volatility target **per symbol** on trailing
+  realized vol, clipped to ±1 notional — identically for every family. Per-symbol sizing is not
+  book-level sizing: realized book volatility is 0.9–3.0% in develop+validate and 1.5–4.6% out of
+  time, so the families are like-for-like in rule and cost, not in delivered risk.
 - **Costs**: a linear charge of `bps` per side on traded notional, reported at 0/2/5/10 bps with 2 bps
-  the headline level a decision is read at; turnover comes from the same object the cost is charged on.
+  the headline level a decision is read at. Turnover is book-level — mean daily traded notional per
+  unit of capital, the same object the charge is taken on — so `turnover × bps × 252 × 1e-4` is the
+  annual return a cost level costs.
+- **Reported units**: Sharpe is annualized at √252 in both windows as a stated convention, not
+  because the panel has 252 sessions a year — the frozen data carries 309.6 sessions per year in
+  develop+validate (Sunday bars included) and 258.4 from 2022, so the two windows' Sharpe *levels* are
+  ~11% apart on equal annualization. The DSR the rule reads is a probability and is unaffected.
 - **No look-ahead, structurally**: a signal formed with data through day `t` drives the position held
   from `t` to `t+1`; a regression test fails on a look-ahead implementation and passes on the correct
   one.
@@ -122,11 +134,12 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
   pinning its sign and scale at the seam.
 - `src/systematic_futures/ml/` — point-in-time features, the hand-rolled purged/embargoed splitter,
   the two LightGBM variants.
-- `harness.py` / `decision.py` — the comparison set and the pre-declared rule, written once so phases
-  cannot drift apart.
+- `harness.py` / `decision.py` — the comparison set, the ML walk-forward protocol (fold geometry,
+  horizon, search budget, trial counts) and the pre-declared rule, written once so phases cannot
+  drift apart.
 - `scripts/` — thin runners; `notebooks/` — explanations. Logic lives in the package, arguments live
   in the runners.
-- CI runs the test suite (100 tests) on every push.
+- CI runs the test suite (101 tests) on every push.
 
 ## Where the interpretation lives
 
@@ -143,19 +156,25 @@ only. The dataset is fetched from the pinned upstream commit and verified agains
 manifest; re-runs without network work off the frozen local store.
 
 ```bash
-git checkout results.1
+git checkout results.2
 uv sync
 uv run python scripts/fetch_raw.py        # writes data/raw/, manifest-gated
 uv run python scripts/build_derived.py    # writes data/derived/, manifest-verified
 uv run python scripts/build_families.py
 uv run python scripts/build_decision.py
 uv run python scripts/build_out_of_sample.py # the single out-of-sample read
-uv run pytest                             # 100 tests
+uv run python scripts/sweep_tsmom.py      # results/trend_sweep/tsmom_sweep.csv
+uv run python scripts/carry_frequency_diagnostic.py  # results/out_of_sample/carry_frequency.csv
+uv run python scripts/build_report_figures.py        # docs/report/figures/equity.pdf
+uv run pytest                             # 101 tests
 uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb
+(cd docs/report && pdflatex -interaction=nonstopmode report.tex)   # report.pdf
 ```
 
 The phase scripts write the same tables that are committed. Regeneration is deterministic by
-construction: seeded fixture demos, frozen inputs, and committed outputs.
+construction: seeded fixture demos, frozen inputs, and committed outputs. `diff -r` against the
+committed `results/` tree is the check — the tables, decision records and return series rebuild
+byte-for-byte.
 
 ## Repository layout
 
@@ -166,7 +185,7 @@ construction: seeded fixture demos, frozen inputs, and committed outputs.
 | `docs/methods/` | per-family governance docs: construction, evidence, failure modes, monitoring |
 | `docs/report/report.tex`, `report.pdf` | the condensed report |
 | `docs/handoff/brief.md` | self-test questions, regulation talking points, non-adopt boundary |
-| `results/phase3|4|5/` | committed tables, decision records, derived return series |
+| `results/phase3|4|5/` | committed tables, decision records, derived return series, the carry frequency diagnostic |
 | `docs/adr/` | decision reasoning (one accounting path) |
 | `docs/data/pst-source.md` | data provenance and licensing posture |
 | `.scratch/lab/` | the spec and phase tickets (local tracker, not committed) |

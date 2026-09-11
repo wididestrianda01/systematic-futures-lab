@@ -27,12 +27,12 @@ no fold predicts, which is why coverage is reported with the numbers.
 
 | variant | window | Sharpe 0 bps | Sharpe 2 bps | DSR | turnover | trials | coverage |
 |---|---|---|---|---|---|---|---|
-| `ml_defaults` (6a) | develop+validate | 1.406 | 0.799 | 0.9989 | 2.107 | 1 | 60.5% |
-| `ml_tuned` (6b) | develop+validate | 2.074 | 1.550 | 0.9999 | 1.622 | 100 | 46.5% |
-| `tsmom` (benchmark) | develop+validate | 0.200 | -0.085 | 0.3726 | 1.654 | 1 | 100% |
-| `ml_defaults` (6a) | out-of-sample | 0.759 | 0.072 | 0.5433 | 3.183 | 1 | 99.1% |
-| `ml_tuned` (6b) | out-of-sample | 0.798 | 0.390 | 0.0261 | 2.077 | 100 | 99.1% |
-| `tsmom` (benchmark) | out-of-sample | 0.780 | 0.551 | 0.7966 | 1.914 | 1 | 100% |
+| `ml_defaults` (6a) | develop+validate | 1.406 | 0.799 | 0.9989 | 0.132 | 1 | 60.5% |
+| `ml_tuned` (6b) | develop+validate | 2.074 | 1.550 | 0.9999 | 0.101 | 100 | 46.5% |
+| `tsmom` (benchmark) | develop+validate | 0.200 | -0.085 | 0.3726 | 0.103 | 1 | 100% |
+| `ml_defaults` (6a) | out-of-sample | 0.759 | 0.072 | 0.5433 | 0.199 | 1 | 99.1% |
+| `ml_tuned` (6b) | out-of-sample | 0.798 | 0.390 | 0.0261 | 0.130 | 100 | 99.1% |
+| `tsmom` (benchmark) | out-of-sample | 0.780 | 0.551 | 0.7966 | 0.120 | 1 | 100% |
 
 The pre-declared rule (`results/decision/DECISION_RULE.md`, written before these numbers existed): a
 variant wins only if its decision-window DSR after costs beats the benchmark's. Applied in
@@ -43,7 +43,7 @@ reported.
 
 **Failure modes (documented, mechanical).**
 
-1. **Cost.** These are the highest-turnover families in the project: 6a reaches 3.18/day out of time,
+1. **Cost.** These are the highest-turnover families in the project: 6a reaches 0.199/day out of time,
    and 2 bps removes 0.69 of its 0.76 gross Sharpe there.
 2. **Coverage.** Folds that cannot be fitted leave flat days, which dilute Sharpe by roughly the
    square root of coverage (46.5% for 6b in develop+validate). This is why the primary read is

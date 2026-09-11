@@ -49,12 +49,16 @@ def traded_notional(exposure: pd.DataFrame) -> pd.DataFrame:
 
 
 def turnover(traded: pd.DataFrame) -> float:
-    """Mean daily traded notional from a `traded_notional` panel.
+    """Mean daily traded notional per unit of book capital, from a `traded_notional` panel.
 
-    The same base the cost model charges, so reporting and charging can never
-    drift apart (both take the frame `traded_notional` returns).
+    The book is an equal-capital mean across symbols (`account` returns per-symbol
+    returns and the pipeline seams average them), so a day's traded notional per
+    unit of book capital is the mean across symbols of |dE| — which is exactly the
+    base `account` charges at `bps` per side. Summing across symbols instead would
+    report the traded notional of the whole book gross, `n_symbols` times the drag
+    the cost column explains.
     """
-    return float(traded.sum(axis=1).mean())
+    return float(traded.mean(axis=1).mean())
 
 
 def deflated_sharpe(returns, trials: int = 1) -> float:

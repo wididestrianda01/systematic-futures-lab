@@ -26,7 +26,7 @@ Read in the order below; commit a one-paragraph personal note per paper to
 | S7 | Maillard, Roncalli, Teïletche 2010 — ERC portfolios | the families read (baseline) | primary source if baseline uses ERC rather than naive vol scaling |
 | S3 | Asness, Moskowitz, Pedersen 2013 — Value and Momentum Everywhere | the families read (XS momentum) | defines the 12m futures XS momentum half of family #3 |
 | S4 | Baltas & Kosowski 2013 — Momentum Strategies in Futures | the families read (methods) | closest prior work; implementation details (signals, turnover) |
-| S5 | Daniel & Moskowitz 2016 — Momentum Crashes | the out-of-sample read (findings) | risk framing for the 2022–2025 OOT window |
+| S5 | Daniel & Moskowitz 2016 — Momentum Crashes | the out-of-sample read (findings) | risk framing for the OOT window (2022 → 2024Q1) |
 | S9 | Fung & Hsieh 2001 — Trend Followers | the out-of-sample read (findings) | CTA lineage for the memo's industry framing |
 
 Note: no canonical "roll mechanics" paper exists — the canon carries it via M3 + M4.

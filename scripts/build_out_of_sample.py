@@ -40,17 +40,20 @@ from systematic_futures.engine.metrics import sharpe
 from systematic_futures.harness import (
     BENCHMARK,
     HEADLINE_BPS,
+    LABELS,
+    ML_VARIANTS,
+    N_TRIALS,
+    SPLITS,
     VOL_TARGET,
-    classic_set,
+    full_set,
     headline_rows,
+    like_for_like,
+    protocol_meta,
     table_for,
+    walk_forward_folds,
 )
-from systematic_futures.ml import leakage_violations, lgbm_defaults, lgbm_tuned, purged_walk_forward
 
 RESULTS = Path("results/results.1")
-HORIZON, SPLITS, EMBARGO, N_TRIALS = 5, 5, 10, 20
-ML_VARIANTS = ("ml_defaults", "ml_tuned")
-LABELS = {"ml_defaults": "6a", "ml_tuned": "6b"}
 
 
 def outcome_doc(primary: dict, sensitivity: dict[str, dict], meta: pd.DataFrame) -> str:
@@ -117,46 +120,21 @@ def main() -> int:
         f"OOT window: {oot.index.min().date()} → {oot.index.max().date()} ({len(oot.index)} dates)"
     )
 
-    folds = purged_walk_forward(wide.index, n_splits=SPLITS, horizon=HORIZON, embargo=EMBARGO)
-    problems = leakage_violations(folds, wide.index, horizon=HORIZON, embargo=EMBARGO)
-    assert not problems, f"splitter leaks across the OOT boundary: {problems[:3]}"
+    folds = walk_forward_folds(wide.index)
     assert max(fold.test.max() for fold in folds) == wide.index.max(), (
         "last fold must cover the end"
     )
 
-    methods = {
-        **classic_set(basis_wide),
-        "ml_defaults": lgbm_defaults(basis_wide, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO),
-        "ml_tuned": lgbm_tuned(
-            basis_wide, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO, n_trials=N_TRIALS
-        ),
-    }
+    methods = full_set(basis_wide)
     signals = {name: method(wide) for name, method in methods.items()}
     trials = {name: getattr(method, "trials", 1) for name, method in methods.items()}
-    meta = pd.DataFrame(
-        {
-            name: {
-                "trials": trials[name],
-                "signal_coverage": float((signals[name].loc[oot.index] != 0).any(axis=1).mean()),
-            }
-            for name in methods
-        }
-    ).T
+    meta = protocol_meta(signals, trials, oot.index)
 
     RESULTS.mkdir(parents=True, exist_ok=True)
     full = table_for(signals, wide, trials=trials, dates=oot.index).join(meta, on="method")
     full.to_csv(RESULTS / "tables.csv", index=False)
 
-    like = []
-    for variant in ML_VARIANTS:
-        covered = signals[variant].index[(signals[variant] != 0).any(axis=1)]
-        dates = oot.index.intersection(covered)
-        table = table_for(signals, wide, trials=trials, dates=dates)
-        table["window"] = variant
-        table["window_dates"] = len(dates)
-        like.append(table)
-        print(f"like-for-like window ({variant}): {len(dates)} of {len(oot.index)} OOT dates")
-    like_tables = pd.concat(like, ignore_index=True)
+    like_tables = like_for_like(signals, wide, signals, trials, oot.index)
     like_tables.to_csv(RESULTS / "tables_like_for_like.csv", index=False)
 
     curves = []

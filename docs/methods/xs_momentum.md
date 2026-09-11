@@ -17,8 +17,8 @@ that day's ranking rather than ranked on a partial history.
 
 | window | Sharpe 0 bps | Sharpe 2 bps | DSR | turnover |
 |---|---|---|---|---|
-| develop+validate | 0.562 | 0.406 | 0.9397 | 0.789 |
-| out-of-sample | 1.294 | 1.174 | 0.9611 | 0.737 |
+| develop+validate | 0.562 | 0.406 | 0.9397 | 0.049 |
+| out-of-sample | 1.294 | 1.174 | 0.9611 | 0.046 |
 
 **Failure modes (documented, mechanical).** With 16 roots a full long-short tilt spreads across
 ranks, so the book is thin: a single root's idiosyncratic move can dominate a day's return. The
