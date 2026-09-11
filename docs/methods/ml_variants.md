@@ -2,7 +2,7 @@
 
 **Source.** M5 (Deflated Sharpe Ratio), M6 (CSCV / probability of backtest overfitting), M7
 (López de Prado, purged and embargoed cross-validation — **partially gated**: the purchased chapters
-are not yet read by the owner). The implementation follows the published CV mechanism rather than a
+are not yet read). The implementation follows the published CV mechanism rather than a
 library splitter, so the leakage argument is inspectable.
 
 **Rule.** Pooled LightGBM regression on the point-in-time feature panel, predicting the forward
@@ -64,4 +64,4 @@ protocol has to be re-run rather than patched.
 
 **Open questions (the memo's, canon-gated).** Why the decision-read winners fail out of time, and what the
 purged/embargoed folds and the DSR deflation actually changed versus a naive split, are exactly the
-questions the M7 gate exists for (tickets 32 and 34).
+questions the M7 gate exists for.

@@ -18,7 +18,7 @@ both return the same rule verdict, so the OOT read cannot become a second decisi
 
 `OOT.md` records the numbers and the pre-declared rule applied to them as **out-of-time evidence
 about the decision-read verdict** — it does not re-decide it, and interpretation stays gated by the
-reading canon (ticket 32) and the decision-read interpretation ticket (34).
+reading canon and the decision-read interpretation pass.
 
 `curves.csv` carries the per-method daily net return series at the headline cost level for both
 windows: derived statistics only, never prices — the analysis notebook plots from it, so the
@@ -105,8 +105,8 @@ def outcome_doc(primary: dict, sensitivity: dict[str, dict], meta: pd.DataFrame)
         f"({SPLITS} x {N_TRIALS} = {SPLITS * N_TRIALS}).\n\n"
         "**Reading.** What the OOT numbers mean — regime attribution, the trend drought the "
         "benchmark carries into 2022, what the ML variants generalized — is interpretation, and "
-        "it stays with the memo (ticket 38) behind the reading canon (ticket 32) and the decision-read "
-        "interpretation (ticket 34). Deliberately not written here.\n\n"
+        "it stays with the memo behind the reading canon and the decision-read "
+        "interpretation pass. Deliberately not written here.\n\n"
         "Robustness read (`tables_like_for_like.csv`): the verdict is asserted identical on both "
         "reads before this file is written.\n"
     )

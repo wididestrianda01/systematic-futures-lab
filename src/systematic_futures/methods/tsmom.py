@@ -3,7 +3,7 @@
 One sleeve per lookback: the trailing-lookback return's sign scaled by
 0.40 / trailing annualized vol (the literature's vol-scaled sleeve), clipped
 to [-1, 1]. Equal-weight averaging of sleeves is the ensemble (see the
-`tsmom` method, ticket 21); the shared engine overlay owns final sizing.
+`tsmom` method); the shared engine overlay owns final sizing.
 Lookbacks are in trading days (21 per calendar month): 1m = 21, 3m = 63,
 12m = 252, sleeves 5/10/20.
 """
@@ -22,7 +22,7 @@ VOL_SCALAR = 0.40  # HOP-style sleeve vol scalar; the ensemble averages sleeves
 
 MONTH = 21  # trading days per calendar month
 
-SLEEVES = (5, 10, 20)  # optional short-term sleeves (ticket 26, ledger +1–2h)
+SLEEVES = (5, 10, 20)  # optional short-term sleeves
 
 TSMOM_HORIZONS = SLEEVES + (21, 63, 252)  # 5/10/20d sleeves + 1m/3m/12m
 

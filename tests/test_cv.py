@@ -1,4 +1,4 @@
-"""Ticket 29 — the purged, embargoed walk-forward splitter.
+"""The purged, embargoed walk-forward splitter.
 
 The contract: expanding contiguous folds, zero train/test label overlap, an
 embargo after every earlier test block, and a naive split that demonstrably

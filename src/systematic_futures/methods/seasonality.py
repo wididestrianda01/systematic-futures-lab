@@ -7,7 +7,7 @@ as-of safe). NaN until `min_years` prior same-months exist inside the window.
 
 The standalone method signs the score: long a historically strong month,
 short a weak one, flat elsewhere. The shared overlay owns sizing; the
-tilt-on-trend variant (ticket 25) reuses the raw score.
+tilt-on-trend variant reuses the raw score.
 """
 
 from __future__ import annotations
@@ -56,7 +56,7 @@ def seasonality(closes: pd.DataFrame) -> pd.DataFrame:
 
 
 def seasonal_tilt(closes: pd.DataFrame) -> pd.DataFrame:
-    """Seasonality as a filter/tilt on the TSMOM ensemble (the spec's
+    """Seasonality as a filter/tilt on the TSMOM ensemble (the
     intended production use): positions scale by 1 + TILT·sign(score) where
     a score exists — favorable month amplifies, unfavorable dampens — and
     stay untouched where seasonality data is still warming up. Clipped back

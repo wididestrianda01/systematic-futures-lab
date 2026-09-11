@@ -1,6 +1,6 @@
 # Reading notes — one paragraph per paper, committed as read
 
-> Provenance: agent-authored working notes (2026-09-09), committed at the owner's request.
+> Provenance: agent-authored working notes (2026-09-09), committed at the maintainer's request.
 > They compress what each paper claims and what this project adopts from it — they are scaffolding
 > for interpretation, not a substitute for reading the papers. The gate stays honest: skim
 > these notes, then at least skim each paper before interpreting the families read+ results.
@@ -120,14 +120,14 @@ M6 for this project's ML variants: k-fold CV on overlapping-label series leaks b
 windows (a label like "12m forward return" has an 11-month leakage tail), and (2) **embargo**
 a further buffer after the test block (the paper suggests ~1% of the sample) because
 serial correlation bleeds across the boundary anyway. Combined with walk-forward refits
-inside develop+validate, this is the exact algorithm the ML tickets implement — but the
+inside develop+validate, this is the exact algorithm the ML variants implement — but the
 book's worked examples and the CPCV variants (ch. 12) are not yet owned. Before the memo's
 ML section is written: read the purchased chapters and extend this note.
 
 ## S5 — Momentum Crashes (Daniel & Moskowitz 2016, JFE 120(2), 221–254)
 
 > **Scaffolding, not a read.** Agent-drafted 2026-09-11 under the same provenance as the notes
-> above, so the owner's read can be a skim-and-confirm. Ticket 37 stays open until that read
+> above, so the read can be a skim-and-confirm. The gate stays open until that read
 > happens, and the memo may not cite this note as read before then.
 
 What it claims: momentum's payoff is crash-prone rather than symmetric — long stretches of small

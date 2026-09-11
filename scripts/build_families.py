@@ -37,7 +37,7 @@ GATE = (
     "**Interpretation status: gated.** The MUST reading canon gates interpretation of any\n"
     "backtest result (`docs/reading/README.md`), and M7 is still partially gated\n"
     "(`docs/reading/notes.md`). Everything below the numbers is a *provisional* reading of\n"
-    "mechanical output, not a checked finding, until the canon closes (ticket 32); the\n"
+    "mechanical output, not a checked finding, until the canon closes; the\n"
     "the out-of-sample read interpretation pass owns it.\n\n"
 )
 

@@ -32,7 +32,7 @@ BENCHMARK = "tsmom"
 HEADLINE_BPS = 2.0
 VOL_TARGET = 0.10  # the shared sizing overlay: every family runs at 10% annualized vol
 
-# The ML walk-forward protocol (tickets 29/31), stated once for the decision read and the out-of-sample read: a change to
+# The ML walk-forward protocol, stated once for the decision read and the out-of-sample read: a change to
 # the fold geometry, the label horizon or the search budget is a protocol change, and both phases
 # must read the same one or the OOT read no longer extends the schedule the rule was decided under.
 HORIZON, SPLITS, EMBARGO, N_TRIALS = 5, 5, 10, 20
@@ -45,7 +45,7 @@ def classic_set(basis: pd.DataFrame) -> dict[str, object]:
     (bound to the basis panel), seasonality and its tilt on trend."""
     return {
         "baseline": baseline,
-        BENCHMARK: tsmom,  # six-horizon benchmark (sleeves adopted, ticket 26)
+        BENCHMARK: tsmom,  # six-horizon benchmark (short sleeves adopted)
         "xs_momentum": xs_momentum,
         "carry": carry(basis),
         "seasonality": seasonality,

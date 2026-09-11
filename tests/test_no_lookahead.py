@@ -27,7 +27,7 @@ def test_signal_first_earns_the_next_return():
 def test_lookahead_implementation_is_caught():
     """Sanity on the guard itself: the same-day (buggy) alignment produces a
     different — non-zero on day 1 — path, i.e. this test would go red on a
-    look-ahead regression (demonstrated during ticket 16, see ticket comment)."""
+    look-ahead regression (demonstrated when the guard was written)."""
     idx = pd.bdate_range("2020-01-01", periods=5)
     closes = pd.DataFrame({"X": [100.0, 110.0, 90.0, 105.0, 95.0]}, index=idx)
     sig = pd.DataFrame({"X": [0.0, 1.0, 1.0, 1.0, 1.0]}, index=idx)

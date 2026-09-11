@@ -2,8 +2,8 @@
 
 Hand-calculated on constructed panels whose properties are exact (constant
 trailing vol, known return paths), so overlay scale, daily PnL, and turnover
-verify without re-implementing the engine. Ticket 19: baseline; 20: TSMOM
-horizons; 21: TSMOM ensemble.
+verify without re-implementing the engine. Baseline, then TSMOM
+horizons and the TSMOM ensemble.
 """
 
 from math import sqrt
@@ -41,7 +41,7 @@ def alternating_panel(n=45):
     return pd.DataFrame({"X": 100.0 * np.cumprod(steps)}, index=idx)
 
 
-# --- ticket 19: baseline -----------------------------------------------------
+# --- baseline -----------------------------------------------------
 
 
 def test_baseline_signal_is_constant_long():
@@ -90,7 +90,7 @@ def test_baseline_through_seam():
     assert table.notna().all().all()
 
 
-# --- ticket 20: TSMOM horizon signals ----------------------------------------
+# --- TSMOM horizon signals ----------------------------------------
 
 
 def monotonic_panel(step=1.005, n=90):
@@ -150,7 +150,7 @@ def test_horizon_signals_pass_seam_alignment():
         run(horizon_signal(wide, lookback), wide, vol_target=VOL_TARGET)
 
 
-# --- ticket 21: TSMOM ensemble ------------------------------------------------
+# --- TSMOM ensemble ------------------------------------------------
 
 
 def _trend_panel():
@@ -193,7 +193,7 @@ def test_tsmom_through_seam():
     assert table.notna().all().all()
 
 
-# --- ticket 22: XS momentum ---------------------------------------------------
+# --- XS momentum ---------------------------------------------------
 
 
 def _xs_panel():
@@ -236,7 +236,7 @@ def test_xs_momentum_through_seam():
     assert table.notna().all().all()
 
 
-# --- ticket 23: carry ----------------------------------------------------------
+# --- carry ----------------------------------------------------------
 
 
 def test_carry_sign_and_neutrality_hand_calculated():
@@ -276,7 +276,7 @@ def test_carry_through_seam():
     assert table["turnover"].iloc[0] > 0  # alternating basis flips positions
 
 
-# --- ticket 24: seasonality standalone -----------------------------------------
+# --- seasonality standalone -----------------------------------------
 
 
 def _season_panel():
@@ -307,7 +307,7 @@ def test_seasonality_through_seam():
     assert table.loc[0.0, "sharpe"] > 0  # in-sample seasonality earns its mean
 
 
-# --- ticket 25: seasonality tilt on trend ---------------------------------------
+# --- seasonality tilt on trend ---------------------------------------
 
 
 def _tilt_panel():

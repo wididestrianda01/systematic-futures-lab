@@ -1,4 +1,4 @@
-"""Tickets 30/31 — the ML variants at the seam.
+"""The ML variants at the seam.
 
 Pinned here: out-of-fold-only predictions (the ML analogue of the engine's
 no-look-ahead guard — perturb a fold's own test block and nothing before it may

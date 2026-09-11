@@ -18,7 +18,7 @@ def constant_long(closes):
     return pd.DataFrame(1.0, index=closes.index, columns=closes.columns)
 
 
-# --- seam accounting (ticket 13) -------------------------------------------
+# --- seam accounting -------------------------------------------
 
 
 def test_constant_long_earns_continuous_returns_including_rolls():
@@ -47,7 +47,7 @@ def test_seam_metrics_shape_and_alignment_guard():
         run(constant_long(wide).iloc[1:], wide)
 
 
-# --- vol overlay (ticket 14) ------------------------------------------------
+# --- vol overlay ------------------------------------------------
 
 
 def test_vol_overlay_hand_calculated():
@@ -71,7 +71,7 @@ def test_position_caps_clip():
     assert e["X"].abs().max() == 1.0
 
 
-# --- cost model (ticket 15) -------------------------------------------------
+# --- cost model -------------------------------------------------
 
 
 def test_cost_model_hand_calculated():

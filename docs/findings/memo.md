@@ -181,7 +181,7 @@ The count is conservative by construction — the deflation never flatters the v
 
 **What was pre-registered and when.** The decision rule was written into
 `results/decision/DECISION_RULE.md` before the decision-read numbers existed; the horizon-sleeve set, the
-tilt multiplier, the cost ladder and the headline cost level were all fixed at ticket-authoring time.
+tilt multiplier, the cost ladder and the headline cost level were all fixed before any results existed.
 Nothing in this memo is a search result across those choices.
 
 **One decision surface, two reads.** The primary read is the identical-window read the rule is
@@ -251,7 +251,7 @@ drag is not the explanation. The score's statistical base is thin by constructio
 holds five priors per calendar month, so the estimate is noisy and its sign is not stable across
 windows (out of time the same family earns +0.828 gross). Its intended use in this project was always
 the tilt on trend, and the tilt inherits trend's turnover and hence trend's cost problem. Reading: a
-documented failed challenger, reported as the spec required, and not evidence against commodity
+documented failed challenger, reported as the plan required, and not evidence against commodity
 seasonality as such (S4).
 
 **Carry's result belongs to the rebalancing frequency, not to the carry premium.** The published

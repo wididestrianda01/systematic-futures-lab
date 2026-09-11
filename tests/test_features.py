@@ -1,4 +1,4 @@
-"""Ticket 28 — the ML feature panel: point-in-time by construction.
+"""The ML feature panel: point-in-time by construction.
 
 Two things are pinned: a couple of features' exact values on a series whose
 properties are hand-known, and the as-of guard — perturb the future, and every

@@ -1,8 +1,8 @@
 # Seasonality — standalone signal and trend tilt
 
 **Source.** S4 (Baltas & Kosowski 2013) for commodity seasonality as a documented effect; the family
-was added to the comparison set at ticket authoring (tickets 24–25) with the explicit expectation
-that the standalone version dies after costs — that failure is a required finding of the spec.
+was added to the comparison set before any results existed, with the explicit expectation
+that the standalone version dies after costs — that failure is a required finding of the plan.
 
 **Rules.** Two variants share one score.
 

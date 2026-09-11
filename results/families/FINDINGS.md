@@ -5,7 +5,7 @@ Window: develop+validate (2010-01-01 → 2021-12-31), frozen panel, 10% vol targ
 **Interpretation status: gated.** The MUST reading canon gates interpretation of any
 backtest result (`docs/reading/README.md`), and M7 is still partially gated
 (`docs/reading/notes.md`). Everything below the numbers is a *provisional* reading of
-mechanical output, not a checked finding, until the canon closes (ticket 32); the
+mechanical output, not a checked finding, until the canon closes; the
 the out-of-sample read interpretation pass owns it.
 
 ## Seasonality standalone loses (expected finding)

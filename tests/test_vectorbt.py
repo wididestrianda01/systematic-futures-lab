@@ -58,7 +58,7 @@ def test_engine_account_matches_vectorbt_without_costs():
 
 
 def test_tsmom_sleeve_sweep_agrees_with_vectorbt():
-    """The spec's TSMOM parameter sweep, cross-checked sleeve by sleeve: to vbt each
+    """The TSMOM parameter sweep, cross-checked sleeve by sleeve: to vbt each
     horizon is its own strategy, so a sign or scale error in one sleeve cannot hide
     behind the ensemble average."""
     wide = continuous_wide(seed=31)

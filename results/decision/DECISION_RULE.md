@@ -1,4 +1,4 @@
-# the decision read decision rule (pre-declared in the spec, before this phase's numbers existed)
+# the decision read decision rule (pre-declared in the plan, before this phase's numbers existed)
 
 **Rule.** Each ML variant (6a `ml_defaults`, 6b `ml_tuned`) must beat the
 `tsmom` benchmark on **decision-window Deflated Sharpe Ratio after costs**
@@ -25,4 +25,4 @@ each variant's selection actually evaluated: 6a searched none
 skipped for lack of data.
 
 **Scope.** One comparison set, one accounting path, two reads of it. The applied
-outcome is `DECISION.md`; the interpretation stays with ticket 34 (M7-gated).
+outcome is `DECISION.md`; the interpretation stays for later (M7-gated).

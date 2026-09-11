@@ -15,13 +15,13 @@ Two readings of the same numbers, both committed:
   ML variant's own covered dates, so a variant is not scored on a diluted series
   against a fully populated benchmark. Same accounting path: the engine's `dates`
   mask. The run asserts both readings return the same verdict, so this read can
-  never become a second decision surface (ticket 33 asked for one table).
+  never become a second decision surface (one table was asked for).
 
 `DECISION_RULE.md` carries the pre-declared rule verbatim; `DECISION.md` records
 that rule applied to these numbers. Trial counts are the honest multiple-testing
 inputs: 6a searched nothing (trials = 1), 6b searched n_splits x n_trials
 configurations per run. Interpretation (what purge/embargo and the DSR deflation
-changed) is ticket 34's, gated by the M7 canon.
+changed) is left for the interpretation pass, gated by the M7 canon.
 
 Run: uv run python scripts/build_decision.py
 """
@@ -54,7 +54,7 @@ from systematic_futures.harness import (
 
 RESULTS = Path("results/phase4")
 
-RULE = f"""# the decision read decision rule (pre-declared in the spec, before this phase's numbers existed)
+RULE = f"""# the decision read decision rule (pre-declared in the plan, before this phase's numbers existed)
 
 **Rule.** Each ML variant (6a `ml_defaults`, 6b `ml_tuned`) must beat the
 `{BENCHMARK}` benchmark on **decision-window Deflated Sharpe Ratio after costs**
@@ -81,7 +81,7 @@ each variant's selection actually evaluated: 6a searched none
 skipped for lack of data.
 
 **Scope.** One comparison set, one accounting path, two reads of it. The applied
-outcome is `DECISION.md`; the interpretation stays with ticket 34 (M7-gated).
+outcome is `DECISION.md`; the interpretation stays for later (M7-gated).
 """
 
 
@@ -126,8 +126,8 @@ def outcome_doc(primary: dict, sensitivity: dict[str, dict]) -> str:
         "the verdict is identical on both reads — asserted in the harness, not asserted here, "
         "because the two reads disagreeing must stop the run rather than be written up.\n\n"
         "Interpretation — what the purged/embargoed folds and the DSR deflation actually "
-        "changed versus a naive same-window split, and where the variants overfit — is ticket "
-        "34's, gated by the M7 reading canon (ticket 32). Deliberately not written here.\n"
+        "changed versus a naive same-window split, and where the variants overfit — is left for later, "
+        "gated by the M7 reading canon. Deliberately not written here.\n"
     )
 
 

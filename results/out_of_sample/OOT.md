@@ -15,6 +15,6 @@ Benchmark `tsmom`: Sharpe 0.55, DSR 0.7966.
 
 **Protocol.** The walk-forward schedule is the decision-read one extended across the whole frozen panel; each fold is refit on prior data only and 6b's search runs inside its fold's training set, so no fold saw an out-of-sample date before predicting it. The fold covering 2022 trains entirely inside develop+validate. Trial counts are unchanged as multiple-testing inputs: 6a searched nothing (trials = 1), 6b = folds x trials (5 x 20 = 100).
 
-**Reading.** What the OOT numbers mean — regime attribution, the trend drought the benchmark carries into 2022, what the ML variants generalized — is interpretation, and it stays with the memo (ticket 38) behind the reading canon (ticket 32) and the decision-read interpretation (ticket 34). Deliberately not written here.
+**Reading.** What the OOT numbers mean — regime attribution, the trend drought the benchmark carries into 2022, what the ML variants generalized — is interpretation, and it stays with the memo behind the reading canon and the decision-read interpretation pass. Deliberately not written here.
 
 Robustness read (`tables_like_for_like.csv`): the verdict is asserted identical on both reads before this file is written.
