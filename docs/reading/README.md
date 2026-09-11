@@ -2,7 +2,7 @@
 
 MUST canon (8 papers, ~15h) gates interpretation of any backtest result (Phases 3+).
 Read in the order below; commit a one-paragraph personal note per paper to
-[notes.md](notes.md) as you finish it. Source research: `.scratch/plan-v2/research/03-domain-theory-canon.md`.
+[notes.md](notes.md) as you finish it. 
 
 | Order | ID | Paper | Ref / link | ~h |
 |---|---|---|---|---|

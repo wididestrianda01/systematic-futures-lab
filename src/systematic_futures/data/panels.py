@@ -28,7 +28,7 @@ from systematic_futures.data.manifest import verify_manifest
 DERIVED = Path("data/derived")
 MANIFEST = Path("manifests/derived.json")
 
-# The split contract (CONTEXT.md): develop 2010–2019, validate 2020–2021, OOT 2022 → 2024Q1.
+# The split contract: develop 2010–2019, validate 2020–2021, OOT 2022 → 2024Q1.
 DEVELOP_START = pd.Timestamp("2010-01-01")
 VALIDATE_END = pd.Timestamp("2021-12-31")
 OOT_START = pd.Timestamp("2022-01-01")

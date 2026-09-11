@@ -75,7 +75,7 @@ correlations; predictability decays over ~1 year. Three implementation notes: ra
 robustness variant because current carry is seasonal, and treat extreme carry spreads as
 distress indicators, not richer signals. Caveat on the artifact: our PDF is the July 2012
 preliminary version — re-verify headline numbers against the published JFE version before
-quoting them in the memo. For this project this doubles as the roll-selection mechanics reference:
+quoting them in the memo. For this project it doubles as the roll-selection mechanics reference:
 carry IS the slope, and the legs data gives it directly.
 
 ## M5 — The Deflated Sharpe Ratio (Bailey & López de Prado 2014)
@@ -108,7 +108,7 @@ audit statistic, never an objective (optimizing to minimize it re-overfits); PBO
 rejects; and it needs full trial disclosure, else it is biased low. Limits: it measures
 selection reliability, not skill (a flat all-good landscape can show high PBO), and each
 split uses half the sample — with 14 years, lookbacks above ~12 months get shredded at
-S=16, so this project may need S=8 for the long-lookback sleeves (state the choice, don't tune it).
+S=16, so the project may need S=8 for the long-lookback sleeves (state the choice, don't tune it).
 
 ## M7 — AFML ch. 7, 11–12 (López de Prado 2018)
 
@@ -159,7 +159,7 @@ payoff is not explained by standard equity/bond factors.
 
 Pinned here: the trend family's payoff shape is a documented property of the style, not something this project
 discovered — which is exactly the industry lineage the memo's buckets (trend / short-term / carry /
-multi-style) and the interview brief need, and the reason a sideways market is the benchmark's
+multi-style) and the self-test brief need, and the reason a sideways market is the benchmark's
 documented weak regime rather than an implementation failure. It also disciplines the claim this project
 makes when the trend benchmark loses money in develop+validate: what the paper establishes is the
 payoff shape, not a promise about any particular window.

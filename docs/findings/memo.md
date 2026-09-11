@@ -1,4 +1,4 @@
-# this project — Findings: a systematic futures method comparison under one honest protocol
+# Findings: a systematic futures method comparison under one honest protocol
 
 **Scope.** Sixteen CME futures roots, daily contract-level data 2010 → 2024Q1, six classic method
 families and two LightGBM variants, one shared vectorised engine, one volatility overlay, one cost
@@ -400,10 +400,6 @@ Deliberate, with reasons — the boundary is a research judgement, not a gap in 
 
 ## 12. Provenance
 
-- Spec and phase tickets: `.scratch/lab/` (local tracker; spec v2 with amendments).
-- Evidence trail: `.scratch/plan-v2/map.md` and the five research files under
-  `.scratch/plan-v2/research/` (job market, tech stack, theory canon, regulation/licensing,
-  method families).
 - Decision reasoning: `docs/adr/0001-one-accounting-path.md`; per-family governance docs in
   `docs/methods/`.
 - Reading canon and notes: `docs/reading/`.
@@ -414,4 +410,4 @@ Deliberate, with reasons — the boundary is a research judgement, not a gap in 
 
 **Market facts used in the framing:** the Danish systematic shop is Alipes Capital (Copenhagen); Da
 Vinci Trading is Amsterdam (a correction carried from the research phase). Regulation talking points
-live in the interview brief.
+live in the self-test brief.

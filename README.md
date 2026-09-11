@@ -1,10 +1,10 @@
-# this project — Systematic futures: a method-comparison lab
+# Systematic futures: a method-comparison lab
 
 One engine, one cost model, one evaluation protocol, and a single out-of-sample window read once:
 six classic futures method families and two LightGBM variants compared on real CME contract data from
 2010 to 2024Q1. The primary artifact is a findings memo — where each method wins, loses, and why —
-supported by an executable walkthrough, per-method governance docs, a condensed report and an
-interview brief.
+supported by an executable walkthrough, per-method governance docs, a condensed report and a
+self-test brief.
 
 **Status:** complete — Phases 0–5 built, results committed, tagged `replication.1` (the revision
 that adds the external replication; `results.2` is the review-pass revision it builds on, and
@@ -197,11 +197,11 @@ DAX, CAC or euro before 2000 on free data).
 | `notebooks/analysis.ipynb` | the executed walkthrough: context, data, pipeline, methodology, results, readings |
 | `docs/methods/` | per-family governance docs: construction, evidence, failure modes, monitoring |
 | `docs/report/report.tex`, `report.pdf` | the condensed report |
-| `docs/handoff/brief.md` | self-test questions, regulation talking points, non-adopt boundary |
+| `docs/self-test.md` | self-test questions, regulation talking points, non-adopt boundary |
 | `results/phase3|4|5/` | committed tables, decision records, derived return series, the carry frequency diagnostic |
 | `docs/adr/` | decision reasoning (one accounting path) |
 | `docs/data/pst-source.md` | data provenance and licensing posture |
-| `.scratch/lab/` | the spec and phase tickets (local tracker, not committed) |
+| `LICENSE` | GPL-3.0 |
 
 ## Boundaries
 
@@ -210,6 +210,6 @@ DAX, CAC or euro before 2000 on free data).
   specific to this feature set, label horizon, fold geometry, cost level and window.
 - **Deliberately skipped**: deep learning, C++/Rust/kdb+, dashboards, MLOps tooling, microstructure,
   VRP/short-vol, standalone mean-reversion, stat-arb/pairs — each with a stated reason in the memo's
-  non-adopt boundary, and regulation talking points in the interview brief rather than in the code.
+  non-adopt boundary, and regulation talking points in the self-test brief rather than in the code.
 - **One universe, one window**: 16 roots and a single out-of-sample read; the out-of-time reversal is
   one draw of a regime, not a law.

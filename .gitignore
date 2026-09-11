@@ -8,3 +8,6 @@ docs/agents/
 __pycache__/
 /data/
 CONTEXT.md
+memories/
+.serena/
+CLAUDE.md
