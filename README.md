@@ -168,7 +168,8 @@ uv run python scripts/sweep_tsmom.py      # results/trend_sweep/tsmom_sweep.csv
 uv run python scripts/carry_frequency_diagnostic.py  # results/out_of_sample/carry_frequency.csv
 uv run python scripts/build_report_figures.py        # docs/report/figures/equity.pdf
 uv run pytest                             # 101 tests
-uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb
+uv run jupyter nbconvert --to notebook --execute --inplace \
+  --ExecutePreprocessor.record_timing=False notebooks/analysis.ipynb
 (cd docs/report && rm -f report.aux report.log report.out && \
    pdflatex -interaction=nonstopmode report.tex)   # report.pdf, reproducible from a clean build
 ```
