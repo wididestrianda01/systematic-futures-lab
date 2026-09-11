@@ -36,6 +36,7 @@ import pandas as pd
 from systematic_futures.data.panels import develop_validate, load_frozen, oot_window
 from systematic_futures.decision import require_same_verdict, verdict
 from systematic_futures.engine import curve
+from systematic_futures.engine.metrics import sharpe
 from systematic_futures.harness import (
     BENCHMARK,
     HEADLINE_BPS,
@@ -159,19 +160,42 @@ def main() -> int:
     like_tables.to_csv(RESULTS / "tables_like_for_like.csv", index=False)
 
     curves = []
-    for label, dates in (("develop_validate", window.index), ("oot", oot.index)):
-        for name, signal in signals.items():
-            returns = curve(signal, wide, vol_target=VOL_TARGET, bps=HEADLINE_BPS, dates=dates)
-            curves.append(
-                pd.DataFrame(
-                    {
-                        "window": label,
-                        "method": name,
-                        "date": returns.index,
-                        "ret": returns.to_numpy(),
-                    }
-                )
+    # The develop+validate series is the develop+validate run's own series: signals computed on that window,
+    # so the warm-up and the ML fold geometry are the ones those tables were built from. The OOT
+    # series is the one the tables above were built from: full-panel signals, metrics masked to the
+    # OOT dates. Each curve is then re-measured and asserted equal to its table's Sharpe before
+    # anything is written — a plot in the notebook cannot disagree with the number printed beside it.
+    window_signals = {name: method(window) for name, method in methods.items()}
+    reference = headline_rows(pd.read_csv("results/decision/tables.csv"))
+    for name, signal in window_signals.items():
+        returns = curve(signal, window, vol_target=VOL_TARGET, bps=HEADLINE_BPS)
+        got, want = sharpe(returns), float(reference.loc[name, "sharpe"])
+        assert abs(got - want) < 1e-9, f"{name}: curve Sharpe {got} != decision-read table's {want}"
+        curves.append(
+            pd.DataFrame(
+                {
+                    "window": "develop_validate",
+                    "method": name,
+                    "date": returns.index,
+                    "ret": returns.to_numpy(),
+                }
             )
+        )
+    for name, signal in signals.items():
+        returns = curve(signal, wide, vol_target=VOL_TARGET, bps=HEADLINE_BPS, dates=oot.index)
+        got = sharpe(returns)
+        want = float(headline_rows(full).loc[name, "sharpe"])
+        assert abs(got - want) < 1e-9, f"{name}: OOT curve Sharpe {got} != the OOT table's {want}"
+        curves.append(
+            pd.DataFrame(
+                {
+                    "window": "oot",
+                    "method": name,
+                    "date": returns.index,
+                    "ret": returns.to_numpy(),
+                }
+            )
+        )
     pd.concat(curves, ignore_index=True).round({"ret": 8}).to_csv(
         RESULTS / "curves.csv", index=False
     )
