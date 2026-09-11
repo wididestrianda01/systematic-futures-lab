@@ -135,7 +135,7 @@ def main() -> int:
     wide, basis_wide = load_frozen()
     window = develop_validate(wide)
 
-    walk_forward_folds(window.index)
+    walk_forward_folds(window.index)  # the schedule every family is fitted on, asserted leak-free
 
     methods = full_set(basis_wide)
     signals = {name: method(window) for name, method in methods.items()}
@@ -146,7 +146,7 @@ def main() -> int:
     full = table_for(signals, window, trials=trials).join(meta, on="method")
     full.to_csv(RESULTS / "tables.csv", index=False)
 
-    like_tables = like_for_like(signals, window, signals, trials, window.index)
+    like_tables = like_for_like(signals, window, trials, window.index)
     like_tables.to_csv(RESULTS / "tables_like_for_like.csv", index=False)
 
     primary = verdict(headline_rows(full), ML_VARIANTS)

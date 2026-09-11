@@ -134,7 +134,7 @@ def main() -> int:
     full = table_for(signals, wide, trials=trials, dates=oot.index).join(meta, on="method")
     full.to_csv(RESULTS / "tables.csv", index=False)
 
-    like_tables = like_for_like(signals, wide, signals, trials, oot.index)
+    like_tables = like_for_like(signals, wide, trials, oot.index)
     like_tables.to_csv(RESULTS / "tables_like_for_like.csv", index=False)
 
     curves = []

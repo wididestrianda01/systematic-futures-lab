@@ -141,9 +141,8 @@ def protocol_meta(
 
 
 def like_for_like(
-    methods: dict[str, object],
-    closes: pd.DataFrame,
     signals: dict[str, pd.DataFrame],
+    closes: pd.DataFrame,
     trials: dict[str, int],
     dates: pd.DatetimeIndex,
 ) -> pd.DataFrame:
@@ -156,7 +155,7 @@ def like_for_like(
     parts = []
     for variant in ML_VARIANTS:
         covered = signals[variant].index[(signals[variant] != 0).any(axis=1)].intersection(dates)
-        table = table_for(methods, closes, trials=trials, dates=covered)
+        table = table_for(signals, closes, trials=trials, dates=covered)
         table["window"] = variant
         table["window_dates"] = len(covered)
         parts.append(table)
