@@ -6,9 +6,10 @@ six classic futures method families and two LightGBM variants compared on real C
 supported by an executable walkthrough, per-method governance docs, a condensed report and an
 interview brief.
 
-**Status:** complete — Phases 0–5 built, results committed, tagged `results.1`. Market data never
-enters this repository: only derived artifacts (code, configs, checksums, signals, statistics) are
-committed.
+**Status:** complete — Phases 0–5 built, results committed, tagged `results.2` (the review-pass
+revision; `results.1` is the preceding one, whose tables carry the summed-across-sleeves turnover
+column). Market data never enters this repository: only derived artifacts (code, configs, checksums,
+signals, statistics) are committed.
 
 ## What it is for
 
