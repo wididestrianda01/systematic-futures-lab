@@ -15,10 +15,10 @@ import pytest
 
 from systematic_futures.engine import run
 from systematic_futures.ml import (
+    inner_split,
     leakage_violations,
     lgbm_defaults,
     lgbm_tuned,
-    model,
     purged_walk_forward,
 )
 
@@ -116,12 +116,12 @@ def test_tuned_variant_reports_honest_trials_and_never_tunes_on_its_test_block()
 
 
 def test_inner_tuning_split_stays_inside_the_fold_training_set():
-    """The wiring no outer perturbation can see: the frames the search is handed come
-    from `fold.train` alone, purged and embargoed, never from the fold's test block."""
+    """The tuning protocol: the frames the search is handed come from `fold.train`
+    alone, purged and embargoed, never from the fold's test block."""
     closes, _ = fixture(n=1800)
     folds = purged_walk_forward(closes.index, n_splits=SPLITS, horizon=HORIZON, embargo=EMBARGO)
     for fold in folds:
-        inner = model._inner_split(fold, horizon=HORIZON, embargo=EMBARGO)
+        inner = inner_split(fold, horizon=HORIZON, embargo=EMBARGO)
         assert set(inner.train) <= set(fold.train)
         assert set(inner.test) <= set(fold.train)
         assert not set(inner.test) & set(fold.test)

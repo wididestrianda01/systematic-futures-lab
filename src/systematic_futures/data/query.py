@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import duckdb
@@ -63,3 +64,37 @@ def query(data_dir: Path | str, sql: str) -> pd.DataFrame:
         return con.execute(sql).df()
     finally:
         con.close()
+
+
+QUERIES = {
+    "coverage": COVERAGE_QUERY,
+    "roll counts": ROLL_COUNTS_QUERY,
+    "continuous coverage": CONTINUOUS_COVERAGE_QUERY,
+}
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Real-data demo: every committed query, run against a store and printed.
+
+    `python -m systematic_futures.data.query DATA_DIR [COVERAGE_OUT.csv]` — pass an
+    output path to commit the coverage query as the demo's evidence.
+    """
+    argv = sys.argv[1:] if argv is None else argv
+    if not 1 <= len(argv) <= 2:
+        print(
+            "usage: python -m systematic_futures.data.query DATA_DIR [COVERAGE_OUT.csv]",
+            file=sys.stderr,
+        )
+        return 2
+    for label, sql in QUERIES.items():
+        print(f"\n== {label}\n{query(argv[0], sql).to_string(index=False)}")
+    if len(argv) == 2:
+        out = Path(argv[1])
+        out.parent.mkdir(parents=True, exist_ok=True)
+        query(argv[0], COVERAGE_QUERY).to_csv(out, index=False)
+        print(f"\nwrote {out}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

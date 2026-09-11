@@ -466,6 +466,20 @@
     },
     "coverage_report.csv": {
       "bytes": 807,
+      "date_range": [
+        "1970-06-15",
+        "2010-03-03"
+      ],
+      "schema": {
+        "bad_successors": "int64",
+        "basis_mean": "float64",
+        "days": "int64",
+        "first": "str",
+        "last": "str",
+        "max_gap_days": "int64",
+        "rolls": "int64",
+        "root": "str"
+      },
       "sha256": "d9f1804ec4e8cfaf3bf3ed1a01f633ae4b30ddff63dd790c00ce924a31f08412"
     },
     "roll_calendar.parquet": {

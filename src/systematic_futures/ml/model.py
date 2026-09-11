@@ -115,7 +115,7 @@ def lgbm_tuned(
 
     def method(closes: pd.DataFrame) -> pd.DataFrame:
         def fit(train: pd.DataFrame, test: pd.DataFrame, fold: Fold) -> pd.DataFrame:
-            inner = _inner_split(fold, horizon=horizon, embargo=embargo)
+            inner = inner_split(fold, horizon=horizon, embargo=embargo)
             dates = train.index.get_level_values("date")
             inner_train, inner_valid = train[dates.isin(inner.train)], train[dates.isin(inner.test)]
             if len(inner_train) < min_train_rows or len(inner_valid) < min_train_rows:
@@ -137,12 +137,13 @@ def lgbm_tuned(
     return method
 
 
-def _inner_split(fold: Fold, *, horizon: int, embargo: int) -> Fold:
+def inner_split(fold: Fold, *, horizon: int, embargo: int) -> Fold:
     """The tuning split: the last quarter of the fold's training dates is the inner
     validation block, purged and embargoed from the rest.
 
-    Built from `fold.train` alone, so a fold's test block can never reach its own
-    search — the property `tests/test_ml.py` pins.
+    Public because it is the tuning protocol, not a wiring detail: a fold's test
+    block can never reach its own search, and that is what `tests/test_ml.py`
+    audits through this function.
     """
     return purged_walk_forward(fold.train, n_splits=3, horizon=horizon, embargo=embargo)[-1]
 

@@ -6,6 +6,7 @@ import pytest
 from systematic_futures.data.manifest import (
     ManifestMismatchError,
     build_manifest,
+    freeze,
     verify_manifest,
     write_manifest,
 )
@@ -65,6 +66,38 @@ def test_missing_and_extra_files_fail(tmp_path):
     (tmp_path / "ZZZ.parquet").touch()
     with pytest.raises(ManifestMismatchError, match="unexpected file: ZZZ.parquet"):
         verify_manifest(tmp_path)
+
+
+def test_csv_store_gets_schema_and_date_range_too(tmp_path):
+    """The raw store is CSV: it must be gated on more than a hash, exactly like Parquet."""
+    dates = pd.bdate_range("2020-01-01", periods=3)
+    pd.DataFrame(
+        {"DATETIME": dates.strftime("%Y-%m-%d %H:%M:%S"), "PRICE": [1.0, 2.0, 3.0]}
+    ).to_csv(tmp_path / "AAA.csv", index=False)
+    entry = build_manifest(tmp_path)["files"]["AAA.csv"]
+    assert set(entry["schema"]) == {"DATETIME", "PRICE"}  # column-level, like Parquet
+    assert entry["schema"]["PRICE"] == "float64"
+    assert entry["date_range"] == ["2020-01-01", "2020-01-03"]
+    write_manifest(tmp_path)
+    pd.DataFrame(
+        {"DATETIME": dates.strftime("%Y-%m-%d %H:%M:%S"), "PRICE": [1.0, 2.0, 4.0]}
+    ).to_csv(tmp_path / "AAA.csv", index=False)
+    with pytest.raises(ManifestMismatchError, match="AAA.csv.*sha256"):
+        verify_manifest(tmp_path)
+
+
+def test_freeze_refuses_drift_before_refreezing(tmp_path, tmp_path_factory):
+    """Verify-then-write: a store edited out of band must fail the freeze, not be
+    absorbed into a fresh manifest."""
+    make_dir(tmp_path)
+    manifest = tmp_path_factory.mktemp("manifests") / "frozen.json"
+    freeze(tmp_path, manifest)
+    verify_manifest(tmp_path, manifest)  # first freeze wrote what it found
+
+    dates = pd.bdate_range("2022-01-01", periods=10)
+    pd.DataFrame({"date": dates, "close": range(10)}).to_parquet(tmp_path / "AAA.parquet")
+    with pytest.raises(ManifestMismatchError, match="AAA.parquet"):
+        freeze(tmp_path, manifest)
 
 
 def test_manifest_json_structure(tmp_path):

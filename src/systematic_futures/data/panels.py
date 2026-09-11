@@ -27,6 +27,10 @@ from systematic_futures.data.manifest import verify_manifest
 DERIVED = Path("data/derived")
 MANIFEST = Path("manifests/derived.json")
 
+# The split contract (CONTEXT.md): develop 2010–2019, validate 2020–2021, OOT 2022 → 2024Q1.
+DEVELOP_START = pd.Timestamp("2010-01-01")
+VALIDATE_END = pd.Timestamp("2021-12-31")
+
 
 def wide_panel(path: Path, value: str) -> pd.DataFrame:
     """Concatenate one derived sub-store's Parquet files into a date x symbol panel."""
@@ -44,6 +48,20 @@ def load_frozen(
     """(wide continuous closes, wide basis) — manifest verified before any read."""
     verify_manifest(derived, manifest)
     return wide_panel(derived / "continuous", "close"), wide_panel(derived / "basis", "basis")
+
+
+def develop_validate(panel: pd.DataFrame) -> pd.DataFrame:
+    """Slice a panel to the develop+validate window — both ends, asserted.
+
+    The derived panel starts in the 1970s, so an end-bounded slice alone would
+    quietly run every metric on pre-develop history. Asserts that the panel
+    reaches past both bounds, so a truncated loader cannot pass as untouched.
+    """
+    if panel.index.min() >= DEVELOP_START:
+        raise ValueError(f"panel starts {panel.index.min().date()}, at/after develop start")
+    if panel.index.max() <= VALIDATE_END:
+        raise ValueError(f"panel ends {panel.index.max().date()}, the OOT window must stay intact")
+    return panel.loc[DEVELOP_START:VALIDATE_END]
 
 
 def _per_symbol(panel: pd.DataFrame, measure) -> pd.DataFrame:

@@ -1,13 +1,8 @@
 import pandas as pd
 import pytest
 
-from systematic_futures.data.roll_calendar import build_roll_calendar
+from systematic_futures.data.roll_calendar import build_roll_calendar, contract_month
 from systematic_futures.data.synthetic import make_synthetic_multiple_prices
-
-
-def month_index(contract_id: int) -> int:
-    """YYYYMM00 → absolute month index (for successor checks across year ends)."""
-    return (contract_id // 10000) * 12 + (contract_id // 100) % 100
 
 
 def test_calendar_is_a_projection_of_observed_legs():
@@ -29,7 +24,7 @@ def test_front_transitions_match_generator_rule():
     cutoff = pd.bdate_range("2020-01-18", "2020-01-22")[0]
     assert by_date.loc[cutoff, "front"] == 20200200
     # forward is always the front's successor month (year-boundary safe)
-    delta = by_date["next"].map(month_index) - by_date["front"].map(month_index)
+    delta = by_date["next"].map(contract_month) - by_date["front"].map(contract_month)
     assert (delta == 1).all()
 
 

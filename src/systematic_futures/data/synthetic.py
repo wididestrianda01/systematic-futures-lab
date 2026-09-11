@@ -7,6 +7,8 @@ import zlib
 import numpy as np
 import pandas as pd
 
+from systematic_futures.data.roll_calendar import contract_id
+
 OHLCV_COLUMNS = ["date", "symbol", "open", "high", "low", "close", "volume"]
 MP_COLUMNS = [
     "DATETIME",
@@ -96,16 +98,14 @@ def make_synthetic_multiple_prices(
             m = d.to_period("M")
             cutoff = pd.bdate_range(d.replace(day=18), d.replace(day=22))[0]
             front = m if d < cutoff else m + 1
-            ids = {
-                "CARRY": (front - 1).year * 10000 + (front - 1).month * 100,
-                "PRICE": front.year * 10000 + front.month * 100,
-                "FORWARD": (front + 1).year * 10000 + (front + 1).month * 100,
+            months = {"CARRY": front - 1, "PRICE": front, "FORWARD": front + 1}
+            ids = {leg: contract_id(period) for leg, period in months.items()}
+            prices = {
+                leg: round(
+                    float(lv) * (1 + premium * max((period.end_time - d).days / 30.44, 0.0)), 4
+                )
+                for leg, period in months.items()
             }
-            prices = {}
-            for leg_name, cid in ids.items():
-                c_period = pd.Period(year=cid // 10000, month=(cid // 100) % 100, freq="M")
-                mte = max((c_period.end_time - d).days / 30.44, 0.0)
-                prices[leg_name] = round(float(lv) * (1 + premium * mte), 4)
             for hours in (20,) if not intraday else (20, 23):
                 rows.append(
                     {

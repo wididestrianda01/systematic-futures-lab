@@ -1,7 +1,8 @@
 """Download the pinned pysystemtrade snapshot → data/raw/, freeze the manifest.
 
 Idempotent: existing files are kept (the snapshot is frozen upstream — a change
-would be a manifest-gate error, not an update). Re-run verifies the gate.
+would be a manifest-gate error, not an update). Re-running verifies the committed
+gate *before* re-freezing, so drift is a hard failure, never silently absorbed.
 
 Run: uv run python scripts/fetch_raw.py
 """
@@ -13,7 +14,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from systematic_futures.data.manifest import verify_manifest, write_manifest
+from systematic_futures.data.manifest import freeze
 from systematic_futures.data.venues import INSTRUMENTS
 
 SNAPSHOT_SHA = "b4a25e6e1e33a54a3ecfb45c0f6db5e2b60b84f8"
@@ -47,10 +48,7 @@ def main() -> int:
         if missing or df.empty:
             raise RuntimeError(f"{instrument}: malformed multiple_prices (missing {missing})")
         print(f"ok {instrument}: {len(df)} rows, {df['PRICE'].notna().sum()} priced days")
-    manifest = write_manifest(DATA_DIR)
-    MANIFESTS.mkdir(exist_ok=True)
-    (MANIFESTS / "raw.json").write_text(manifest.read_text())
-    verify_manifest(DATA_DIR, MANIFESTS / "raw.json")
+    freeze(DATA_DIR, MANIFESTS / "raw.json")
     print("raw store frozen; manifest gate: OK (manifests/raw.json)")
     return 0
 

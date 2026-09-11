@@ -25,7 +25,6 @@ from systematic_futures.methods import (
     tsmom,
     xs_momentum,
 )
-from systematic_futures.methods.tsmom import VOL_SCALAR
 
 VOL_TARGET = 0.10
 LOOKBACK = 30
@@ -127,6 +126,8 @@ def test_horizon_vol_scaling_hand_calculated():
     # Alternating +4% / -3% daily returns: trailing 21d return is positive
     # (up days net over down days) while annualized vol is large enough that
     # 0.40/sigma stays uncapped — the scale is observable, not clipped.
+    # The scalar is pinned as a literal (HOP's 0.40): re-deriving it from the
+    # module constant would make this fixture pass for any scalar value.
     n = 60
     idx = pd.bdate_range("2020-01-01", periods=n)
     steps = np.where(np.arange(n) % 2 == 0, 1.04, 0.97)
@@ -135,7 +136,7 @@ def test_horizon_vol_scaling_hand_calculated():
 
     rets = closes.pct_change()
     expected = (
-        np.sign(closes.pct_change(21)) * (VOL_SCALAR / (rets.rolling(21).std(ddof=1) * sqrt(ANN)))
+        np.sign(closes.pct_change(21)) * (0.40 / (rets.rolling(21).std(ddof=1) * sqrt(ANN)))
     ).clip(-1.0, 1.0)
 
     sig = horizon_signal(closes, 21)

@@ -4,8 +4,9 @@ In pysystemtrade's multiple_prices format each day carries the three active legs
 with their contract IDs: PRICE (front, what the position holds), FORWARD (the
 front's expiry successor), CARRY (the prior contract). The calendar is a
 projection of those legs: front flips exactly on observed transitions.
-Contract IDs are structured YYYYMM00 and are never parsed for logic beyond
-monotonicity checks.
+Contract IDs are structured YYYYMM00 and are decoded only through
+`contract_month` / `contract_id`, which feed the successor checks — never a
+price or a return.
 """
 
 from __future__ import annotations
@@ -22,6 +23,20 @@ MP_COLUMNS = [
     "FORWARD",
     "FORWARD_CONTRACT",
 ]
+
+
+def contract_month(contract_id: int | pd.Series) -> int | pd.Series:
+    """YYYYMM00 → absolute month index (year-boundary-safe for successor checks).
+
+    One of the two places contract IDs are decoded/encoded; scalar and Series in,
+    same out.
+    """
+    return (contract_id // 10000) * 12 + (contract_id // 100) % 100
+
+
+def contract_id(period: pd.Period) -> int:
+    """Calendar month → YYYYMM00 contract ID (the encoder `contract_month` reads)."""
+    return period.year * 10000 + period.month * 100
 
 
 def build_roll_calendar(mp: pd.DataFrame) -> pd.DataFrame:

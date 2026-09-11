@@ -13,9 +13,11 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from systematic_futures.data.panels import (
     consecutive_returns,
+    develop_validate,
     forward_return,
     held_positions,
     trailing_mean,
@@ -95,3 +97,18 @@ def test_forward_return_spans_each_symbols_own_observations():
     # the date after the hole's return, not the hole's calendar neighbour.
     assert np.isclose(ahead["B"].iloc[19], closes["B"].iloc[24] / closes["B"].iloc[19] - 1.0)
     assert ahead["B"].iloc[20:23].isna().all()  # B has no observation there, so no return
+
+
+def test_develop_validate_bounds_both_ends():
+    """The window contract: both ends applied, and a panel that does not extend past
+    them is an error — the derived panel starts in the 1970s, so an end-bounded slice
+    alone would run every metric on pre-develop history."""
+    panel = pd.DataFrame({"X": 1.0}, index=pd.bdate_range("2005-01-03", "2025-12-31"))
+    window = develop_validate(panel)
+    assert window.index.min() == pd.Timestamp("2010-01-01")
+    assert window.index.max() == pd.Timestamp("2021-12-31")
+
+    with pytest.raises(ValueError, match="develop start"):
+        develop_validate(pd.DataFrame({"X": 1.0}, index=pd.bdate_range("2010-01-04", "2021-12-31")))
+    with pytest.raises(ValueError, match="OOT window"):
+        develop_validate(pd.DataFrame({"X": 1.0}, index=pd.bdate_range("2005-01-03", "2021-12-31")))

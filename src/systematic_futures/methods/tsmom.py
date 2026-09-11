@@ -44,7 +44,7 @@ def horizon_signal(closes: pd.DataFrame, lookback: int) -> pd.DataFrame:
 
 def tsmom(closes: pd.DataFrame) -> pd.DataFrame:
     """The decision-rule benchmark: equal-weight mean of the vol-scaled
-    1/3/12m horizon sleeves. The ML variants (4a defaults, 4b Optuna) must
+    1/3/12m horizon sleeves. The ML variants (6a defaults, 6b Optuna) must
     beat this on test-window DSR after costs, or they are documented as
     failed challengers.
     """

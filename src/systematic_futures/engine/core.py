@@ -40,7 +40,12 @@ def to_wide(continuous: pd.DataFrame) -> pd.DataFrame:
     return continuous.pivot(index="date", columns="symbol", values="close").sort_index()
 
 
-def account(exposure: pd.DataFrame, closes: pd.DataFrame, bps: float = 0.0) -> pd.DataFrame:
+def account(
+    exposure: pd.DataFrame,
+    closes: pd.DataFrame,
+    bps: float = 0.0,
+    held: pd.DataFrame | None = None,
+) -> pd.DataFrame:
     """Daily per-symbol strategy returns from an exposure path.
 
     r(t) = E(t-1) * R(t) - (bps/1e4) * |E(t) - E(t-1)|, where E is the position
@@ -48,8 +53,13 @@ def account(exposure: pd.DataFrame, closes: pd.DataFrame, bps: float = 0.0) -> p
     `held_positions`) and R(t) is measured over that symbol's own observations
     (`consecutive_returns`). The first day enters from flat (|E(t0)| is charged as
     the entry trade) and earns nothing (no prior close to measure a return against).
+
+    `held` is the already-resolved position path: `run` passes the frame it
+    charges turnover on, so the trade the cost model charges is provably the
+    trade the reported turnover counts.
     """
-    held = held_positions(exposure, closes)
+    if held is None:
+        held = held_positions(exposure, closes)
     pnl = (held.shift(1) * consecutive_returns(closes)).fillna(0.0)
     return pnl - bps / 1e4 * traded_notional(held)
 
@@ -93,17 +103,19 @@ def run(
         exposure = vol_target_positions(sig, closes, vol_target, cap, vol_lookback)
     rows = {}
     held = held_positions(exposure, closes)
+    traded = traded_notional(held)
     for bps in bps_grid:
-        daily = account(exposure, closes, bps)
-        traded = traded_notional(held)
-        if dates is not None:
-            daily, traded = daily.reindex(dates), traded.reindex(dates)
+        daily = account(exposure, closes, bps, held)
+        if dates is None:
+            charged = traded
+        else:
+            daily, charged = daily.reindex(dates), traded.reindex(dates)
         r = daily.mean(axis=1)
         rows[bps] = {
             "sharpe": sharpe(r),
             "sortino": sortino(r),
             "max_dd": max_drawdown(r),
-            "turnover": turnover(traded),
+            "turnover": turnover(charged),
             "dsr": deflated_sharpe(r, trials),
         }
     return pd.DataFrame.from_dict(rows, orient="index").rename_axis("bps")

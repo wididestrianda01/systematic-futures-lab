@@ -9,13 +9,14 @@ embargoed walk-forward splitter, and a pooled LightGBM refit per fold.
 
 from systematic_futures.ml.cv import Fold, leakage_violations, purged_walk_forward
 from systematic_futures.ml.features import FEATURES, feature_panel, forward_label
-from systematic_futures.ml.model import lgbm_defaults, lgbm_tuned
+from systematic_futures.ml.model import inner_split, lgbm_defaults, lgbm_tuned
 
 __all__ = [
     "FEATURES",
     "Fold",
     "feature_panel",
     "forward_label",
+    "inner_split",
     "leakage_violations",
     "lgbm_defaults",
     "lgbm_tuned",
