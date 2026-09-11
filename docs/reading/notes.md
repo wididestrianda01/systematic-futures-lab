@@ -123,3 +123,43 @@ serial correlation bleeds across the boundary anyway. Combined with walk-forward
 inside develop+validate, this is the exact algorithm the ML tickets implement — but the
 book's worked examples and the CPCV variants (ch. 12) are not yet owned. Before the memo's
 ML section is written: read the purchased chapters and extend this note.
+
+## S5 — Momentum Crashes (Daniel & Moskowitz 2016, JFE 120(2), 221–254)
+
+> **Scaffolding, not a read.** Agent-drafted 2026-09-11 under the same provenance as the notes
+> above, so the owner's read can be a skim-and-confirm. Ticket 37 stays open until that read
+> happens, and the memo may not cite this note as read before then.
+
+What it claims: momentum's payoff is crash-prone rather than symmetric — long stretches of small
+gains punctuated by rare, severe drawdowns. The crashes cluster in **rebounds after bear markets
+when volatility is high**, and the mechanism named is the short leg: the losers being shorted are
+exactly the high-beta, distressed names that rally hardest when the market snaps back, so a static
+long-short momentum book is short a call on the recovery. The remedy the paper quantifies is
+**dynamic, vol-scaled exposure** — scaling the momentum book by the ratio of forecast momentum
+return to its volatility roughly doubles risk-adjusted performance against the static book, at the
+cost of lower average exposure.
+
+Pinned here: the paper's crash mechanism is developed on equity cross-sectional momentum, so it
+transfers to this project's futures XS family only as (a) the general claim that momentum payoffs are
+regime-dependent and crash-prone — the framing this project needs for the 2022–2024Q1 out-of-sample
+window — and (b) the confirmation that vol-scaled exposure is the documented mitigation, which
+this project's shared overlay already applies to every family. Use it as risk framing in the memo and the
+brief; do not read it as an implementation instruction, and do not claim it validates the futures
+cross-section.
+
+## S9 — The Risk in Hedge Fund Strategies: Theory and Evidence from Trend Followers (Fung & Hsieh 2001, RFS 14(2), 313–341)
+
+> **Scaffolding, not a read** — same provenance and gate as S5 above.
+
+What it claims: trend-following returns replicate a portfolio of **lookback straddles** on currency,
+bond and commodity markets — the primitive strategies that pay off in large moves in either
+direction. That convexity explains the industry's observed profile: trend followers earn their
+returns in extreme markets (crises included) and bleed in range-bound, low-volatility ones, and the
+payoff is not explained by standard equity/bond factors.
+
+Pinned here: the trend family's payoff shape is a documented property of the style, not something this project
+discovered — which is exactly the industry lineage the memo's buckets (trend / short-term / carry /
+multi-style) and the interview brief need, and the reason a sideways market is the benchmark's
+documented weak regime rather than an implementation failure. It also disciplines the claim this project
+makes when the trend benchmark loses money in develop+validate: what the paper establishes is the
+payoff shape, not a promise about any particular window.
