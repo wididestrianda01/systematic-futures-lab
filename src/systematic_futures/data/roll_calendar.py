@@ -64,17 +64,20 @@ def build_roll_calendar(mp: pd.DataFrame) -> pd.DataFrame:
 
 def extract_contract_prices(mp: pd.DataFrame) -> pd.DataFrame:
     """Melt the three legs into a long per-contract close panel
-    [date, raw_symbol, close] (one row per contract-day, latest snapshot wins)."""
+    [symbol, date, raw_symbol, close] (one row per symbol-contract-day,
+    latest snapshot wins). Contract IDs are bare YYYYMM00 month numbers —
+    they collide across instruments, so the symbol must ride along."""
     out = []
     for price_col, contract_col in (
         ("PRICE", "PRICE_CONTRACT"),
         ("FORWARD", "FORWARD_CONTRACT"),
         ("CARRY", "CARRY_CONTRACT"),
     ):
-        leg = mp[["DATETIME", price_col, contract_col]].dropna()
+        leg = mp[["symbol", "DATETIME", price_col, contract_col]].dropna()
         out.append(
             pd.DataFrame(
                 {
+                    "symbol": leg["symbol"],
                     "date": leg["DATETIME"].dt.normalize(),
                     "raw_symbol": leg[contract_col].astype("int64"),
                     "close": leg[price_col].astype(float),
@@ -84,7 +87,7 @@ def extract_contract_prices(mp: pd.DataFrame) -> pd.DataFrame:
     return (
         pd.concat(out)
         .sort_values("date")
-        .groupby(["date", "raw_symbol"], as_index=False)
+        .groupby(["symbol", "date", "raw_symbol"], as_index=False)
         .last()
         .reset_index(drop=True)
     )

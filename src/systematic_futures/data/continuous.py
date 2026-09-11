@@ -27,7 +27,7 @@ def back_adjust(raw: pd.DataFrame, calendar: pd.DataFrame) -> pd.DataFrame:
         cal = cal.sort_values("date").reset_index(drop=True)
         legs = set(cal["front"]) | set(cal["next"])
         wide = (
-            raw.loc[raw["raw_symbol"].isin(legs)]
+            raw.loc[(raw["symbol"] == sym) & raw["raw_symbol"].isin(legs)]
             .pivot(index="date", columns="raw_symbol", values="close")
             .sort_index()
         )
@@ -39,7 +39,10 @@ def back_adjust(raw: pd.DataFrame, calendar: pd.DataFrame) -> pd.DataFrame:
             cum *= wide.at[prev_day, cal.at[i, "front"]] / wide.at[prev_day, cal.at[i - 1, "front"]]
             factor[factor.index < cal.at[i, "date"]] = cum
         held = cal.merge(
-            raw, left_on=["date", "front"], right_on=["date", "raw_symbol"], how="inner"
+            raw,
+            left_on=["symbol", "date", "front"],
+            right_on=["symbol", "date", "raw_symbol"],
+            how="inner",
         )
         assert held["date"].tolist() == cal["date"].tolist(), f"{sym}: raw missing held closes"
         out = held[["date", "symbol"]].copy()
