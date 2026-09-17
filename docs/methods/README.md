@@ -19,6 +19,13 @@ Shared machinery, stated here once and true of every doc below:
   return a cost level costs. Sharpe is annualized at √252 in both windows as a convention; the frozen
   panel carries 309.6 sessions per year before 2022 and 258.4 after, so the two windows' Sharpe
   levels are not strictly comparable.
+- **Rolls are not charged**: `traded_notional` is the change in *held exposure*, so a contract roll —
+  which leaves the exposure unchanged while trading two sides of that symbol's notional — costs
+  nothing in the model, and the held path carries a position across a symbol's non-quoting sessions
+  the same way. Measured on the committed panel at the roll calendar's dates, roll trades would add
+  0.016/day of book turnover to the baseline's 0.007 (≈2.3× its charged trading) and 0.012/day to
+  carry's 0.176 (≈7%), so the understatement is largest exactly where the charged base is smallest:
+  the families' ranking is unaffected, the low-turnover cost drag is understated.
 - **Headline cost level**: 2 bps/side — the level a decision is read at.
 - **Windows**: develop+validate 2010-01-01 → 2021-12-31 (the develop+validate tables); out-of-sample
   2022-01-03 → 2024-03-28, read once by `scripts/build_out_of_sample.py` (the out-of-sample tables).

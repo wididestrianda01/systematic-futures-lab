@@ -112,7 +112,8 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
 - **Reported units**: Sharpe is annualized at √252 in both windows as a stated convention, not
   because the panel has 252 sessions a year — the frozen data carries 309.6 sessions per year in
   develop+validate (Sunday bars included) and 258.4 from 2022, so the two windows' Sharpe *levels* are
-  ~11% apart on equal annualization. The DSR the rule reads is a probability and is unaffected.
+  ~9% apart on equal annualization (√(309.6/258.4)); the develop+validate column printed at √252 sits
+  ~11% below its own session density. The DSR the rule reads is a probability and is unaffected.
 - **No look-ahead, structurally**: a signal formed with data through day `t` drives the position held
   from `t` to `t+1`; a regression test fails on a look-ahead implementation and passes on the correct
   one.

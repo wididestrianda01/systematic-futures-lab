@@ -16,13 +16,15 @@ the paper as the data allows and states the breadth it is missing.
 ## Check 1 — the data layer against published per-instrument statistics
 
 `table1_vol.csv`: annualised volatility per instrument against MOP Table 1, both constructions.
-The paper's table spans 1965/start → 2009; the free series start later, and the ratio tracks that
-gap almost exactly.
+The paper's table spans 1965/start → 2009; the free series start later, and the ratio drifts with
+that gap — mean `|ratio − 1|` runs 0.11 for series that overlap the paper's sample, 0.16 for those
+starting 16–25 years late and 0.20 beyond 25 years (rank correlation 0.35, so the level is noisy
+instrument by instrument while the widening is plain in the groups below).
 
 | group | instruments | vol ratio ours/published |
 |---|---|---|
-| free history overlapping the paper's sample | CORN, WHEAT, SUGAR, CATTLE, GOLD, SILVER, SP500, US_10Y, GBP, JPY, CHF, CAD | 0.71 – 1.06 (median 0.94) |
-| free history starting after 1990 | CRUDE, NATGAS, COPPER, JGB, NOK, NZD, SEK, IBEX, SPI200, MIB … | 0.46 – 1.12 |
+| free history overlapping the paper's sample | CORN, WHEAT, SUGAR, CATTLE, GOLD, SILVER, SP500, US_10Y, GBP_USD, JPY_USD, CHF_USD, CAD_USD | 0.71 – 1.06 (median 0.94) |
+| free history starting after 1990 | CRUDE, NATGAS, COPPER, JP_10Y, NOK_USD, NZD_USD, SEK_USD, IBEX35, ASX_SPI200, FTSE_MIB … | 0.46 – 1.12 |
 | free history starting after 2015 | EURO_2Y, EURO_10Y, EURO_30Y, SOYOIL, SOYMEAL, FTSE100 | 0.62 – 1.33 |
 
 Median across all 46: **0.94** (adjusted) and **0.94** (naive splice). Twelve instruments with
