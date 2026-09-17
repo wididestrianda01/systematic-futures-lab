@@ -11,3 +11,9 @@ CONTEXT.md
 memories/
 .serena/
 CLAUDE.md
+docs/report/report.aux
+docs/report/report.log
+docs/report/report.out
+docs/report/report.fls
+docs/report/report.fdb_latexmk
+docs/report/report.synctex.gz
