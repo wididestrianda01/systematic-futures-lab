@@ -137,7 +137,9 @@ def test_report_cost_ladder_matches_the_committed_table(tables):
             )
 
 
-@pytest.mark.parametrize(("marker", "ending", "phase"), [("### 4.1", "### 4.2", 4), ("### 4.2", "### 4.3", 5)])
+@pytest.mark.parametrize(
+    ("marker", "ending", "phase"), [("### 4.1", "### 4.2", 4), ("### 4.2", "### 4.3", 5)]
+)
 def test_memo_headline_tables_match_the_committed_tables(tables, marker, ending, phase):
     """Memo §4.1/§4.2: Sharpe, DSR and turnover, develop+validate and out-of-sample."""
     lines = section(MEMO.read_text(), marker, ending)
