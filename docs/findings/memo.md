@@ -150,14 +150,14 @@ verdict stands as decided; this is evidence about it, and it is not retuned.
 
 | family | 0 bps | 2 bps | 5 bps | 10 bps |
 |---|---|---|---|---|
-| `baseline` | 0.419 / -0.685 | 0.408 / -0.694 | 0.390 / -0.711 | 0.361 / -0.734 |
-| `tsmom` | 0.200 / 0.780 | -0.085 / 0.551 | -0.508 / 0.210 | -1.203 / -0.364 |
-| `xs_momentum` | 0.562 / 1.294 | 0.406 / 1.174 | 0.172 / 0.985 | -0.216 / 0.698 |
-| `carry` | -3.214 / -1.513 | -3.614 / -1.756 | -4.203 / -2.119 | -5.147 / -2.716 |
-| `seasonality` | -0.027 / 0.828 | -0.088 / 0.770 | -0.177 / 0.682 | -0.326 / 0.537 |
-| `seasonal_tilt` | 0.163 / 0.644 | -0.116 / 0.407 | -0.530 / 0.046 | -1.208 / -0.529 |
-| `ml_defaults` | 1.406 / 0.759 | 0.799 / 0.072 | -0.123 / -0.965 | -1.660 / -2.661 |
-| `ml_tuned` | 2.074 / 0.798 | 1.550 / 0.390 | 0.753 / -0.222 | -0.621 / -1.232 |
+| `baseline` | 0.419 / -0.685 | 0.408 / -0.694 | 0.390 / -0.709 | 0.361 / -0.734 |
+| `tsmom` | 0.200 / 0.780 | -0.085 / 0.551 | -0.508 / 0.208 | -1.203 / -0.358 |
+| `xs_momentum` | 0.562 / 1.294 | 0.406 / 1.174 | 0.172 / 0.994 | -0.216 / 0.695 |
+| `carry` | -3.214 / -1.513 | -3.614 / -1.756 | -4.203 / -2.119 | -5.147 / -2.718 |
+| `seasonality` | -0.027 / 0.828 | -0.088 / 0.770 | -0.177 / 0.683 | -0.326 / 0.539 |
+| `seasonal_tilt` | 0.163 / 0.644 | -0.116 / 0.407 | -0.530 / 0.054 | -1.208 / -0.529 |
+| `ml_defaults` | 1.406 / 0.759 | 0.799 / 0.072 | -0.122 / -0.957 | -1.660 / -2.658 |
+| `ml_tuned` | 2.074 / 0.798 | 1.550 / 0.390 | 0.746 / -0.220 | -0.616 / -1.232 |
 
 (develop+validate / out-of-sample. Turnover is identical across a row by construction — only the
 price per trade changes.)
@@ -167,7 +167,7 @@ Two families have a *sign-flipping* cost profile, both in develop+validate: the 
 stay positive gross *and* net at the headline level in both windows — 6a 0.759 → 0.072 and 6b
 0.798 → 0.390 out of time — so what cost takes from them is most of the signal, not its sign. At
 5 bps the survivors differ by window: develop+validate leaves the baseline (0.390), XS momentum
-(0.172) and `ml_tuned` (0.753) positive; out of time leaves XS momentum (0.994), seasonality (0.683),
+(0.172) and `ml_tuned` (0.746) positive; out of time leaves XS momentum (0.994), seasonality (0.683),
 the trend benchmark (0.208) and the tilt (0.054).
 
 ---

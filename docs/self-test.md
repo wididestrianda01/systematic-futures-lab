@@ -58,7 +58,7 @@ cost is not the only way a family fails: standalone seasonality is negative *bef
 gross on turnover of 0.025, a quarter of the benchmark's), so there the signal, not the churn, is the
 problem. In monitoring terms I would track turnover and the cost-to-gross ratio per family, not just
 Sharpe — and at 5 bps three of the eight families stay positive in develop+validate (baseline 0.390,
-XS momentum 0.172, the tuned variant 0.753), while the out-of-sample window leaves four (XS momentum
+XS momentum 0.172, the tuned variant 0.746), while the out-of-sample window leaves four (XS momentum
 0.994, seasonality 0.683, the trend benchmark 0.208, the tilt 0.054).
 
 **5. Your carry family is the worst performer in both windows. Argue for and against "carry does not
