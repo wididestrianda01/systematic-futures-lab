@@ -1,30 +1,42 @@
 # Systematic futures: a method-comparison lab
 
-One engine, one cost model, one evaluation protocol, and a single out-of-sample window read once:
-six classic futures method families and two LightGBM variants compared on real CME contract data from
-2010 to 2024Q1. The primary artifact is a findings memo — where each method wins, loses, and why —
-supported by an executable walkthrough, per-method governance docs, a condensed report and a
-self-test brief.
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 
-**Status:** complete — the pipeline is built end to end, results committed, tagged `replication.1`
-(the revision that adds the external replication; `results.2` is the review-pass revision it builds
-on, and `results.1` the one before that, whose tables carry the summed-across-sleeves turnover
-column).
+Do six classic futures method families, and a machine-learned challenger, survive after costs on real
+CME contract data? Sixteen CME roots, 2010 to 2024Q1, one accounting engine, one cost model, one
+evaluation protocol, and one out-of-sample window read once. The primary artifact is a findings memo:
+where each method wins, loses, and why, supported by an executed walkthrough, per-method governance
+docs, a condensed report and a self-test brief.
+
+Read: [findings memo](docs/findings/memo.md) ·
+[executed walkthrough](notebooks/analysis.ipynb) ·
+[condensed report](docs/report/report.pdf)
+
+**Status:** complete. `replication.1` is the current revision. The earlier `results.1` and
+`results.2` tags are still on the history.
+
 Market data never enters this repository: only derived artifacts (code, configs, checksums,
 signals, statistics) are committed.
 
 ## What it is for
 
 **The decision it supports.** Whether to run a systematic futures book, and with which method
-families. That is a capital-allocation decision, so the lab is built the way a desk would build it:
-one accounting path, a frozen dataset, a pre-declared selection rule, and an out-of-sample window that
-was spent once, at the end.
+families. That is a capital-allocation question, so the lab is built the way a desk would build it:
+one accounting path, a frozen dataset, a pre-declared selection rule, and an out-of-sample window
+spent once, at the end.
 
-**Two jobs, deliberately bundled.** First, learn the craft — futures are where systematic trading is
-most explicit, since rolls, term structure, carry, volatility targeting, costs and multiple testing
-all appear in the same object. Second, prove the craft: the vocabulary throughout (research cycle from
-signal generation to implementation; calibration, validation, monitoring; cost and turnover
-discipline; overfitting as a measured quantity) is the vocabulary systematic employers screen for.
+**What trading the book costs.** Cost level decides this comparison before signal quality does. At
+2 bps a side the trend benchmark pays 0.52% of capital a year and gives up its gross edge (-0.085 net
+against +0.20 gross), while the tuned variant pays 0.51% and keeps 1.550. Raise the charge to 10 bps
+and the trend benchmark is at -1.20 while the low-turnover families barely move. Out of time the same
+mechanism shows up on `ml_defaults`: 0.759 gross becomes 0.072 net on a 1.00% a year drag. Every
+family is reported across the 0/2/5/10 bps ladder.
+
+**Two jobs, deliberately bundled.** Learn the craft, and prove it. Futures are where systematic
+trading is most explicit, since rolls, term structure, carry, volatility targeting, costs and
+multiple testing all appear in the same object, so a lab built here exercises the whole research
+cycle: research from signal generation to implementation, calibration, validation and monitoring,
+cost and turnover discipline, and overfitting as a quantity you measure.
 
 ## Headline results
 
@@ -43,9 +55,13 @@ Sharpe at the headline cost level (2 bps/side) with the Deflated Sharpe Ratio, o
 | ML 6a `ml_defaults` | 0.799 | 0.9989 | 0.072 | 0.5433 |
 | ML 6b `ml_tuned` | **1.550** | **0.9999** | 0.390 | 0.0261 |
 
-The pre-declared rule — an ML variant wins only if its decision-window deflated Sharpe after costs
-beats the benchmark's — was written before the decision read's numbers existed. Both variants clear it inside
-the decision window and **both fail it out of time**. That is reported as the finding, not retuned
+Four of the eight families are positive after costs on the decision window and six are positive out
+of time, but only three are positive in both: cross-sectional momentum, and the two ML variants.
+Cross-sectional momentum is the only family positive in every sub-period and in both windows.
+
+The pre-declared rule (an ML variant wins only if its decision-window deflated Sharpe after costs
+beats the benchmark's) was written before the decision read's numbers existed. Both variants clear it
+inside the decision window and both fail it out of time. That is reported as the finding, not retuned
 away; `results/out_of_sample/OOT.md` records the read, and `results/decision/DECISION.md` keeps the
 decision read's verdict as decided.
 
@@ -57,15 +73,15 @@ Four further readings, argued in the memo:
   tilt. Trend and the seasonal tilt flip sign between gross and headline cost; both ML variants stay
   positive gross and net, with cost taking most of the signal rather than its sign.
 - **The null model is a real competitor.** Vol-targeted buy-and-hold earns 0.408 at 2 bps on book
-  turnover of 0.007 — the diversification return, which a signal has to beat before it has shown
-  anything.
+  turnover of 0.007 (3.5 bps a year in cost), which is the diversification return a signal has to
+  beat before it has shown anything.
 - **What generalised is what did not need to time the regime.** Cross-sectional momentum is positive
   in every sub-period and both windows; the passive book lost money in all three out-of-sample years
   while the timing families earned it.
 - **Two honest-failure results.** Standalone seasonality is negative before costs at turnover below
   the benchmark's (so churn is not the explanation), and carry's number belongs to rebalancing a
-  basis-derived sign daily — the same rule held monthly earns +0.163 where the daily refresh earns
-  -3.614, and the published construction is a monthly, rank-weighted slope magnitude — so the carry
+  basis-derived sign daily: the same rule held monthly earns +0.163 where the daily refresh earns
+  -3.614, and the published construction is a monthly, rank-weighted slope magnitude, so the carry
   premium is neither confirmed nor refuted here. Evidence:
   `results/out_of_sample/carry_frequency.csv`.
 
@@ -73,14 +89,14 @@ Four further readings, argued in the memo:
 
 Raw per-contract daily prices for **16 CME roots** (ES, NQ, YM, ZN, ZB, ZF, GC, SI, HG, CL, NG, ZC,
 ZW, 6E, 6J, 6B) from pysystemtrade's free `multiple_prices_csv` snapshot, pinned at commit `b4a25e6`
-and frozen upstream on 2024-03-28. Each row carries three legs with contract identifiers — front,
-successor and prior — so rolls, back-adjustment and basis are built in this project rather than
+and frozen upstream on 2024-03-28. Each row carries three legs with contract identifiers (front,
+successor and prior), so rolls, back-adjustment and basis are built in this project rather than
 inherited from a vendor's adjusted series. KC/SB/CC (ICE softs, no free feed) and BZ (Brent legs start
 in 2020-08) are excluded, recorded in code with their reasons.
 
 **Licensing posture.** The repository ships no market data, private or public: `data/` is gitignored,
-and everything committed under `results/` is a derived statistic — metrics, return series, signals,
-checksums. A committed manifest carries SHA-256, schema and date range per derived file, and ingest
+and everything committed under `results/` is a derived statistic (metrics, return series, signals,
+checksums). A committed manifest carries SHA-256, schema and date range per derived file, and ingest
 fails on any drift. Details: `docs/data/pst-source.md`.
 
 ## The pipeline
@@ -91,9 +107,9 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
 ```
 
 - **Roll calendar**: observed from the leg data. The front contract flips exactly when the data says
-  it flips — no last-trade-date estimate, no vendor rule.
+  it flips, with no last-trade-date estimate and no vendor rule.
 - **Continuous series**: ratio back-adjustment, applied backwards from the newest contract, with one
-  invariant pinned by test — the continuous series' daily return equals the held contract's own
+  invariant pinned by test: the continuous series' daily return equals the held contract's own
   return on every session, rolls included.
 - **Basis**: `close(next)/close(front) − 1` on raw closes; days missing a leg are dropped, never
   zero-filled.
@@ -103,16 +119,19 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
 - **One accounting path** (ADR 0001): every method is a callable `closes → signals`; the engine owns
   sizing, P&L, costs and metrics. The arithmetic that tunes a model and the arithmetic that publishes
   a table cannot drift apart, and a test pins the equivalence.
-- **Shared overlay**: signals scaled to a 10% annualized volatility target **per symbol** on trailing
-  realized vol, clipped to ±1 notional — identically for every family. Per-symbol sizing is not
+- **Shared overlay**: signals scaled to a 10% annualized volatility target per symbol on trailing
+  realized vol, clipped to ±1 notional, identically for every family. Per-symbol sizing is not
   book-level sizing: realized book volatility is 0.9–3.0% in develop+validate and 1.5–4.6% out of
   time, so the families are like-for-like in rule and cost, not in delivered risk.
 - **Costs**: a linear charge of `bps` per side on traded notional, reported at 0/2/5/10 bps with 2 bps
-  the headline level a decision is read at. Turnover is book-level — mean daily traded notional per
-  unit of capital, the same object the charge is taken on — so `turnover × bps × 252 × 1e-4` is the
-  annual return a cost level costs.
+  the headline level a decision is read at. Turnover is book-level (`turnover × bps × 252 × 1e-4` is
+  the annual return a cost level costs), measured as mean daily traded notional per unit of capital,
+  which is the same object the charge is taken on. At 2 bps that runs from 0.25%/yr for
+  cross-sectional momentum (turnover 0.049) to 0.89%/yr for carry (0.176) and 1.00%/yr for
+  `ml_defaults` out of time (0.199). The trend benchmark's 0.52%/yr, against its 1.8% realized book
+  volatility, is the 0.28 Sharpe between its +0.20 gross and -0.085 net.
 - **Reported units**: Sharpe is annualized at √252 in both windows as a stated convention, not
-  because the panel has 252 sessions a year — the frozen data carries 309.6 sessions per year in
+  because the panel has 252 sessions a year. The frozen data carries 309.6 sessions per year in
   develop+validate (Sunday bars included) and 258.4 from 2022, so the two windows' Sharpe *levels* are
   ~9% apart on equal annualization (√(309.6/258.4)); the develop+validate column printed at √252 sits
   ~11% below its own session density. The DSR the rule reads is a probability and is unaffected.
@@ -125,28 +144,28 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
   re-measuring each ML variant on its own covered dates; the run stops if they disagree.
 - **Multiple testing**: the Deflated Sharpe Ratio is deflated by the configurations each selection
   evaluated (1 for every classic family, 100 for the tuned variant), and the ML folds are purged and
-  embargoed by hand — `leakage_violations` re-derives the property from the fold semantics on every
-  run. M6's CSCV probability-of-backtest-overfitting diagnostic is deliberately *not* implemented;
-  the gap is recorded rather than glossed.
+  embargoed by hand, with `leakage_violations` re-deriving the property from the fold semantics on
+  every run. M6's CSCV probability-of-backtest-overfitting diagnostic is not implemented; the gap is
+  recorded rather than glossed.
 
 ## Design and architecture
 
-- `src/systematic_futures/data/` — universe map, observed roll calendar, ratio-adjusted continuous
+- `src/systematic_futures/data/`: universe map, observed roll calendar, ratio-adjusted continuous
   builder, basis, the manifest gate, a DuckDB/Parquet query layer.
-- `src/systematic_futures/engine/` — the seam: `run(method, data) → metrics table`, the sizing
+- `src/systematic_futures/engine/`: the seam: `run(method, data) → metrics table`, the sizing
   overlay, the held-position path, the cost charge, metrics, DSR, and `curve()` for plotted series.
-- `src/systematic_futures/methods/` — one callable per family, each with a hand-calculated fixture
+- `src/systematic_futures/methods/`: one callable per family, each with a hand-calculated fixture
   pinning its sign and scale at the seam.
-- `src/systematic_futures/ml/` — point-in-time features, the hand-rolled purged/embargoed splitter,
+- `src/systematic_futures/ml/`: point-in-time features, the hand-rolled purged/embargoed splitter,
   the two LightGBM variants.
-- `protocol.py` — the comparison's two contracts: the protocol (fold geometry, horizon, search budget,
+- `protocol.py`: the comparison's two contracts: the protocol (fold geometry, horizon, search budget,
   cost level, overlay) and the method (a signal source plus the trial count its selection evaluated).
-- `comparison.py` — the comparison table's shape and every read of it: assembly, the headline read,
+- `comparison.py`: the comparison table's shape and every read of it: assembly, the headline read,
   coverage and trial metadata, the like-for-like mask. It imports no family, so the shape costs nothing.
-- `catalogue.py` — the comparison set (classics plus 6a/6b) and the walk-forward entry point.
-- `reporting.py` — the rendered outcome: the markdown body of the decision records, from the same read.
-- `decision.py` — the pre-declared rule and its guard, written once so the phases cannot drift apart.
-- `scripts/` — thin runners; `notebooks/` — explanations. Logic lives in the package, arguments live
+- `catalogue.py`: the comparison set (classics plus 6a/6b) and the walk-forward entry point.
+- `reporting.py`: the rendered outcome: the markdown body of the decision records, from the same read.
+- `decision.py`: the pre-declared rule and its guard, written once so the phases cannot drift apart.
+- `scripts/`: thin runners; `notebooks/`: explanations. Logic lives in the package, arguments live
   in the runners.
 - CI runs the test suite (123 tests) on every push.
 
@@ -155,7 +174,7 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
 `docs/findings/memo.md` is the argument: the regime the trend benchmark lived through, why the ML
 variants' in-window edge was concentrated in the periods the benchmark lost money, what purge and
 embargo bought and what they cannot buy, and the two honest-failure findings. `docs/reading/notes.md`
-records the canon behind it — M1–M6 and M8 are read and closed; M7 and the two SHOULD papers are
+records the canon behind it: M1–M6 and M8 are read and closed; M7 and the two SHOULD papers are
 scaffolded and marked *not read*, and the memo flags the claims that rest on them.
 
 ## Reproduce
@@ -185,27 +204,28 @@ uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ip
 
 The phase scripts write the same tables that are committed. Regeneration is deterministic by
 construction: seeded fixture demos, frozen inputs, committed outputs, and no wall-clock anywhere in
-the tables. `diff -r` against the committed `results/` tree is the check — the tables, decision
+the tables. `diff -r` against the committed `results/` tree is the check: the tables, decision
 records and return series rebuild byte-for-byte, as do the report figure and the report PDF. The
-executed notebook is deterministic in *content*: every printed number matches, but the kernel stamps
-cell timings and may split one stdout stream into two, so compare its outputs rather than its bytes.
+executed notebook is deterministic in *content*, since every printed number matches, but the kernel
+stamps cell timings and may split one stdout stream into two, so compare its outputs and not its
+bytes.
 
 `results/replication/` is the external check on all of that: MOP (2012) Eq. (5) run verbatim on the
 52 instruments the free snapshot can supply from the paper's Table 1, with `FINDINGS.md` stating what
 reproduces (13.7% volatility and Sharpe 1.20 for the diversified factor against the paper's 12% and
-"greater than one") and what cannot (the paper's own 58-instrument universe — no LME metals, Bund,
-DAX, CAC or euro before 2000 on free data).
+"greater than one") and what cannot (the paper's own 58-instrument universe, since free data carries
+no LME metals, Bund, DAX, CAC or euro before 2000).
 
 ## Repository layout
 
 | path | what it holds |
 |---|---|
-| `docs/findings/memo.md` | the primary artifact — findings, readings, limitations, non-adopts |
+| `docs/findings/memo.md` | the primary artifact: findings, readings, limitations, non-adopts |
 | `notebooks/analysis.ipynb` | the executed walkthrough: context, data, pipeline, methodology, results, readings |
 | `docs/methods/` | per-family governance docs: construction, evidence, failure modes, monitoring |
 | `docs/report/report.tex`, `report.pdf` | the condensed report |
 | `docs/self-test.md` | self-test questions, regulation talking points, non-adopt boundary |
-| `results/families|decision|out_of_sample/` | committed tables, decision records, derived return series, the carry frequency diagnostic |
+| `results/families/`, `results/decision/`, `results/out_of_sample/` | committed tables, decision records, derived return series, the carry frequency diagnostic |
 | `results/trend_sweep/` | the TSMOM horizon sweep, one sleeve per lookback |
 | `docs/adr/` | decision reasoning (one accounting path) |
 | `docs/data/pst-source.md` | data provenance and licensing posture |
@@ -214,10 +234,15 @@ DAX, CAC or euro before 2000 on free data).
 ## Boundaries
 
 - **Not claimed**: live trading, order routing, intraday execution, market impact beyond the constant
-  cost ladder, and any statement about machine learning on futures in general — the ML result is
+  cost ladder, and any statement about machine learning on futures in general, since the ML result is
   specific to this feature set, label horizon, fold geometry, cost level and window.
-- **Deliberately skipped**: deep learning, C++/Rust/kdb+, dashboards, MLOps tooling, microstructure,
-  VRP/short-vol, standalone mean-reversion, stat-arb/pairs — each with a stated reason in the memo's
+- **Out of scope**: deep learning, C++/Rust/kdb+, dashboards, MLOps tooling, microstructure,
+  VRP/short-vol, standalone mean-reversion, stat-arb/pairs, each with a stated reason in the memo's
   non-adopt boundary, and regulation talking points in the self-test brief rather than in the code.
 - **One universe, one window**: 16 roots and a single out-of-sample read; the out-of-time reversal is
   one draw of a regime, not a law.
+
+## License
+
+GPL-3.0-or-later. Copyright (C) 2026 wididestrianda01. The full text is in [LICENSE](LICENSE); the
+data source and its licensing posture are documented in `docs/data/pst-source.md`.
