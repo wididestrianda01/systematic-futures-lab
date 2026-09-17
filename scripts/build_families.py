@@ -1,10 +1,10 @@
-"""the families read exit: run every method family through the shared seam on the frozen
+"""The families read: run every method family through the shared seam on the frozen
 panel — develop+validate only (2010-01-01 → 2021-12-31; the OOT window 2022+ stays
 untouched for its single end-of-project read) — and commit the per-family
 comparison tables plus the seasonality-after-costs finding.
 
 Window and comparison set come from the package (`data.panels.develop_validate`,
-`catalogue.classic_set`) so the decision read cannot drift from this phase. The committed
+`catalogue.classic_set`) so the decision read cannot drift from this one. The committed
 numbers are mechanical output; the MUST canon gates interpreting them.
 
 Run: uv run python scripts/build_families.py
@@ -26,14 +26,14 @@ from systematic_futures.data.panels import (
 )
 from systematic_futures.protocol import PROTOCOL, Method
 
-RESULTS = Path("results/phase3")
+RESULTS = Path("results/families")
 
 GATE = (
     "**Interpretation status: gated.** The MUST reading canon gates interpretation of any\n"
     "backtest result (`docs/reading/README.md`), and M7 is still partially gated\n"
     "(`docs/reading/notes.md`). Everything below the numbers is a *provisional* reading of\n"
     "mechanical output, not a checked finding, until the canon closes; the\n"
-    "the out-of-sample read interpretation pass owns it.\n\n"
+    "out-of-sample interpretation pass owns it.\n\n"
 )
 
 
@@ -53,7 +53,7 @@ def main() -> int:
     dies = season["sharpe"] < trend["sharpe"]
 
     (RESULTS / "FINDINGS.md").write_text(
-        "# the families read findings\n\n"
+        "# Families read — findings\n\n"
         f"Window: develop+validate ({DEVELOP_START.date()} → {VALIDATE_END.date()}), frozen "
         f"panel, {PROTOCOL.vol_target:.0%} vol target, 16 CME roots; OOT (2022+) untouched.\n\n"
         f"{GATE}"

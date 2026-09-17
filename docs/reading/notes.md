@@ -3,7 +3,7 @@
 > Provenance: agent-authored working notes (2026-09-09), committed at the maintainer's request.
 > They compress what each paper claims and what this project adopts from it — they are scaffolding
 > for interpretation, not a substitute for reading the papers. The gate stays honest: skim
-> these notes, then at least skim each paper before interpreting the families read+ results.
+> these notes, then at least skim each paper before interpreting the results.
 > Order and links: [README.md](README.md).
 
 ## M8 — The Sharpe Ratio (Sharpe 1994)

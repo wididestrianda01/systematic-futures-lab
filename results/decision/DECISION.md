@@ -1,4 +1,4 @@
-# the decision read decision (the pre-declared rule applied)
+# Decision (the pre-declared rule applied)
 
 Rule: `DECISION_RULE.md`, applied to the 2 bps row of the primary read (`tables.csv`) on the develop+validate window (2010-01-01 → 2021-12-31).
 

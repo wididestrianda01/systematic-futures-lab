@@ -62,6 +62,6 @@ sentinels); and a hard retest trigger on any change to the feature set, label ho
 search space or the model class — under RTS 6 framing each of those is a material change, and the
 protocol has to be re-run rather than patched.
 
-**Open questions (the memo's, canon-gated).** Why the decision-read winners fail out of time, and what the
+**Open questions (the memo's, canon-gated).** Why the decision read's winners fail out of time, and what the
 purged/embargoed folds and the DSR deflation actually changed versus a naive split, are exactly the
 questions the M7 gate exists for.

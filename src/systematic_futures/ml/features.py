@@ -2,7 +2,7 @@
 
 Every value at (t, symbol) is computed from closes through t only: trailing
 returns, realized vol and a vol ratio, distance from a moving average, the
-cross-sectional ranks of momentum and basis, the the data layer basis level (carry),
+cross-sectional ranks of momentum and basis, the data layer's basis level (carry),
 and the same-calendar-month seasonality score the seasonality family uses.
 The table is tidy — one row per (date, symbol), one column per feature — which
 is the shape a pooled model consumes directly.
@@ -12,7 +12,7 @@ training target, never a model input.
 
 Macro-series features are a documented non-adopt: the free-only data posture
 has no redistributable point-in-time macro source, so the ML variants learn
-from the panel this repo already owns (the out-of-sample read carries the line into the
+from the panel this repo already owns (the non-adopt boundary carries the line into the
 non-adopt boundary).
 """
 

@@ -1,11 +1,11 @@
-# the decision read decision rule (pre-declared in the plan, before this phase's numbers existed)
+# Decision rule (pre-declared in the plan, before this read's numbers existed)
 
 **Rule.** Each ML variant (6a `ml_defaults`, 6b `ml_tuned`) must beat the
 `tsmom` benchmark on **decision-window Deflated Sharpe Ratio after costs**
 — the 2 bps row of the tables — to be reported as a winner.
 The decision window is the walk-forward **out-of-fold** folds inside
 develop+validate: the single out-of-sample read (2022 → 2024Q1) stays untouched
-until the out-of-sample read, so it cannot be the decision window without spending the touch.
+until it is taken, so it cannot be the decision window without spending the touch.
 
 A variant that fails this test is documented as a **failed challenger** with the
 numbers that failed it — not retuned until it passes.

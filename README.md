@@ -6,9 +6,10 @@ six classic futures method families and two LightGBM variants compared on real C
 supported by an executable walkthrough, per-method governance docs, a condensed report and a
 self-test brief.
 
-**Status:** complete — Phases 0–5 built, results committed, tagged `replication.1` (the revision
-that adds the external replication; `results.2` is the review-pass revision it builds on, and
-`results.1` the one before that, whose tables carry the summed-across-sleeves turnover column).
+**Status:** complete — the pipeline is built end to end, results committed, tagged `replication.1`
+(the revision that adds the external replication; `results.2` is the review-pass revision it builds
+on, and `results.1` the one before that, whose tables carry the summed-across-sleeves turnover
+column).
 Market data never enters this repository: only derived artifacts (code, configs, checksums,
 signals, statistics) are committed.
 
@@ -43,10 +44,10 @@ Sharpe at the headline cost level (2 bps/side) with the Deflated Sharpe Ratio, o
 | ML 6b `ml_tuned` | **1.550** | **0.9999** | 0.390 | 0.0261 |
 
 The pre-declared rule — an ML variant wins only if its decision-window deflated Sharpe after costs
-beats the benchmark's — was written before the decision-read numbers existed. Both variants clear it inside
+beats the benchmark's — was written before the decision read's numbers existed. Both variants clear it inside
 the decision window and **both fail it out of time**. That is reported as the finding, not retuned
-away; `results/out_of_sample/OOT.md` records the read, and `results/decision/DECISION.md` keeps the decision-read
-verdict as decided.
+away; `results/out_of_sample/OOT.md` records the read, and `results/decision/DECISION.md` keeps the
+decision read's verdict as decided.
 
 Four further readings, argued in the memo:
 
@@ -65,7 +66,8 @@ Four further readings, argued in the memo:
   the benchmark's (so churn is not the explanation), and carry's number belongs to rebalancing a
   basis-derived sign daily — the same rule held monthly earns +0.163 where the daily refresh earns
   -3.614, and the published construction is a monthly, rank-weighted slope magnitude — so the carry
-  premium is neither confirmed nor refuted here. Evidence: `results/out_of_sample/carry_frequency.csv`.
+  premium is neither confirmed nor refuted here. Evidence:
+  `results/out_of_sample/carry_frequency.csv`.
 
 ## The dataset
 
@@ -167,9 +169,9 @@ git checkout replication.1
 uv sync
 uv run python scripts/fetch_raw.py        # writes data/raw/, manifest-gated
 uv run python scripts/build_derived.py    # writes data/derived/, manifest-verified
-uv run python scripts/build_families.py
-uv run python scripts/build_decision.py
-uv run python scripts/build_out_of_sample.py # the single out-of-sample read
+uv run python scripts/build_families.py       # results/families/
+uv run python scripts/build_decision.py       # results/decision/
+uv run python scripts/build_out_of_sample.py  # the single out-of-sample read
 uv run python scripts/sweep_tsmom.py      # results/trend_sweep/tsmom_sweep.csv
 uv run python scripts/carry_frequency_diagnostic.py  # results/out_of_sample/carry_frequency.csv
 uv run python scripts/build_report_figures.py        # docs/report/figures/equity.pdf
@@ -203,7 +205,8 @@ DAX, CAC or euro before 2000 on free data).
 | `docs/methods/` | per-family governance docs: construction, evidence, failure modes, monitoring |
 | `docs/report/report.tex`, `report.pdf` | the condensed report |
 | `docs/self-test.md` | self-test questions, regulation talking points, non-adopt boundary |
-| `results/phase3|4|5/` | committed tables, decision records, derived return series, the carry frequency diagnostic |
+| `results/families|decision|out_of_sample/` | committed tables, decision records, derived return series, the carry frequency diagnostic |
+| `results/trend_sweep/` | the TSMOM horizon sweep, one sleeve per lookback |
 | `docs/adr/` | decision reasoning (one accounting path) |
 | `docs/data/pst-source.md` | data provenance and licensing posture |
 | `LICENSE` | GPL-3.0 |

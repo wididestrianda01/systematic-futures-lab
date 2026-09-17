@@ -26,10 +26,10 @@ SUB_PERIOD = lambda frame: pd.cut(
 )
 
 
-def applied(phase: int) -> tuple[dict, dict[str, dict]]:
-    """The verdict and its robustness read, taken from a committed phase's tables."""
-    tables = pd.read_csv(ROOT / f"results/phase{phase}/tables.csv")
-    like = pd.read_csv(ROOT / f"results/phase{phase}/tables_like_for_like.csv")
+def applied(read: str) -> tuple[dict, dict[str, dict]]:
+    """The verdict and its robustness read, taken from one committed read's tables."""
+    tables = pd.read_csv(ROOT / f"results/{read}/tables.csv")
+    like = pd.read_csv(ROOT / f"results/{read}/tables_like_for_like.csv")
     primary = verdict(
         headline_rows(tables, PROTOCOL.headline_bps), ML_VARIANTS, benchmark=BENCHMARK
     )
@@ -46,14 +46,16 @@ def applied(phase: int) -> tuple[dict, dict[str, dict]]:
 
 def test_the_committed_decision_records_are_what_the_renderer_produces():
     """DECISION.md and OOT.md carry the rendered read of the committed tables, not a second copy."""
-    primary, sensitivity = applied(4)
+    primary, sensitivity = applied("decision")
     body = outcome_table(primary, sensitivity, ML_VARIANTS, LABELS)
     decision = (ROOT / "results/decision/DECISION.md").read_text()
     assert body in decision
     assert benchmark_line(primary, BENCHMARK) in decision
 
-    primary, sensitivity = applied(5)
-    meta = headline_rows(pd.read_csv(ROOT / "results/out_of_sample/tables.csv"), PROTOCOL.headline_bps)
+    primary, sensitivity = applied("out_of_sample")
+    meta = headline_rows(
+        pd.read_csv(ROOT / "results/out_of_sample/tables.csv"), PROTOCOL.headline_bps
+    )
     coverage = {v: [f"{meta.loc[v, 'signal_coverage']:.0%}"] for v in ML_VARIANTS}
     body = outcome_table(
         primary,

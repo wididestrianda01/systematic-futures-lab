@@ -27,11 +27,11 @@ Shared machinery, stated here once and true of every doc below:
   carry's 0.176 (≈7%), so the understatement is largest exactly where the charged base is smallest:
   the families' ranking is unaffected, the low-turnover cost drag is understated.
 - **Headline cost level**: 2 bps/side — the level a decision is read at.
-- **Windows**: develop+validate 2010-01-01 → 2021-12-31 (the develop+validate tables); out-of-sample
-  2022-01-03 → 2024-03-28, read once by `scripts/build_out_of_sample.py` (the out-of-sample tables).
+- **Windows**: develop+validate 2010-01-01 → 2021-12-31 (the families and decision tables);
+  out-of-sample 2022-01-03 → 2024-03-28, read once by `scripts/build_out_of_sample.py`.
 - **Evidence provenance**: `results/families/tables.csv`, `results/decision/tables.csv`,
-  `results/out_of_sample/tables.csv` (plus `results/out_of_sample/carry_frequency.csv` for the carry
-  frequency diagnostic). The tables are frozen; the numbers below are read from them, never
+  `results/out_of_sample/tables.csv` (plus `results/out_of_sample/carry_frequency.csv` for the
+  carry frequency diagnostic). The tables are frozen; the numbers below are read from them, never
   recomputed here.
 
 | family | doc | rule source |

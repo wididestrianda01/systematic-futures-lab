@@ -23,7 +23,7 @@ revision, and no market data is in the repository."
 **1. Why is the out-of-sample window read only once?**
 Because every additional look turns the test into a selection problem. The window's job is to be the
 one number no decision consumed on the way in. In this project the rule was written before the
-decision-read numbers existed, the window is read by one script, and it is extended-walk-forward so that
+decision read's numbers existed, the window is read by one script, and it is extended-walk-forward so that
 the fold covering 2022 trains entirely inside develop+validate. The pay-off is not theoretical: the
 pre-declared winners failed that read, and if the window had been peeked at earlier the temptation to
 retune — and the DSR inflation that follows — would have been enormous.
@@ -132,8 +132,8 @@ with the sources listed inline below.
 5. **"Material change" retesting.** The ESMA briefing's own table includes retrained or modified ML
    components and changed data feeds. This is where an Optuna search stops being a notebook habit and
    becomes a governance event: `docs/methods/` names, per family, what counts as a material change
-   (feature set, label horizon, fold geometry, search space, cost level, universe), and the decision-read
-   decision rule was committed *before* the numbers existed.
+   (feature set, label horizon, fold geometry, search space, cost level, universe), and the decision
+   rule was committed *before* the numbers existed.
 6. **MAR and the AI Act.** MAR covers commodity derivatives and benchmarks, not just equities, and
    the canonical manipulation patterns are spoofing, layering and momentum ignition; RTS 6 requires
    monitoring that systems cannot be used contrary to MAR. The AI Act (Reg. 2024/1689) interplay per

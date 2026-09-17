@@ -1,4 +1,4 @@
-# the families read findings
+# Families read — findings
 
 Window: develop+validate (2010-01-01 → 2021-12-31), frozen panel, 10% vol target, 16 CME roots; OOT (2022+) untouched.
 
@@ -6,7 +6,7 @@ Window: develop+validate (2010-01-01 → 2021-12-31), frozen panel, 10% vol targ
 backtest result (`docs/reading/README.md`), and M7 is still partially gated
 (`docs/reading/notes.md`). Everything below the numbers is a *provisional* reading of
 mechanical output, not a checked finding, until the canon closes; the
-the out-of-sample read interpretation pass owns it.
+out-of-sample interpretation pass owns it.
 
 ## Seasonality standalone loses (expected finding)
 

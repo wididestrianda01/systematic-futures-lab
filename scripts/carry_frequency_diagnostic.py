@@ -27,7 +27,7 @@ from systematic_futures.comparison import headline_rows, resolved, table_for
 from systematic_futures.data.panels import develop_validate, load_frozen, oot_window
 from systematic_futures.protocol import PROTOCOL, Method
 
-RESULTS = Path("results/results.1")
+RESULTS = Path("results/out_of_sample")
 
 
 def month_start(signal: pd.DataFrame) -> pd.DataFrame:
@@ -58,9 +58,9 @@ def main() -> int:
             ]
         ),
         "oot": float(
-            headline_rows(pd.read_csv("results/out_of_sample/tables.csv"), PROTOCOL.headline_bps).loc[
-                "carry", "sharpe"
-            ]
+            headline_rows(
+                pd.read_csv("results/out_of_sample/tables.csv"), PROTOCOL.headline_bps
+            ).loc["carry", "sharpe"]
         ),
     }
 

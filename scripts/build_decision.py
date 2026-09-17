@@ -1,10 +1,10 @@
-"""the decision read comparison: variants 6a/6b against the TSMOM benchmark through the shared seam.
+"""The comparison and the decision: variants 6a/6b against the TSMOM benchmark through the seam.
 
 Window: develop+validate (2010-01-01 → 2021-12-31, `data.panels.develop_validate`).
 The walk-forward out-of-fold folds ARE the decision window; the single OOT read
-(2022 → 2024Q1) stays untouched for its end-of-project touch in the out-of-sample read. The
-comparison set (`catalogue`) and the table shape (`comparison`), so the families read and the decision read
-cannot drift apart.
+(2022 → 2024Q1) stays untouched for its end-of-project touch. The
+comparison set (`catalogue`) and the table shape (`comparison`), so the families read and this
+one cannot drift apart.
 
 Two readings of the same numbers, both committed:
 
@@ -59,16 +59,16 @@ from systematic_futures.reporting import (
     outcome_table,
 )
 
-RESULTS = Path("results/phase4")
+RESULTS = Path("results/decision")
 
-RULE = f"""# the decision read decision rule (pre-declared in the plan, before this phase's numbers existed)
+RULE = f"""# Decision rule (pre-declared in the plan, before this read's numbers existed)
 
 **Rule.** Each ML variant (6a `ml_defaults`, 6b `ml_tuned`) must beat the
 `{BENCHMARK}` benchmark on **decision-window Deflated Sharpe Ratio after costs**
 — the {PROTOCOL.headline_bps:.0f} bps row of the tables — to be reported as a winner.
 The decision window is the walk-forward **out-of-fold** folds inside
 develop+validate: the single out-of-sample read (2022 → 2024Q1) stays untouched
-until the out-of-sample read, so it cannot be the decision window without spending the touch.
+until it is taken, so it cannot be the decision window without spending the touch.
 
 A variant that fails this test is documented as a **failed challenger** with the
 numbers that failed it — not retuned until it passes.
@@ -112,7 +112,7 @@ def outcome_doc(primary: dict, sensitivity: dict[str, dict]) -> str:
             "with the numbers above, not retuned until they pass."
         )
     return (
-        "# the decision read decision (the pre-declared rule applied)\n\n"
+        "# Decision (the pre-declared rule applied)\n\n"
         f"Rule: `DECISION_RULE.md`, applied to the {PROTOCOL.headline_bps:.0f} bps row of the primary "
         f"read (`tables.csv`) on the develop+validate window "
         f"({DEVELOP_START.date()} → {VALIDATE_END.date()}).\n\n"

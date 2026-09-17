@@ -1,6 +1,7 @@
 """The comparison set — the families this project compares, under one protocol.
 
-the families read, the decision read and the out-of-sample read must not drift: the same families, the same window, the same table shape.
+The families read, the decision read and the out-of-sample read must not drift: the same families,
+the same window, the same table shape.
 This is the one place the set is stated, so a phase adds a family here instead of restating it, and the
 walk-forward entry point lives beside it: the schedule the decision was taken under and the schedule
 the out-of-sample read extends are one call, asserted leak-free.
@@ -64,9 +65,9 @@ def full_set(basis: pd.DataFrame, *, protocol: Protocol = PROTOCOL) -> dict[str,
 def walk_forward_folds(index: pd.DatetimeIndex, *, protocol: Protocol = PROTOCOL) -> list[Fold]:
     """The one walk-forward schedule, purged and embargoed, asserted leak-free.
 
-    the decision read runs it over develop+validate, the out-of-sample read over the whole frozen panel so the fold covering
-    2022 trains entirely inside develop+validate; both use this call, so the schedule cannot differ
-    between the decision and the out-of-sample read.
+    The decision read runs it over develop+validate, the out-of-sample read over the whole frozen
+    panel so the fold covering 2022 trains entirely inside develop+validate; both use this call, so the
+    schedule cannot differ between them.
     """
     folds = purged_walk_forward(
         index, n_splits=protocol.splits, horizon=protocol.horizon, embargo=protocol.embargo

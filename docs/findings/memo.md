@@ -143,8 +143,8 @@ flat on days they do not cover.
 | `baseline` | -0.694 | 0.1470 | 0.009 |
 | `carry` | -1.756 | 0.0041 | 0.165 |
 
-**The pre-declared rule, applied as written:** both ML variants fail it out of time. The decision-read
-verdict stands as decided; this is evidence about it, and it is not retuned.
+**The pre-declared rule, applied as written:** both ML variants fail it out of time. The decision
+read's verdict stands as decided; this is evidence about it, and it is not retuned.
 
 ### 4.3 Cost sensitivity (Sharpe by cost level)
 
@@ -180,7 +180,7 @@ configurations each selection actually evaluated: 1 for every family that search
 The count is conservative by construction — the deflation never flatters the variant.
 
 **What was pre-registered and when.** The decision rule was written into
-`results/decision/DECISION_RULE.md` before the decision-read numbers existed; the horizon-sleeve set, the
+`results/decision/DECISION_RULE.md` before the decision read's numbers existed; the horizon-sleeve set, the
 tilt multiplier, the cost ladder and the headline cost level were all fixed before any results existed.
 Nothing in this memo is a search result across those choices.
 
@@ -202,7 +202,7 @@ the treatment this project implemented, and the gap is stated rather than glosse
 
 ## 6. Where the ML variants overfit, and where they did not
 
-**In-window.** The decision-read rule's bar was the trend benchmark's decision-window DSR (0.3726), and the
+**In-window.** The decision rule's bar was the trend benchmark's decision-window DSR (0.3726), and the
 benchmark earned a *negative* net Sharpe in that window. Beating it is therefore a low bar: the
 correct statement is "the variants did not lose money where the benchmark did", not "the variants
 demonstrated skill". The sub-period decomposition makes the concentration explicit:
@@ -403,9 +403,10 @@ Deliberate, with reasons — the boundary is a research judgement, not a gap in 
 - Decision reasoning: `docs/adr/0001-one-accounting-path.md`; per-family governance docs in
   `docs/methods/`.
 - Reading canon and notes: `docs/reading/`.
-- Committed numbers: `results/families/`, `results/decision/`, `results/out_of_sample/`; decision records
-  `results/decision/DECISION_RULE.md`, `DECISION.md`, `results/out_of_sample/OOT.md`; and the carry frequency
-  diagnostic `results/out_of_sample/carry_frequency.csv` (`scripts/carry_frequency_diagnostic.py`).
+- Committed numbers: `results/families/`, `results/decision/`, `results/out_of_sample/`; decision
+  records `results/decision/DECISION_RULE.md`, `DECISION.md`, `results/out_of_sample/OOT.md`; and the
+  carry frequency diagnostic `results/out_of_sample/carry_frequency.csv`
+  (`scripts/carry_frequency_diagnostic.py`).
 - The executable version of this memo's story: `notebooks/analysis.ipynb`.
 
 **Market facts used in the framing:** the Danish systematic shop is Alipes Capital (Copenhagen); Da

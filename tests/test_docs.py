@@ -1,7 +1,7 @@
 """The hand-typed numbers in the docs are the committed tables' values, at the precision they print.
 
 The condensed report's two tables, the memo's three and the self-test's quoted rows are transcribed by
-hand from `results/phase{3,4,5}/tables.csv`. This test is what keeps them from drifting when the tables
+hand from `results/{families,decision,out_of_sample}/tables.csv`. This test is what keeps them from drifting when the tables
 are regenerated — the drift the 2026-09-17 sanity check found (15 memo cells, 3 report cells) is what
 it fails on. Comparison is exact at the precision the document prints: `0.746` and a table value of
 0.7457 agree, `0.753` does not.
@@ -28,13 +28,16 @@ LEVELS = (0.0, 2.0, 5.0, 10.0)
 
 
 @pytest.fixture(scope="module")
-def tables() -> dict[int, pd.DataFrame]:
-    return {phase: pd.read_csv(ROOT / f"results/phase{phase}/tables.csv") for phase in (3, 4, 5)}
+def tables() -> dict[str, pd.DataFrame]:
+    return {
+        read: pd.read_csv(ROOT / f"results/{read}/tables.csv")
+        for read in ("families", "decision", "out_of_sample")
+    }
 
 
-def headline(tables: dict[int, pd.DataFrame], phase: int) -> pd.DataFrame:
+def headline(tables: dict[str, pd.DataFrame], read: str) -> pd.DataFrame:
     """One row per method at the headline cost level."""
-    return tables[phase][tables[phase]["bps"] == HEADLINE].set_index("method")
+    return tables[read][tables[read]["bps"] == HEADLINE].set_index("method")
 
 
 def value(table: pd.DataFrame, method: str, bps: float, column: str) -> float:
@@ -103,18 +106,23 @@ def test_report_headline_table_matches_the_committed_tables(tables):
     rows = [line for line in lines if "&" in line and line.strip().endswith("\\\\")]
     rows = [row for row in rows if not row.startswith("Family")]
     assert len(rows) == 8
-    columns = (("sharpe", 4), ("dsr", 4), ("sharpe", 5), ("dsr", 5))
+    columns = (
+        ("sharpe", "decision"),
+        ("dsr", "decision"),
+        ("sharpe", "out_of_sample"),
+        ("dsr", "out_of_sample"),
+    )
     for row in rows:
         cells = [cell.strip() for cell in row.rstrip("\\").split("&")]
         method = family(cells[0])
         printed = [cell_value(cell) for cell in cells[1:]]
         assert len(printed) == len(columns)
-        for (column, phase), got in zip(columns, printed):
-            where = "develop+validate" if phase == 4 else "out-of-sample"
+        for (column, read), got in zip(columns, printed):
+            where = "develop+validate" if read == "decision" else "out-of-sample"
             check(
                 f"report.tex Table 1 {method} {column} ({where})",
                 got,
-                value(tables[phase], method, HEADLINE, column),
+                value(tables[read], method, HEADLINE, column),
             )
 
 
@@ -133,19 +141,20 @@ def test_report_cost_ladder_matches_the_committed_table(tables):
             check(
                 f"report.tex Table 2 {method} @{bps:g}bps",
                 got,
-                value(tables[4], method, bps, "sharpe"),
+                value(tables["decision"], method, bps, "sharpe"),
             )
 
 
 @pytest.mark.parametrize(
-    ("marker", "ending", "phase"), [("### 4.1", "### 4.2", 4), ("### 4.2", "### 4.3", 5)]
+    ("marker", "ending", "read"),
+    [("### 4.1", "### 4.2", "decision"), ("### 4.2", "### 4.3", "out_of_sample")],
 )
-def test_memo_headline_tables_match_the_committed_tables(tables, marker, ending, phase):
+def test_memo_headline_tables_match_the_committed_tables(tables, marker, ending, read):
     """Memo §4.1/§4.2: Sharpe, DSR and turnover, develop+validate and out-of-sample."""
     lines = section(MEMO.read_text(), marker, ending)
     rows = [line for line in lines if line.startswith("| `")]
     assert len(rows) == 8
-    source = tables[phase]
+    source = tables[read]
     for row in rows:
         cells = [cell.strip() for cell in row.strip().strip("|").split("|")]
         method = family(cells[0])
@@ -169,9 +178,9 @@ def test_memo_cost_ladder_matches_the_committed_tables(tables):
         for bps, cell in zip(LEVELS, cells[1:]):
             printed = [float(number) for number in re.findall(r"-?\d+\.\d+", cell)]
             assert len(printed) == 2, f"memo §4.3 {method} @{bps:g}bps: {cell!r}"
-            for phase, got in zip((4, 5), printed):
+            for read, got in zip(("decision", "out_of_sample"), printed):
                 check(
-                    f"memo §4.3 {method} @{bps:g}bps {'dev' if phase == 4 else 'oot'}",
+                    f"memo §4.3 {method} @{bps:g}bps {'dev' if read == 'decision' else 'oot'}",
                     got,
-                    value(tables[phase], method, bps, "sharpe"),
+                    value(tables[read], method, bps, "sharpe"),
                 )

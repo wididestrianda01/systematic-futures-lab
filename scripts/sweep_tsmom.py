@@ -21,7 +21,7 @@ from systematic_futures.data.panels import develop_validate, load_frozen
 from systematic_futures.methods.tsmom import TSMOM_HORIZONS, horizon_signal, tsmom
 from systematic_futures.protocol import PROTOCOL, Method
 
-RESULTS = Path("results/phase2")
+RESULTS = Path("results/trend_sweep")
 
 
 def main() -> int:

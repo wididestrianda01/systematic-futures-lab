@@ -1,6 +1,6 @@
 """Carry — term-structure slope from raw front/deferred prices.
 
-The the data layer basis series is the carry input: basis = close(next)/close(front)
+The data layer's basis series is the carry input: basis = close(next)/close(front)
 − 1, computed on RAW closes. Backwardation (basis < 0) pays a long a positive
 roll carry, so the signal is long a backwardated front, short a contangoed
 one — direction only (sign of −basis); the shared overlay owns sizing. Days

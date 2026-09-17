@@ -1,6 +1,6 @@
 """The pre-declared decision rule, applied to the comparison table — the rule, not the prose.
 
-the decision read pre-declared, before its numbers existed, that each ML variant must beat
+The comparison read pre-declared, before its numbers existed, that each ML variant must beat
 the `tsmom` benchmark on headline Deflated Sharpe after costs, and that a variant
 which fails is documented as a failed challenger rather than retuned until it
 passes. That comparison lives here rather than in the phase script, so it can be

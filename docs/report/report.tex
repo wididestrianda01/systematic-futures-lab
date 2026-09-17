@@ -154,7 +154,7 @@ a quarter of the benchmark's 0.103), on a score backed by five priors per calend
 with rank weighting and monthly rebalancing; what ran here is the sign of the current basis, refreshed
 daily, and that sign moves with the front leg's own price. Holding the identical signal from each
 month's first session earns $+0.163$ where the daily refresh earns $-3.614$, and inverting the daily
-rule earns $+2.807$ (\texttt{results/out_of_sample/carry\_frequency.csv}). The sign convention is \emph{not}
+rule earns $+2.807$ (\texttt{results/out\_of\_sample/carry\_frequency.csv}). The sign convention is \emph{not}
 resolved by adopting the profitable direction, and the carry premium is neither confirmed nor refuted
 by these numbers.
 \item \textbf{2023 is the year nobody earned.} Out of time, every family sits at or below zero in 2023
@@ -174,8 +174,8 @@ futures in general.
 
 \section*{Reproducibility}
 \texttt{uv sync}, fetch the pinned snapshot, rebuild derived data (manifest-gated),
-\texttt{uv run python scripts/build\_phase3\_tables.py}, \texttt{build\_phase4\_tables.py},
-\texttt{build\_results.1\_oot.py}; the committed tables are reproduced exactly. Reading order for the
+\texttt{uv run python scripts/build\_families.py}, \texttt{build\_decision.py},
+\texttt{build\_out\_of\_sample.py}; the committed tables are reproduced exactly. Reading order for the
 story: \texttt{notebooks/analysis.ipynb}, then \texttt{docs/findings/memo.md}.
 
 \end{document}
