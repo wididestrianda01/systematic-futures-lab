@@ -35,10 +35,6 @@ multiple testing all appear in the same object, so a lab built here exercises th
 cycle: research from signal generation to implementation, calibration, validation and monitoring,
 cost and turnover discipline, and overfitting as a quantity you measure.
 
-**What stands behind it.** `docs/reading/notes.md` records the canon: M1–M6 and M8 are read and
-closed; M7 and the two SHOULD papers are scaffolded and marked *not read*, and the memo flags the
-claims that rest on them.
-
 ## Headline results
 
 Sharpe at the headline cost level (2 bps/side) with the Deflated Sharpe Ratio, on the decision window
@@ -174,7 +170,9 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
 
 `docs/findings/memo.md` is the argument: the regime the trend benchmark lived through, why the ML
 variants' in-window edge was concentrated in the periods the benchmark lost money, what purge and
-embargo bought and what they cannot buy, and the two honest-failure findings.
+embargo bought and what they cannot buy, and the two honest-failure findings. `docs/reading/notes.md`
+records the reading canon behind the interpretation, and the memo flags every claim that rests on a
+source outside it.
 
 ## Reproduce
 
