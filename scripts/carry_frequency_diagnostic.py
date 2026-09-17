@@ -23,8 +23,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from systematic_futures.comparison import headline_rows, resolved, table_for
 from systematic_futures.data.panels import develop_validate, load_frozen, oot_window
-from systematic_futures.harness import headline_rows, table_for
+from systematic_futures.protocol import PROTOCOL, Method
 
 RESULTS = Path("results/results.1")
 
@@ -34,13 +35,13 @@ def month_start(signal: pd.DataFrame) -> pd.DataFrame:
     return signal.groupby([signal.index.year, signal.index.month]).transform("first")
 
 
-def constructions(basis: pd.DataFrame) -> dict[str, pd.DataFrame]:
+def constructions(basis: pd.DataFrame) -> dict[str, Method]:
     """The committed rule, the same rule at monthly frequency, and the committed rule's inverse."""
     daily = -np.sign(basis)
     return {
-        "daily_sign_neg_basis": daily,
-        "month_start_sign_neg_basis": month_start(daily),
-        "daily_sign_basis_inverse": -daily,
+        "daily_sign_neg_basis": Method(daily),
+        "month_start_sign_neg_basis": Method(month_start(daily)),
+        "daily_sign_basis_inverse": Method(-daily),
     }
 
 
@@ -52,18 +53,25 @@ def main() -> int:
     # script used, metrics masked the same way, so this file cannot silently diverge from the tables.
     committed = {
         "develop_validate": float(
-            headline_rows(pd.read_csv("results/families/tables.csv")).loc["carry", "sharpe"]
+            headline_rows(pd.read_csv("results/families/tables.csv"), PROTOCOL.headline_bps).loc[
+                "carry", "sharpe"
+            ]
         ),
         "oot": float(
-            headline_rows(pd.read_csv("results/out_of_sample/tables.csv")).loc["carry", "sharpe"]
+            headline_rows(pd.read_csv("results/out_of_sample/tables.csv"), PROTOCOL.headline_bps).loc[
+                "carry", "sharpe"
+            ]
         ),
     }
 
     rows = []
     for label, closes, mask in (("develop_validate", window, None), ("oot", wide, oot.index)):
-        table = table_for(constructions(basis_wide.reindex(index=closes.index)), closes, dates=mask)
+        methods = resolved(constructions(basis_wide.reindex(index=closes.index)), closes)
+        table = table_for(methods, closes, protocol=PROTOCOL, dates=mask)
         table["window"] = label
-        got = float(headline_rows(table).loc["daily_sign_neg_basis", "sharpe"])
+        got = float(
+            headline_rows(table, PROTOCOL.headline_bps).loc["daily_sign_neg_basis", "sharpe"]
+        )
         assert abs(got - committed[label]) < 1e-9, f"{label}: {got} != committed {committed[label]}"
         rows.append(table)
 
@@ -71,7 +79,7 @@ def main() -> int:
     RESULTS.mkdir(parents=True, exist_ok=True)
     out.to_csv(RESULTS / "carry_frequency.csv", index=False)
 
-    headline = headline_rows(out)[["sharpe", "turnover", "dsr"]]
+    headline = headline_rows(out, PROTOCOL.headline_bps)[["sharpe", "turnover", "dsr"]]
     print(headline.to_string())
     print(f"\nwrote {RESULTS}/carry_frequency.csv")
     return 0

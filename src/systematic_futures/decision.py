@@ -15,10 +15,8 @@ from collections.abc import Mapping, Sequence
 
 import pandas as pd
 
-from systematic_futures.harness import BENCHMARK
 
-
-def verdict(rows: pd.DataFrame, variants: Sequence[str], *, benchmark: str = BENCHMARK) -> dict:
+def verdict(rows: pd.DataFrame, variants: Sequence[str], *, benchmark: str) -> dict:
     """Apply the rule to one read: `rows` = the headline rows, indexed by method.
 
     A variant beats the benchmark only on a strictly greater DSR after costs — a

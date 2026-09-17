@@ -15,9 +15,11 @@ from __future__ import annotations
 from functools import partial
 from pathlib import Path
 
+from systematic_futures.catalogue import BENCHMARK
+from systematic_futures.comparison import table_for
 from systematic_futures.data.panels import develop_validate, load_frozen
-from systematic_futures.harness import BENCHMARK, table_for
 from systematic_futures.methods.tsmom import TSMOM_HORIZONS, horizon_signal, tsmom
+from systematic_futures.protocol import PROTOCOL, Method
 
 RESULTS = Path("results/phase2")
 
@@ -26,10 +28,10 @@ def main() -> int:
     wide, _ = load_frozen()
     window = develop_validate(wide)
 
-    methods = {f"sleeve_{h}d": partial(horizon_signal, lookback=h) for h in TSMOM_HORIZONS}
-    methods[BENCHMARK] = tsmom
+    methods = {f"sleeve_{h}d": Method(partial(horizon_signal, lookback=h)) for h in TSMOM_HORIZONS}
+    methods[BENCHMARK] = Method(tsmom)
 
-    sweep = table_for(methods, window)
+    sweep = table_for(methods, window, protocol=PROTOCOL)
 
     RESULTS.mkdir(parents=True, exist_ok=True)
     sweep.to_csv(RESULTS / "tsmom_sweep.csv", index=False)

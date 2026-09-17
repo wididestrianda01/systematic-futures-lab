@@ -20,3 +20,14 @@ against a LightGBM fit, accepted for the guarantee.
   the reported turnover counts were provably one object — rejected: it widens the interface for
   one caller (12 of 13 call sites ignore it) to save 0.26 ms of a 2.18 ms call. The agreement is
   the pure function `traded_notional(held_positions(exposure, closes))`, identical on both sides.
+
+## Scope: which interface may carry a family's inputs
+
+The refusal above is about the *engine's* interface, and it holds: nothing an engine call could derive
+for itself is accepted as an argument. The *comparison table*'s interface is a different seam and takes
+the opposite decision — `comparison.table_for` receives each family as a `protocol.Method` carrying the
+trial count its selection evaluated, rather than a callable plus a parallel `trials` mapping. The reason
+is this ADR's own: three call sites threaded that mapping by hand, the number sets the DSR bar the rule
+is read against, and a family could omit it and still report an undeflated DSR. Narrow where widening
+would save one caller a derivation it can do itself; explicit where the value is an input no caller can
+derive.

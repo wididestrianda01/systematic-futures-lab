@@ -136,12 +136,16 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
   pinning its sign and scale at the seam.
 - `src/systematic_futures/ml/` — point-in-time features, the hand-rolled purged/embargoed splitter,
   the two LightGBM variants.
-- `harness.py` / `decision.py` — the comparison set, the ML walk-forward protocol (fold geometry,
-  horizon, search budget, trial counts) and the pre-declared rule, written once so phases cannot
-  drift apart.
+- `protocol.py` — the comparison's two contracts: the protocol (fold geometry, horizon, search budget,
+  cost level, overlay) and the method (a signal source plus the trial count its selection evaluated).
+- `comparison.py` — the comparison table's shape and every read of it: assembly, the headline read,
+  coverage and trial metadata, the like-for-like mask. It imports no family, so the shape costs nothing.
+- `catalogue.py` — the comparison set (classics plus 6a/6b) and the walk-forward entry point.
+- `reporting.py` — the rendered outcome: the markdown body of the decision records, from the same read.
+- `decision.py` — the pre-declared rule and its guard, written once so the phases cannot drift apart.
 - `scripts/` — thin runners; `notebooks/` — explanations. Logic lives in the package, arguments live
   in the runners.
-- CI runs the test suite (101 tests) on every push.
+- CI runs the test suite (114 tests) on every push.
 
 ## Where the interpretation lives
 
@@ -170,7 +174,7 @@ uv run python scripts/carry_frequency_diagnostic.py  # results/out_of_sample/car
 uv run python scripts/build_report_figures.py        # docs/report/figures/equity.pdf
 uv run python scripts/fetch_replication.py           # data/replication/, the MOP subset
 uv run python scripts/build_mop_replication.py       # results/replication/ - external checks
-uv run pytest                             # 107 tests
+uv run pytest                             # 114 tests
 uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb
 (cd docs/report && rm -f report.aux report.log report.out && \
    pdflatex -interaction=nonstopmode report.tex)   # report.pdf, reproducible from a clean build

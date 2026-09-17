@@ -33,50 +33,46 @@ from pathlib import Path
 
 import pandas as pd
 
+from systematic_futures.catalogue import (
+    BENCHMARK,
+    LABELS,
+    ML_VARIANTS,
+    full_set,
+    walk_forward_folds,
+)
+from systematic_futures.comparison import (
+    headline_rows,
+    like_for_like,
+    protocol_meta,
+    resolved,
+    table_for,
+)
 from systematic_futures.data.panels import develop_validate, load_frozen, oot_window
 from systematic_futures.decision import require_same_verdict, verdict
 from systematic_futures.engine import curve
 from systematic_futures.engine.metrics import sharpe
-from systematic_futures.harness import (
-    BENCHMARK,
-    HEADLINE_BPS,
-    LABELS,
-    ML_VARIANTS,
-    N_TRIALS,
-    SPLITS,
-    VOL_TARGET,
-    full_set,
-    headline_rows,
-    like_for_like,
-    protocol_meta,
-    table_for,
-    walk_forward_folds,
+from systematic_futures.protocol import PROTOCOL
+from systematic_futures.reporting import (
+    benchmark_line,
+    family_names,
+    outcome_split,
+    outcome_table,
 )
 
 RESULTS = Path("results/results.1")
 
 
 def outcome_doc(primary: dict, sensitivity: dict[str, dict], meta: pd.DataFrame) -> str:
-    rows = "\n".join(
-        f"| {LABELS[v]} `{v}` | {primary['variant_sharpe'][v]:.2f} | "
-        f"{primary['variant_dsr'][v]:.4g} | {'yes' if primary['beats'][v] else 'no'} | "
-        f"{sensitivity[v]['variant_dsr'][v]:.4g} | {'yes' if sensitivity[v]['beats'][v] else 'no'} | "
-        f"{meta.loc[v, 'signal_coverage']:.0%} |"
-        for v in ML_VARIANTS
-    )
-    winners = [v for v in ML_VARIANTS if primary["beats"][v]]
-    losers = [v for v in ML_VARIANTS if not primary["beats"][v]]
+    winners, losers = outcome_split(primary, ML_VARIANTS)
     if winners:
         outcome = (
             "**Out-of-time outcome: the rule is met by "
-            + ", ".join(f"{LABELS[v]} `{v}`" for v in winners)
+            + family_names(winners, LABELS)
             + "** on the OOT window, the same way it was met in develop+validate."
         )
         if losers:
             outcome += (
-                " "
-                + ", ".join(f"{LABELS[v]} `{v}`" for v in losers)
-                + " do not beat the benchmark out of time."
+                " " + family_names(losers, LABELS) + " do not beat the benchmark out of time."
             )
     else:
         outcome = (
@@ -84,25 +80,23 @@ def outcome_doc(primary: dict, sensitivity: dict[str, dict], meta: pd.DataFrame)
             "decision-read winners do not carry their edge past 2021, and that is the finding, not a "
             "reason to retune."
         )
+    coverage = {v: [f"{meta.loc[v, 'signal_coverage']:.0%}"] for v in ML_VARIANTS}
     return (
         "# the out-of-sample read — the out-of-sample read (2022 → 2024Q1)\n\n"
         "**One touch.** These are the only numbers in the project measured on dates after "
         "2021-12-31. The decision-read verdict in `results/decision/DECISION.md` stands as it was "
         "decided; what follows is out-of-time evidence about it, not a reopening.\n\n"
         f"Rule: the pre-declared rule of `results/decision/DECISION_RULE.md`, applied here to the "
-        f"{HEADLINE_BPS:.0f} bps row of the primary read on the OOT window.\n\n"
-        f"Benchmark `{BENCHMARK}`: Sharpe {primary['benchmark_sharpe']:.2f}, "
-        f"DSR {primary['benchmark_dsr']:.4g}.\n\n"
-        "| variant | Sharpe | DSR (primary) | beats benchmark | DSR (own dates) | beats benchmark "
-        "| OOT coverage |\n|---|---|---|---|---|---|---|\n"
-        f"{rows}\n\n"
+        f"{PROTOCOL.headline_bps:.0f} bps row of the primary read on the OOT window.\n\n"
+        f"{benchmark_line(primary, BENCHMARK)}\n\n"
+        f"{outcome_table(primary, sensitivity, ML_VARIANTS, LABELS, extra_headers=('OOT coverage',), extra_cells=coverage)}\n\n"
         f"{outcome}\n\n"
         "**Protocol.** The walk-forward schedule is the decision-read one extended across the whole "
         "frozen panel; each fold is refit on prior data only and 6b's search runs inside its "
         "fold's training set, so no fold saw an out-of-sample date before predicting it. The "
         "fold covering 2022 trains entirely inside develop+validate. Trial counts are unchanged "
         "as multiple-testing inputs: 6a searched nothing (trials = 1), 6b = folds x trials "
-        f"({SPLITS} x {N_TRIALS} = {SPLITS * N_TRIALS}).\n\n"
+        f"({PROTOCOL.splits} x {PROTOCOL.n_trials} = {PROTOCOL.splits * PROTOCOL.n_trials}).\n\n"
         "**Reading.** What the OOT numbers mean — regime attribution, the trend drought the "
         "benchmark carries into 2022, what the ML variants generalized — is interpretation, and "
         "it stays with the memo behind the reading canon and the decision-read "
@@ -120,21 +114,21 @@ def main() -> int:
         f"OOT window: {oot.index.min().date()} → {oot.index.max().date()} ({len(oot.index)} dates)"
     )
 
-    folds = walk_forward_folds(wide.index)
+    folds = walk_forward_folds(wide.index, protocol=PROTOCOL)
     assert max(fold.test.max() for fold in folds) == wide.index.max(), (
         "last fold must cover the end"
     )
 
-    methods = full_set(basis_wide)
-    signals = {name: method(wide) for name, method in methods.items()}
-    trials = {name: getattr(method, "trials", 1) for name, method in methods.items()}
-    meta = protocol_meta(signals, trials, oot.index)
+    resolved_oot = resolved(full_set(basis_wide, protocol=PROTOCOL), wide)
+    meta = protocol_meta(resolved_oot, oot.index)
 
     RESULTS.mkdir(parents=True, exist_ok=True)
-    full = table_for(signals, wide, trials=trials, dates=oot.index).join(meta, on="method")
+    full = table_for(resolved_oot, wide, protocol=PROTOCOL, dates=oot.index).join(meta, on="method")
     full.to_csv(RESULTS / "tables.csv", index=False)
 
-    like_tables = like_for_like(signals, wide, trials, oot.index)
+    like_tables = like_for_like(
+        resolved_oot, wide, variants=ML_VARIANTS, protocol=PROTOCOL, dates=oot.index
+    )
     like_tables.to_csv(RESULTS / "tables_like_for_like.csv", index=False)
 
     curves = []
@@ -143,10 +137,12 @@ def main() -> int:
     # series is the one the tables above were built from: full-panel signals, metrics masked to the
     # OOT dates. Each curve is then re-measured and asserted equal to its table's Sharpe before
     # anything is written — a plot in the notebook cannot disagree with the number printed beside it.
-    window_signals = {name: method(window) for name, method in methods.items()}
-    reference = headline_rows(pd.read_csv("results/decision/tables.csv"))
-    for name, signal in window_signals.items():
-        returns = curve(signal, window, vol_target=VOL_TARGET, bps=HEADLINE_BPS)
+    window_signals = resolved(full_set(basis_wide, protocol=PROTOCOL), window)
+    reference = headline_rows(pd.read_csv("results/decision/tables.csv"), PROTOCOL.headline_bps)
+    for name, method in window_signals.items():
+        returns = curve(
+            method.signal, window, vol_target=PROTOCOL.vol_target, bps=PROTOCOL.headline_bps
+        )
         got, want = sharpe(returns), float(reference.loc[name, "sharpe"])
         assert abs(got - want) < 1e-9, f"{name}: curve Sharpe {got} != decision-read table's {want}"
         curves.append(
@@ -159,10 +155,16 @@ def main() -> int:
                 }
             )
         )
-    for name, signal in signals.items():
-        returns = curve(signal, wide, vol_target=VOL_TARGET, bps=HEADLINE_BPS, dates=oot.index)
+    for name, method in resolved_oot.items():
+        returns = curve(
+            method.signal,
+            wide,
+            vol_target=PROTOCOL.vol_target,
+            bps=PROTOCOL.headline_bps,
+            dates=oot.index,
+        )
         got = sharpe(returns)
-        want = float(headline_rows(full).loc[name, "sharpe"])
+        want = float(headline_rows(full, PROTOCOL.headline_bps).loc[name, "sharpe"])
         assert abs(got - want) < 1e-9, f"{name}: OOT curve Sharpe {got} != the OOT table's {want}"
         curves.append(
             pd.DataFrame(
@@ -178,16 +180,24 @@ def main() -> int:
         RESULTS / "curves.csv", index=False
     )
 
-    primary = verdict(headline_rows(full), ML_VARIANTS)
+    primary = verdict(headline_rows(full, PROTOCOL.headline_bps), ML_VARIANTS, benchmark=BENCHMARK)
     sensitivity = {
-        variant: verdict(headline_rows(like_tables[like_tables["window"] == variant]), ML_VARIANTS)
+        variant: verdict(
+            headline_rows(like_tables[like_tables["window"] == variant], PROTOCOL.headline_bps),
+            ML_VARIANTS,
+            benchmark=BENCHMARK,
+        )
         for variant in ML_VARIANTS
     }
     require_same_verdict(primary, sensitivity)
     (RESULTS / "OOT.md").write_text(outcome_doc(primary, sensitivity, meta))
 
     print()
-    print(headline_rows(full)[["sharpe", "dsr", "turnover", "signal_coverage"]].to_string())
+    print(
+        headline_rows(full, PROTOCOL.headline_bps)[
+            ["sharpe", "dsr", "turnover", "signal_coverage"]
+        ].to_string()
+    )
     print(f"\nwrote {RESULTS}/tables.csv, tables_like_for_like.csv, curves.csv, OOT.md")
     return 0
 

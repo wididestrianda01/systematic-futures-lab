@@ -1,10 +1,11 @@
-"""Method families — every family a callable, every call through the same seam.
+"""Method families — every family a `protocol.Method`, every call through the same seam.
 
 Convention for adding a family (kept in one place so the comparison stays
 apples-to-apples):
 
-- a method is a callable mapping the wide continuous-close panel (date x
-  symbol) to a signal table of the same shape, values in [-1, 1];
+- a family is wrapped in `protocol.Method`: a callable mapping the wide continuous-close panel
+  (date x symbol) to a signal table of the same shape, values in [-1, 1], plus the trial count its
+  selection actually evaluated (1 for a family that searched nothing);
 - sizing (10% annualized vol target + position caps) lives in the shared
   engine overlay, never inside a method;
 - each family ships a hand-calculated golden fixture pinning its sign and

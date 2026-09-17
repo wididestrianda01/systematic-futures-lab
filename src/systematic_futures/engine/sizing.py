@@ -18,13 +18,17 @@ import pandas as pd
 from systematic_futures.data.panels import consecutive_returns, trailing_std
 from systematic_futures.engine.metrics import ANN
 
+VOL_TARGET = 0.10  # annualized volatility per symbol
+CAP = 1.0  # position cap in notional
+LOOKBACK = 30  # trailing observations the realized volatility is measured over
+
 
 def vol_target_positions(
     sig: pd.DataFrame,
     closes: pd.DataFrame,
-    vol_target: float = 0.10,
-    cap: float = 1.0,
-    lookback: int = 30,
+    vol_target: float = VOL_TARGET,
+    cap: float = CAP,
+    lookback: int = LOOKBACK,
 ) -> pd.DataFrame:
     sd = trailing_std(consecutive_returns(closes), lookback) * np.sqrt(ANN)
     scale = vol_target / sd

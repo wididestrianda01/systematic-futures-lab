@@ -16,7 +16,7 @@ it:
 Folds are walk-forward (expanding train, contiguous test blocks, no shuffling),
 which is also the honest order a live model would have been refit in.
 `leakage_violations` re-checks both mechanisms from the fold semantics, so the
-harness can assert cleanliness rather than trust the constructor.
+catalogue can assert cleanliness rather than trust the constructor.
 """
 
 from __future__ import annotations
@@ -36,12 +36,14 @@ class Fold:
 
 
 def purged_walk_forward(
-    index: pd.DatetimeIndex, *, n_splits: int = 5, horizon: int = 1, embargo: int = 5
+    index: pd.DatetimeIndex, *, n_splits: int, horizon: int, embargo: int
 ) -> list[Fold]:
     """Expanding-window folds over `index`, purged and embargoed.
 
     index: the sample dates (unique). horizon: label length in trading days.
     embargo: dates excluded after each test block. Deterministic by construction.
+    The geometry is required, never defaulted: which schedule a comparison ran under is its protocol
+    (`protocol.Protocol`), and a default here could silently differ from the declared one.
     """
     dates = pd.DatetimeIndex(sorted(pd.Index(index).unique()))
     n = len(dates)
@@ -65,7 +67,7 @@ def purged_walk_forward(
 
 
 def leakage_violations(
-    folds: list[Fold], index: pd.DatetimeIndex, *, horizon: int = 1, embargo: int = 5
+    folds: list[Fold], index: pd.DatetimeIndex, *, horizon: int, embargo: int
 ) -> list[str]:
     """Every train/test contamination in `folds` — empty means clean.
 

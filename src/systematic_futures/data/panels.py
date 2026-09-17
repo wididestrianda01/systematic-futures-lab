@@ -1,7 +1,7 @@
 """Frozen-panel loading, shaping and measurement — the one place a panel is read, put on
 the close grid, and measured.
 
-Both phase scripts (the families read tables, the decision read ML harness) read the same two wide
+Both phase scripts (the families read tables, the decision read comparison) read the same two wide
 panels: the back-adjusted continuous closes the seam runs on, and the raw-leg
 basis series the carry family and the ML features bind. Hoisted here so the
 loader — and its gate — exist once.

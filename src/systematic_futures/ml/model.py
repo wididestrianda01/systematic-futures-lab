@@ -16,10 +16,15 @@ Labels are the forward h-day return scaled by trailing vol as-of t
 and never a model input.
 
 Multiple testing: the Deflated Sharpe Ratio needs the number of configurations
-the selection actually evaluated, so `method.trials` rides on the returned
-callable — 1 for 6a (defaults, no search), folds x n_trials for 6b. 6b's
-tuning happens inside a fold, on a purged inner split of that fold's training
-data: a test block never informs its own search.
+the selection actually evaluated, so each variant returns a `protocol.Method`
+carrying its trial count — 1 for 6a (defaults, no search), folds x n_trials for
+6b. 6b's tuning happens inside a fold, on a purged inner split of that fold's
+training data: a test block never informs its own search.
+
+The fold geometry, the search budget and the overlay the tuning objective scores
+through all come from the comparison protocol (`protocol.Protocol`), so the
+search that picks a variant's parameters and the table that reports them are
+measured under one schedule (ADR 0001).
 """
 
 from __future__ import annotations
@@ -36,15 +41,10 @@ from systematic_futures.engine.core import run
 from systematic_futures.methods.ranking import centered_rank
 from systematic_futures.ml.cv import Fold, purged_walk_forward
 from systematic_futures.ml.features import FEATURES, feature_panel, forward_label
+from systematic_futures.protocol import PROTOCOL, Method, Protocol
 
-HORIZON = 5  # label length in trading days
-N_SPLITS = 5
-EMBARGO = 10
 SEED = 7
 MIN_TRAIN_ROWS = 250
-VOL_TARGET = 0.10
-CAP = 1.0
-TUNING_BPS = 2.0  # the headline cost level the tuning objective sees
 STAGES = (50, 150)  # cumulative boosting rounds; the pruner decides after the first
 DEFAULT_PARAMS = {
     "learning_rate": 0.05,
@@ -64,45 +64,33 @@ def _walk_forward(
     fit_for: FitFor,
     basis: pd.DataFrame | None,
     *,
-    horizon: int,
-    n_splits: int,
-    embargo: int,
+    protocol: Protocol,
     min_train_rows: int,
     trials: int,
-):
+) -> Method:
     """The walk-forward scaffold every ML variant is: folds in, out-of-fold signals out.
 
-    The variant supplies only its fit; the fold loop, the out-of-fold-only
-    guarantee and the trial count that feeds the Deflated Sharpe Ratio are wired
-    here once. `fit_for` is called per invocation, so a variant's learner state
-    never leaks between calls.
+    The variant supplies only its fit; the fold loop, the out-of-fold-only guarantee and the trial
+    count the Deflated Sharpe Ratio is deflated by are wired here once. `fit_for` is called per
+    invocation, so a variant's learner state never leaks between calls.
     """
 
     def method(closes: pd.DataFrame) -> pd.DataFrame:
         return _signals(
-            closes,
-            basis,
-            fit_for(closes),
-            horizon=horizon,
-            n_splits=n_splits,
-            embargo=embargo,
-            min_train_rows=min_train_rows,
+            closes, basis, fit_for(closes), protocol=protocol, min_train_rows=min_train_rows
         )
 
-    method.trials = trials
-    return method
+    return Method(signal=method, trials=trials)
 
 
 def lgbm_defaults(
     basis: pd.DataFrame | None = None,
     *,
-    horizon: int = HORIZON,
-    n_splits: int = N_SPLITS,
-    embargo: int = EMBARGO,
+    protocol: Protocol = PROTOCOL,
     seed: int = SEED,
     min_train_rows: int = MIN_TRAIN_ROWS,
-):
-    """Variant 6a: sensible defaults, no search. Returns a method with `trials` = 1."""
+) -> Method:
+    """Variant 6a: sensible defaults, no search — a method with `trials` = 1."""
 
     def fit_for(closes: pd.DataFrame) -> Fit:
         learner = LGBMRegressor(
@@ -118,9 +106,7 @@ def lgbm_defaults(
     return _walk_forward(
         fit_for,
         basis,
-        horizon=horizon,
-        n_splits=n_splits,
-        embargo=embargo,
+        protocol=protocol,
         min_train_rows=min_train_rows,
         trials=1,
     )
@@ -129,16 +115,13 @@ def lgbm_defaults(
 def lgbm_tuned(
     basis: pd.DataFrame | None = None,
     *,
-    horizon: int = HORIZON,
-    n_splits: int = N_SPLITS,
-    embargo: int = EMBARGO,
-    n_trials: int = 20,
+    protocol: Protocol = PROTOCOL,
     seed: int = SEED,
     min_train_rows: int = MIN_TRAIN_ROWS,
-):
-    """Variant 6b: pruned TPE per fold; `trials` = n_splits x n_trials.
+) -> Method:
+    """Variant 6b: pruned TPE per fold; `trials` = the protocol's folds x n_trials.
 
-    Conservative by construction: every fold runs a study of `n_trials`
+    Conservative by construction: every fold runs a study of the protocol's `n_trials`
     configurations, counted whether or not a fold was later skipped for lack of
     data, so the DSR deflation never flatters the variant.
     """
@@ -146,12 +129,12 @@ def lgbm_tuned(
 
     def fit_for(closes: pd.DataFrame) -> Fit:
         def fit(train: pd.DataFrame, test: pd.DataFrame, fold: Fold) -> pd.DataFrame:
-            inner = inner_split(fold, horizon=horizon, embargo=embargo)
+            inner = inner_split(fold, protocol=protocol)
             dates = train.index.get_level_values("date")
             inner_train, inner_valid = train[dates.isin(inner.train)], train[dates.isin(inner.test)]
             if len(inner_train) < min_train_rows or len(inner_valid) < min_train_rows:
                 return pd.DataFrame(index=fold.test, columns=closes.columns, dtype=float)
-            params = _tune(closes, inner_train, inner_valid, n_trials=n_trials, seed=seed)
+            params = _tune(inner_train, inner_valid, closes, protocol=protocol, seed=seed)
             return _fit_full(closes, train, test, params, seed)
 
         return fit
@@ -159,15 +142,13 @@ def lgbm_tuned(
     return _walk_forward(
         fit_for,
         basis,
-        horizon=horizon,
-        n_splits=n_splits,
-        embargo=embargo,
+        protocol=protocol,
         min_train_rows=min_train_rows,
-        trials=n_splits * n_trials,
+        trials=protocol.splits * protocol.n_trials,
     )
 
 
-def inner_split(fold: Fold, *, horizon: int, embargo: int) -> Fold:
+def inner_split(fold: Fold, *, protocol: Protocol = PROTOCOL) -> Fold:
     """The tuning split: the last quarter of the fold's training dates is the inner
     validation block, purged and embargoed from the rest.
 
@@ -175,7 +156,9 @@ def inner_split(fold: Fold, *, horizon: int, embargo: int) -> Fold:
     block can never reach its own search, and that is what `tests/test_ml.py`
     audits through this function.
     """
-    return purged_walk_forward(fold.train, n_splits=3, horizon=horizon, embargo=embargo)[-1]
+    return purged_walk_forward(
+        fold.train, n_splits=3, horizon=protocol.horizon, embargo=protocol.embargo
+    )[-1]
 
 
 def _signals(
@@ -183,9 +166,7 @@ def _signals(
     basis: pd.DataFrame | None,
     fit: Fit,
     *,
-    horizon: int,
-    n_splits: int,
-    embargo: int,
+    protocol: Protocol,
     min_train_rows: int,
 ) -> pd.DataFrame:
     """Walk-forward out-of-fold signal panel (0 wherever no fold predicts).
@@ -196,13 +177,18 @@ def _signals(
     feature window — raise rather than return an all-zero panel whose metrics
     are silently NaN.
     """
-    samples = feature_panel(closes, basis).join(forward_label(closes, horizon)).dropna()
+    samples = feature_panel(closes, basis).join(forward_label(closes, protocol.horizon)).dropna()
     if len(samples) < min_train_rows:
         raise ValueError(
             f"only {len(samples)} complete feature/label samples for {closes.shape[1]} symbols "
             f"over {len(closes)} days: check the basis panel's alignment and the history length"
         )
-    folds = purged_walk_forward(closes.index, n_splits=n_splits, horizon=horizon, embargo=embargo)
+    folds = purged_walk_forward(
+        closes.index,
+        n_splits=protocol.splits,
+        horizon=protocol.horizon,
+        embargo=protocol.embargo,
+    )
     signals = pd.DataFrame(0.0, index=closes.index, columns=closes.columns)
     for fold in folds:
         dates = samples.index.get_level_values("date")
@@ -222,11 +208,11 @@ def _wide(values, index: pd.MultiIndex, closes: pd.DataFrame) -> pd.DataFrame:
 
 
 def _tune(
-    closes: pd.DataFrame,
     inner_train: pd.DataFrame,
     inner_valid: pd.DataFrame,
+    closes: pd.DataFrame,
     *,
-    n_trials: int,
+    protocol: Protocol,
     seed: int,
 ) -> dict:
     """Pruned TPE over LightGBM hyperparameters, scored on the inner validation block."""
@@ -248,7 +234,7 @@ def _tune(
             )
             trained = stage
             pred = _wide(booster.predict(inner_valid[FEATURES]), inner_valid.index, closes)
-            score = _score(pred, closes)
+            score = _score(pred, closes, protocol=protocol)
             trial.report(score, stage)
             if trial.should_prune():
                 raise optuna.TrialPruned()
@@ -259,7 +245,7 @@ def _tune(
         sampler=optuna.samplers.TPESampler(seed=seed, n_startup_trials=5),
         pruner=optuna.pruners.MedianPruner(n_startup_trials=5, n_warmup_steps=0),
     )
-    study.optimize(objective, n_trials=n_trials, catch=(ValueError,))
+    study.optimize(objective, n_trials=protocol.n_trials, catch=(ValueError,))
     return dict(DEFAULT_PARAMS, **study.best_params)
 
 
@@ -293,22 +279,29 @@ def _fit_full(
     return _wide(booster.predict(test[FEATURES]), test.index, closes)
 
 
-def _score(pred: pd.DataFrame, closes: pd.DataFrame) -> float:
+def _score(pred: pd.DataFrame, closes: pd.DataFrame, *, protocol: Protocol) -> float:
     """Sharpe of the ranked signal on the predicted dates — through the pipeline seam.
 
     The tuning objective crosses the same interface the comparison tables do: the
-    ranked predictions go to `engine.run` with the predicted dates as the mask and
-    the tuning cost as the one bps level, so the search that picks the parameters
-    and the metric the decision rule reads cannot drift apart. A flat window scores
-    NaN at the seam, and -inf here: the pruner must never compare against NaN.
+    ranked predictions go to `engine.run` with the predicted dates as the mask, the
+    protocol's overlay and the protocol's headline cost as the one bps level, so the
+    search that picks the parameters and the metric the decision rule reads cannot
+    drift apart. A flat window scores NaN at the seam, and -inf here: the pruner must
+    never compare against NaN.
     """
     signal = centered_rank(pred).fillna(0.0)
     if signal.empty:
         return float("-inf")
     window = closes.loc[: signal.index.max()]
     panel = signal.reindex(index=window.index).fillna(0.0)
+    bps = protocol.headline_bps
     table = run(
-        panel, window, vol_target=VOL_TARGET, cap=CAP, bps_grid=(TUNING_BPS,), dates=signal.index
+        panel,
+        window,
+        vol_target=protocol.vol_target,
+        cap=protocol.cap,
+        bps_grid=(bps,),
+        dates=signal.index,
     )
-    value = float(table.loc[TUNING_BPS, "sharpe"])
+    value = float(table.loc[bps, "sharpe"])
     return value if np.isfinite(value) else float("-inf")

@@ -1,10 +1,11 @@
 """ML family — variants 6a/6b, seam-compatible like every classic family.
 
-The seam contract is identical to `methods/`: a callable taking the wide
-continuous close panel and returning a signal table on the same grid, with the
-shared overlay and cost model applied by the engine. What differs is only what
-lives underneath: a point-in-time feature panel, a hand-rolled purged and
-embargoed walk-forward splitter, and a pooled LightGBM refit per fold.
+The seam contract is identical to `methods/`: a `protocol.Method` — a callable taking the wide
+continuous close panel and returning a signal table on the same grid, plus the trial count its
+selection evaluated — with the shared overlay and cost model applied by the engine. What differs is
+only what lives underneath: a point-in-time feature panel, a hand-rolled purged and embargoed
+walk-forward splitter, and a pooled LightGBM refit per fold. The fold geometry, search budget and
+overlay come from the comparison protocol (`protocol.Protocol`).
 """
 
 from systematic_futures.ml.cv import Fold, leakage_violations, purged_walk_forward

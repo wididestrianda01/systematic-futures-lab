@@ -20,7 +20,7 @@ score — every value as-of t. `ml.features.forward_label` is the one deliberate
 object and is never a model input. `ml.cv.purged_walk_forward` builds expanding-train, contiguous-test
 folds, purges training dates whose label window reaches into the test block, and embargoes a further
 buffer after every earlier test block; `leakage_violations` re-derives both mechanisms from the fold
-semantics so the harness asserts cleanliness instead of trusting the constructor. Signals are 0 where
+semantics so the catalogue asserts cleanliness instead of trusting the constructor. Signals are 0 where
 no fold predicts, which is why coverage is reported with the numbers.
 
 **Evidence** (frozen tables; 2 bps is the headline level):

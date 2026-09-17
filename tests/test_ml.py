@@ -21,9 +21,9 @@ from systematic_futures.ml import (
     lgbm_tuned,
     purged_walk_forward,
 )
+from systematic_futures.protocol import Protocol
 
-HORIZON, SPLITS, EMBARGO = 5, 3, 10
-N_TUNED_TRIALS = 2
+PROTOCOL_TEST = Protocol(horizon=5, splits=3, embargo=10, n_trials=2)
 N = 2400
 
 
@@ -49,23 +49,26 @@ def fixture(n: int = N):
     return closes, basis_panel(closes)
 
 
+def fold_schedule(index: pd.DatetimeIndex):
+    return purged_walk_forward(
+        index,
+        n_splits=PROTOCOL_TEST.splits,
+        horizon=PROTOCOL_TEST.horizon,
+        embargo=PROTOCOL_TEST.embargo,
+    )
+
+
 def walk_forward_cut(closes: pd.DataFrame) -> pd.Timestamp:
     """End of the middle fold's test block: everything at or before it is predicted
     by folds whose training data lies entirely before it."""
-    folds = purged_walk_forward(closes.index, n_splits=SPLITS, horizon=HORIZON, embargo=EMBARGO)
-    return folds[1].test[-1]
+    return fold_schedule(closes.index)[1].test[-1]
 
 
 @pytest.mark.parametrize(
     ("build", "expected_trials"),
     [
-        (lambda basis: lgbm_defaults(basis, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO), 1),
-        (
-            lambda basis: lgbm_tuned(
-                basis, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO, n_trials=N_TUNED_TRIALS
-            ),
-            SPLITS * N_TUNED_TRIALS,
-        ),
+        (lambda basis: lgbm_defaults(basis, protocol=PROTOCOL_TEST), 1),
+        (lambda basis: lgbm_tuned(basis, protocol=PROTOCOL_TEST), 3 * 2),
     ],
     ids=["6a defaults", "6b tuned"],
 )
@@ -77,19 +80,20 @@ def test_every_variant_predicts_out_of_fold_only_and_counts_its_trials(build, ex
     method = build(basis)
     assert method.trials == expected_trials
 
-    signals = method(closes)
+    signals = method.signal(closes)
     cut = walk_forward_cut(closes)
     assert (signals.loc[:cut] != 0).any().any(), "fixture must yield out-of-fold signals"
 
     perturbed = closes.copy()
     perturbed.loc[closes.index > cut] *= 1.5
-    pd.testing.assert_frame_equal(signals.loc[:cut], method(perturbed).loc[:cut])
+    pd.testing.assert_frame_equal(signals.loc[:cut], method.signal(perturbed).loc[:cut])
 
 
 def test_defaults_learn_a_planted_momentum_effect():
     closes, basis = fixture()
-    signals = lgbm_defaults(basis, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO)(closes)
-    forward = closes.shift(-HORIZON) / closes - 1.0
+    method = lgbm_defaults(basis, protocol=PROTOCOL_TEST)
+    signals = method.signal(closes)
+    forward = closes.shift(-PROTOCOL_TEST.horizon) / closes - 1.0
 
     ics = []
     for date, row in signals.iterrows():
@@ -103,16 +107,16 @@ def test_defaults_learn_a_planted_momentum_effect():
 
 def test_defaults_run_through_the_seam_deterministically():
     closes, basis = fixture(n=1800)
-    method = lgbm_defaults(basis, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO)
+    method = lgbm_defaults(basis, protocol=PROTOCOL_TEST)
     assert method.trials == 1
 
-    first = run(method, closes, vol_target=0.10)
-    second = run(method, closes, vol_target=0.10)
+    first = run(method.signal, closes, vol_target=PROTOCOL_TEST.vol_target)
+    second = run(method.signal, closes, vol_target=PROTOCOL_TEST.vol_target)
     pd.testing.assert_frame_equal(first, second)
     assert list(first.index) == [0.0, 2.0, 5.0, 10.0]
     assert first["sharpe"].notna().all() and first["turnover"].notna().all()
 
-    signals = method(closes)
+    signals = method.signal(closes)
     assert signals.index.equals(closes.index) and signals.columns.equals(closes.columns)
     assert (signals.iloc[:252] == 0.0).all().all()  # warmup stays flat, never back-filled
     assert not signals.isna().any().any()
@@ -120,30 +124,32 @@ def test_defaults_run_through_the_seam_deterministically():
 
 def test_the_tuned_search_is_deterministic():
     closes, basis = fixture()
-    method = lgbm_tuned(
-        basis, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO, n_trials=N_TUNED_TRIALS
-    )
-    pd.testing.assert_frame_equal(method(closes), method(closes))  # seeded search is reproducible
+    method = lgbm_tuned(basis, protocol=PROTOCOL_TEST)
+    pd.testing.assert_frame_equal(method.signal(closes), method.signal(closes))
 
 
 def test_inner_tuning_split_stays_inside_the_fold_training_set():
     """The tuning protocol: the frames the search is handed come from `fold.train`
     alone, purged and embargoed, never from the fold's test block."""
     closes, _ = fixture(n=1800)
-    folds = purged_walk_forward(closes.index, n_splits=SPLITS, horizon=HORIZON, embargo=EMBARGO)
-    for fold in folds:
-        inner = inner_split(fold, horizon=HORIZON, embargo=EMBARGO)
+    for fold in fold_schedule(closes.index):
+        inner = inner_split(fold, protocol=PROTOCOL_TEST)
         assert set(inner.train) <= set(fold.train)
         assert set(inner.test) <= set(fold.train)
         assert not set(inner.test) & set(fold.test)
         assert inner.test.min() > inner.train.max()  # validation follows the inner train
-        assert not leakage_violations([inner], fold.train, horizon=HORIZON, embargo=EMBARGO)
+        assert not leakage_violations(
+            [inner],
+            fold.train,
+            horizon=PROTOCOL_TEST.horizon,
+            embargo=PROTOCOL_TEST.embargo,
+        )
 
 
 def test_missing_or_misaligned_basis_raises_instead_of_going_flat():
-    closes, basis = fixture(n=1200)
+    closes, _ = fixture(n=1200)
     with pytest.raises(ValueError, match="complete feature/label samples"):
-        lgbm_defaults(horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO)(closes)
-    misaligned = basis.rename(columns={name: f"{name}_x" for name in basis.columns})
+        lgbm_defaults(protocol=PROTOCOL_TEST).signal(closes)
+    misaligned = basis_panel(closes).rename(columns={name: f"{name}_x" for name in closes.columns})
     with pytest.raises(ValueError, match="complete feature/label samples"):
-        lgbm_defaults(misaligned, horizon=HORIZON, n_splits=SPLITS, embargo=EMBARGO)(closes)
+        lgbm_defaults(misaligned, protocol=PROTOCOL_TEST).signal(closes)

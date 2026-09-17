@@ -28,6 +28,7 @@ def test_a_variant_beats_the_benchmark_only_on_strictly_greater_dsr():
             }
         ),
         ("ml_a", "ml_b", "ml_c"),
+        benchmark=BENCH,
     )
     assert read["beats"] == {"ml_a": True, "ml_b": False, "ml_c": False}  # a tie is not a win
     assert read["benchmark_sharpe"] == 0.10 and read["benchmark_dsr"] == 0.50
@@ -37,15 +38,21 @@ def test_a_variant_beats_the_benchmark_only_on_strictly_greater_dsr():
 
 def test_reads_may_differ_in_numbers_but_not_in_verdict():
     primary = verdict(
-        rows({BENCH: (0.0, 0.50), "ml_a": (0.9, 0.90), "ml_b": (0.1, 0.10)}), ("ml_a", "ml_b")
+        rows({BENCH: (0.0, 0.50), "ml_a": (0.9, 0.90), "ml_b": (0.1, 0.10)}),
+        ("ml_a", "ml_b"),
+        benchmark=BENCH,
     )
     sharper_benchmark = verdict(
-        rows({BENCH: (0.0, 0.40), "ml_a": (0.7, 0.80), "ml_b": (0.2, 0.20)}), ("ml_a", "ml_b")
+        rows({BENCH: (0.0, 0.40), "ml_a": (0.7, 0.80), "ml_b": (0.2, 0.20)}),
+        ("ml_a", "ml_b"),
+        benchmark=BENCH,
     )
     require_same_verdict(primary, {"like-for-like": sharper_benchmark})
 
     flip = verdict(
-        rows({BENCH: (0.0, 0.50), "ml_a": (0.9, 0.10), "ml_b": (0.1, 0.10)}), ("ml_a", "ml_b")
+        rows({BENCH: (0.0, 0.50), "ml_a": (0.9, 0.10), "ml_b": (0.1, 0.10)}),
+        ("ml_a", "ml_b"),
+        benchmark=BENCH,
     )
     with pytest.raises(ValueError, match="must not depend on the read"):
         require_same_verdict(primary, {"like-for-like": flip})

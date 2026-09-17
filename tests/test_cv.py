@@ -66,6 +66,6 @@ def test_deterministic_and_input_validated():
     for a, b in zip(first, second, strict=True):
         assert a.train.equals(b.train) and a.test.equals(b.test)
     with pytest.raises(ValueError):
-        purged_walk_forward(INDEX, n_splits=0)
+        purged_walk_forward(INDEX, n_splits=0, horizon=HORIZON, embargo=EMBARGO)
     with pytest.raises(ValueError):
-        purged_walk_forward(INDEX[:3], n_splits=5)
+        purged_walk_forward(INDEX[:3], n_splits=5, horizon=HORIZON, embargo=EMBARGO)

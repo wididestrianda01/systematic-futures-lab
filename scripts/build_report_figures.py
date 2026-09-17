@@ -17,7 +17,7 @@ matplotlib.use("Agg")  # a headless backend, chosen before pyplot is imported
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from systematic_futures.harness import HEADLINE_BPS, VOL_TARGET
+from systematic_futures.protocol import PROTOCOL
 
 CURVES = Path("results/out_of_sample/curves.csv")
 FIGURES = Path("docs/report/figures")
@@ -37,8 +37,8 @@ def main() -> int:
             equity = (1.0 + group.set_index("date")["ret"]).cumprod()
             ax.plot(equity.index, equity.to_numpy(), linewidth=1.0, label=name)
         ax.set_title(
-            f"{title} — net equity, {HEADLINE_BPS:.0f} bps/side, "
-            f"{VOL_TARGET:.0%} per-symbol vol target"
+            f"{title} — net equity, {PROTOCOL.headline_bps:.0f} bps/side, "
+            f"{PROTOCOL.vol_target:.0%} per-symbol vol target"
         )
         ax.set_ylabel("equity (start = 1)")
         ax.legend(ncols=4, fontsize=7)
