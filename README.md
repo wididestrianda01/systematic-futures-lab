@@ -6,7 +6,7 @@ Do six classic futures method families, and a machine-learned challenger, surviv
 CME contract data? Sixteen CME roots, 2010 to 2024Q1, one accounting engine, one cost model, one
 evaluation protocol, and one out-of-sample window read once. The primary artifact is a findings memo:
 where each method wins, loses, and why, supported by an executed walkthrough, per-method governance
-docs, a condensed report and a self-test brief.
+docs and a condensed report.
 
 Read: [findings memo](docs/findings/memo.md) ·
 [executed walkthrough](notebooks/analysis.ipynb) ·
@@ -62,25 +62,87 @@ inside the decision window and both fail it out of time. That is reported as the
 away; `results/out_of_sample/OOT.md` records the read, and `results/decision/DECISION.md` keeps the
 decision read's verdict as decided.
 
-Four further readings, argued in the memo:
+## Reading the results
 
-- **Costs select strategies rather than shading them.** At 5 bps the survivors differ by window: the
-  decision window leaves the baseline, cross-sectional momentum and the tuned variant positive, while
-  the out-of-sample window leaves cross-sectional momentum, seasonality, the trend benchmark and the
-  tilt. Trend and the seasonal tilt flip sign between gross and headline cost; both ML variants stay
-  positive gross and net, with cost taking most of the signal rather than its sign.
-- **The null model is a real competitor.** Vol-targeted buy-and-hold earns 0.408 at 2 bps on book
-  turnover of 0.007 (3.5 bps a year in cost), which is the diversification return a signal has to
-  beat before it has shown anything.
-- **What generalised is what did not need to time the regime.** Cross-sectional momentum is positive
-  in every sub-period and both windows; the passive book lost money in all three out-of-sample years
-  while the timing families earned it.
-- **Two honest-failure results.** Standalone seasonality is negative before costs at turnover below
-  the benchmark's (so churn is not the explanation), and carry's number belongs to rebalancing a
-  basis-derived sign daily: the same rule held monthly earns +0.163 where the daily refresh earns
-  -3.614, and the published construction is a monthly, rank-weighted slope magnitude, so the carry
-  premium is neither confirmed nor refuted here. Evidence:
-  `results/out_of_sample/carry_frequency.csv`.
+The table is the arithmetic; this section is what it means. Every number below is read from the
+committed tables under `results/`, and the long form with citations is `docs/findings/memo.md`.
+
+**Costs select strategies rather than shading them.** Ten basis points a side changes which family
+wins, and turnover decides it: the ladder charges the same turnover at a different price, so what it
+sorts is turnover. Book turnover runs 0.007 of capital a day for the baseline, 0.025 for seasonality,
+0.049 for cross-sectional momentum, 0.096 for the tilt, 0.103 for the trend benchmark and 0.176 for
+carry. The benchmark travels +0.200 gross → -0.085 at the headline level → -1.203 at 10 bps; the tilt
++0.163 → -0.116 → -1.208; the low-turnover families barely move (baseline 0.419 → 0.361,
+cross-sectional momentum 0.562 → -0.216). At 5 bps the survivors differ by window: develop+validate
+leaves the baseline (0.390), cross-sectional momentum (0.172) and the tuned variant (0.746) positive,
+while the out-of-sample window leaves cross-sectional momentum (0.994), seasonality (0.683), the trend
+benchmark (0.208) and the tilt (0.054).
+
+**The null model is the bar, and four families fail to clear it.** Vol-targeted buy-and-hold earns
+Sharpe 0.408 at 2 bps on 0.007 of daily book turnover, a charge of 3.5 bps a year, and that number is
+the diversification return rather than a signal. On the decision window the trend benchmark, carry,
+standalone seasonality and the tilt all finish below it after costs. Out of time the same book loses
+money in all three years (-1.28 in 2022, -0.14 in 2023, -0.20 in 2024Q1), which is the other half of
+the lesson: the free lunch is regime-dependent, and in that window the cross-section paid while
+passive exposure did not.
+
+**The ML verdict is the honest one.** The rule was pre-declared before these numbers existed: a
+variant wins only if its decision-window deflated Sharpe after costs beats the benchmark's. Both
+variants clear it in develop+validate (DSR 0.9989 and 0.9999 against 0.3726) and both fail it on the
+single out-of-sample read (0.5433 and 0.0261 against 0.7966). The in-window edge is also
+concentrated where the bar was lowest, since the benchmark earned a negative net Sharpe in that
+window: clearing it means the variants did not lose where the benchmark did, not that skill was
+demonstrated.
+
+| family | 2010–2014 | 2015–2019 | 2020–2021 |
+|---|---|---|---|
+| `tsmom` (benchmark) | 0.15 | -0.51 | 0.33 |
+| `ml_defaults` (6a) | -0.80 | 1.50 | 1.17 |
+| `ml_tuned` (6b) | no coverage | 1.97 | 2.22 |
+| `xs_momentum` | 0.41 | 0.30 | 0.66 |
+
+Out of time the cost charge consumes 6a's signal (0.759 gross, 0.072 net on 0.199 a day of book
+turnover, a 1.00% a year charge), and 6b holds 0.390 with a DSR of 0.0261 under its 100-configuration
+deflation. Purged, embargoed folds and the trial-count deflation guarantee no label leakage and an
+honest search count. Neither can create persistence the features do not have: trailing returns,
+realized vol, moving-average distance, basis and seasonality are a non-linear re-expression of the
+same premia the classic families trade, so when the benchmark's regime turns the recombination has
+nothing extra to lean on.
+
+**Two failures worth more than the losers.** Standalone seasonality is negative *before* costs
+(-0.027 gross) at book turnover of 0.025, a quarter of the benchmark's, so churn is not the
+explanation; the score rests on five priors per calendar month, and out of time the same family earns
++0.828 gross. Carry's number belongs to the rebalancing frequency, not to the carry premium:
+
+| construction | develop+validate | out-of-sample | turnover |
+|---|---|---|---|
+| daily `sign(-basis)`, the committed row | -3.614 | -1.756 | 0.176 |
+| the same rule held from each month's first session | +0.163 | +0.001 | 0.016 |
+| daily `sign(basis)`, the committed rule inverted | +2.807 | +1.269 | 0.176 |
+
+The published construction is a monthly, rank-weighted slope *magnitude*, and no term-structure
+premium has a Sharpe of 3.6 in either direction, so the committed row measures naive daily sign
+carry. The sign convention is not resolved by adopting the profitable direction; that is the
+selection bias the deflated Sharpe exists to catch. Evidence:
+`results/out_of_sample/carry_frequency.csv`.
+
+**What generalised was what did not need to time the regime.** Cross-sectional momentum is positive
+in every sub-period of the decision window (0.41 / 0.30 / 0.66) and in both windows (0.406 at 2 bps
+in, 1.174 out). Out of time it earned 1.59 in 2022 and 5.25 in 2024Q1 against -0.32 in 2023, and 2023
+is the year nobody earned: with one exception every family sits at or below zero, which is the flat,
+mean-reverting regime the trend literature names as the family's worst case. The passive book lost
+money in all three of those years while the timing and selection families earned it.
+
+**How to read these numbers.** Sharpe is annualized at √252 in both windows as a stated convention,
+while the frozen panel carries 309.6 sessions a year before 2022 and 258.4 after, so the two windows'
+Sharpe levels are not strictly comparable and the develop+validate column sits about 11% above its
+own session density; the DSR the rule reads is a probability and is unaffected. Sizing targets
+volatility per symbol rather than per book, so realized book volatility runs 0.9–3.0% in
+develop+validate and 1.5–4.6% out of time: the families are like-for-like in rule and cost, not in
+delivered risk. Coverage dilutes a Sharpe by roughly √coverage, which is why each ML variant is also
+read on its own covered dates (benchmark DSR 0.4253 on 6a's dates, 0.3651 on 6b's, both verdicts
+unchanged). The DSR bounds selection bias under zero skill; it is not a promise about the next
+window, and it did not save these variants.
 
 ## The dataset
 
@@ -171,8 +233,7 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
 `docs/findings/memo.md` is the argument: the regime the trend benchmark lived through, why the ML
 variants' in-window edge was concentrated in the periods the benchmark lost money, what purge and
 embargo bought and what they cannot buy, and the two honest-failure findings. `docs/reading/notes.md`
-records the reading canon behind the interpretation, and the memo flags every claim that rests on a
-source outside it.
+records the reading behind the interpretation.
 
 ## Reproduce
 
@@ -221,7 +282,6 @@ no LME metals, Bund, DAX, CAC or euro before 2000).
 | `notebooks/analysis.ipynb` | the executed walkthrough: context, data, pipeline, methodology, results, readings |
 | `docs/methods/` | per-family governance docs: construction, evidence, failure modes, monitoring |
 | `docs/report/report.tex`, `report.pdf` | the condensed report |
-| `docs/self-test.md` | self-test questions, regulation talking points, non-adopt boundary |
 | `results/families/`, `results/decision/`, `results/out_of_sample/` | committed tables, decision records, derived return series, the carry frequency diagnostic |
 | `results/trend_sweep/` | the TSMOM horizon sweep, one sleeve per lookback |
 | `docs/adr/` | decision reasoning (one accounting path) |
@@ -235,7 +295,7 @@ no LME metals, Bund, DAX, CAC or euro before 2000).
   specific to this feature set, label horizon, fold geometry, cost level and window.
 - **Out of scope**: deep learning, C++/Rust/kdb+, dashboards, MLOps tooling, microstructure,
   VRP/short-vol, standalone mean-reversion, stat-arb/pairs, each with a stated reason in the memo's
-  non-adopt boundary, and regulation talking points in the self-test brief rather than in the code.
+  non-adopt boundary.
 - **One universe, one window**: 16 roots and a single out-of-sample read; the out-of-time reversal is
   one draw of a regime, not a law.
 
