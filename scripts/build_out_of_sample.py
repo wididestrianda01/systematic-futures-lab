@@ -76,7 +76,7 @@ def outcome_doc(primary: dict, sensitivity: dict[str, dict], meta: pd.DataFrame)
             )
     else:
         outcome = (
-            "**Out-of-time outcome: the rule fails for both variants** on the OOT window — the "
+            "**Out-of-time outcome: the rule fails for both variants** on the OOT window: the "
             "decision-read winners do not carry their edge past 2021, and that is the finding, not a "
             "reason to retune."
         )
@@ -97,8 +97,8 @@ def outcome_doc(primary: dict, sensitivity: dict[str, dict], meta: pd.DataFrame)
         "fold covering 2022 trains entirely inside develop+validate. Trial counts are unchanged "
         "as multiple-testing inputs: 6a searched nothing (trials = 1), 6b = folds x trials "
         f"({PROTOCOL.splits} x {PROTOCOL.n_trials} = {PROTOCOL.splits * PROTOCOL.n_trials}).\n\n"
-        "**Reading.** What the OOT numbers mean — regime attribution, the trend drought the "
-        "benchmark carries into 2022, what the ML variants generalized — is interpretation, and "
+        "**Reading.** What the OOT numbers mean (regime attribution, the trend drought the "
+        "benchmark carries into 2022, what the ML variants generalized) is interpretation, and "
         "it stays with the memo behind the reading canon and the "
         "interpretation pass. Deliberately not written here.\n\n"
         "Robustness read (`tables_like_for_like.csv`): the verdict is asserted identical on both "

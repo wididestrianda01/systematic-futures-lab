@@ -11,10 +11,10 @@ Benchmark `tsmom`: Sharpe 0.55, DSR 0.7966.
 | 6a `ml_defaults` | 0.07 | 0.5433 | no | 0.5533 | no | 99% |
 | 6b `ml_tuned` | 0.39 | 0.02606 | no | 0.02936 | no | 99% |
 
-**Out-of-time outcome: the rule fails for both variants** on the OOT window — the decision-read winners do not carry their edge past 2021, and that is the finding, not a reason to retune.
+**Out-of-time outcome: the rule fails for both variants** on the OOT window: the decision-read winners do not carry their edge past 2021, and that is the finding, not a reason to retune.
 
 **Protocol.** The walk-forward schedule is the decision read's, extended across the whole frozen panel; each fold is refit on prior data only and 6b's search runs inside its fold's training set, so no fold saw an out-of-sample date before predicting it. The fold covering 2022 trains entirely inside develop+validate. Trial counts are unchanged as multiple-testing inputs: 6a searched nothing (trials = 1), 6b = folds x trials (5 x 20 = 100).
 
-**Reading.** What the OOT numbers mean — regime attribution, the trend drought the benchmark carries into 2022, what the ML variants generalized — is interpretation, and it stays with the memo behind the reading canon and the interpretation pass. Deliberately not written here.
+**Reading.** What the OOT numbers mean (regime attribution, the trend drought the benchmark carries into 2022, what the ML variants generalized) is interpretation, and it stays with the memo behind the reading canon and the interpretation pass. Deliberately not written here.
 
 Robustness read (`tables_like_for_like.csv`): the verdict is asserted identical on both reads before this file is written.

@@ -2,11 +2,11 @@
 
 **Source.** S4 (Baltas & Kosowski 2013) for commodity seasonality as a documented effect; the family
 was added to the comparison set before any results existed, with the explicit expectation
-that the standalone version dies after costs — that failure is a required finding of the plan.
+that the standalone version dies after costs: that failure is a required finding of the plan.
 
 **Rules.** Two variants share one score.
 
-- `seasonality` (standalone): sign of the same-calendar-month score — long a historically strong
+- `seasonality` (standalone): sign of the same-calendar-month score: long a historically strong
   month, short a weak one, flat elsewhere.
 - `seasonal_tilt`: the same score used as a multiplier on the TSMOM ensemble, `1 ± 0.5`, leaving the
   trend position untouched where the score is still warming up.
@@ -27,7 +27,7 @@ quote hole does not become a zero-return day.
 | `seasonal_tilt` | out-of-sample | 0.644 | 0.407 | 0.7304 | 0.115 |
 
 **Failure modes (documented, mechanical).** In develop+validate the standalone signal is negative
-*before* costs (-0.027) while its turnover is *below* the trend benchmark's — so churn is not what
+*before* costs (-0.027) while its turnover is *below* the trend benchmark's, so churn is not what
 makes that window negative. The score's statistical base is thin by construction: a 60-month window
 holds only five priors per calendar month, so the estimate is noisy and its sign can flip between
 adjacent regimes (it does, out of time). The tilt inherits all of trend's turnover and adds the
@@ -35,10 +35,10 @@ score's noise on top; it never reduces the benchmark's exposure, only amplifies 
 
 **Monitoring.** Rolling Sharpe of each variant separately; score coverage (share of roots and days
 with a score, which grows over the sample); the tilt-versus-trend return gap (a widening gap means the
-tilt is doing work — in whichever direction); and turnover, since the tilt is the higher-turnover
+tilt is doing work, in whichever direction); and turnover, since the tilt is the higher-turnover
 variant.
 
-**Open questions.** Whether the 0.5 tilt multiplier should be pre-registered differently — it was
+**Open questions.** Whether the 0.5 tilt multiplier should be pre-registered differently; it was
 fixed at authoring, not tuned, so the committed numbers are not a search result. Whether the
 standalone variant's failure should be interpreted as evidence against commodity seasonality or as
 evidence about this universe and window is a reading the memo owes (S4, read; the interpretation is

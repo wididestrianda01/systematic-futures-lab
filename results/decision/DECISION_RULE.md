@@ -2,17 +2,17 @@
 
 **Rule.** Each ML variant (6a `ml_defaults`, 6b `ml_tuned`) must beat the
 `tsmom` benchmark on **decision-window Deflated Sharpe Ratio after costs**
-— the 2 bps row of the tables — to be reported as a winner.
+(the 2 bps row of the tables) to be reported as a winner.
 The decision window is the walk-forward **out-of-fold** folds inside
 develop+validate: the single out-of-sample read (2022 → 2024Q1) stays untouched
 until it is taken, so it cannot be the decision window without spending the touch.
 
 A variant that fails this test is documented as a **failed challenger** with the
-numbers that failed it — not retuned until it passes.
+numbers that failed it, not retuned until it passes.
 
 **Reads.** `tables.csv` is the pre-declared primary read: every method on the
 identical window, and the read the rule is applied to. `tables_like_for_like.csv`
-re-measures every family on each ML variant's own covered dates — a robustness
+re-measures every family on each ML variant's own covered dates, a robustness
 read, not a second decision surface: it exists because a signal that is flat by
 construction on part of the window has its Sharpe diluted by roughly
 sqrt(coverage), and the harness asserts both reads return the same verdict

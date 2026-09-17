@@ -65,17 +65,17 @@ RULE = f"""# Decision rule (pre-declared in the plan, before this read's numbers
 
 **Rule.** Each ML variant (6a `ml_defaults`, 6b `ml_tuned`) must beat the
 `{BENCHMARK}` benchmark on **decision-window Deflated Sharpe Ratio after costs**
-— the {PROTOCOL.headline_bps:.0f} bps row of the tables — to be reported as a winner.
+(the {PROTOCOL.headline_bps:.0f} bps row of the tables) to be reported as a winner.
 The decision window is the walk-forward **out-of-fold** folds inside
 develop+validate: the single out-of-sample read (2022 → 2024Q1) stays untouched
 until it is taken, so it cannot be the decision window without spending the touch.
 
 A variant that fails this test is documented as a **failed challenger** with the
-numbers that failed it — not retuned until it passes.
+numbers that failed it, not retuned until it passes.
 
 **Reads.** `tables.csv` is the pre-declared primary read: every method on the
 identical window, and the read the rule is applied to. `tables_like_for_like.csv`
-re-measures every family on each ML variant's own covered dates — a robustness
+re-measures every family on each ML variant's own covered dates, a robustness
 read, not a second decision surface: it exists because a signal that is flat by
 construction on part of the window has its Sharpe diluted by roughly
 sqrt(coverage), and the harness asserts both reads return the same verdict
@@ -108,7 +108,7 @@ def outcome_doc(primary: dict, sensitivity: dict[str, dict]) -> str:
             )
     else:
         verdict_text = (
-            "**Verdict: the rule fails for both variants — documented as failed challengers**, "
+            "**Verdict: the rule fails for both variants**, documented as failed challengers, "
             "with the numbers above, not retuned until they pass."
         )
     return (
@@ -120,10 +120,10 @@ def outcome_doc(primary: dict, sensitivity: dict[str, dict]) -> str:
         f"{outcome_table(primary, sensitivity, ML_VARIANTS, LABELS)}\n\n"
         f"{verdict_text}\n\n"
         "Robustness read (`tables_like_for_like.csv`, each variant on its own covered dates): "
-        "the verdict is identical on both reads — asserted in the harness, not asserted here, "
+        "the verdict is identical on both reads. That agreement is asserted in the harness, not asserted here, "
         "because the two reads disagreeing must stop the run rather than be written up.\n\n"
-        "Interpretation — what the purged/embargoed folds and the DSR deflation actually "
-        "changed versus a naive same-window split, and where the variants overfit — is left for later, "
+        "Interpretation (what the purged/embargoed folds and the DSR deflation actually "
+        "changed versus a naive same-window split, and where the variants overfit) is left for later, "
         "gated by the M7 reading canon. Deliberately not written here.\n"
     )
 

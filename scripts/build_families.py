@@ -64,7 +64,7 @@ def main() -> int:
         f"{trend_free['sharpe']:.2f} / {trend['sharpe']:.2f} "
         f"(turnover {trend['turnover']:.2f}). Reported as a failed challenger.\n\n"
         + (
-            "Provisional reading: the failure is edge rather than churn — the signal is already "
+            "Provisional reading: the failure is edge rather than churn: the signal is already "
             "negative before costs and its turnover is *below* the benchmark's, so cost drag "
             "alone does not explain it.\n"
             if dies
@@ -96,11 +96,11 @@ def main() -> int:
         "Numbers: the KMPV convention (long backwardated / short contangoed, i.e. carry = "
         "front−next over next) posts Sharpe "
         f"{rows.loc['carry', 'sharpe']:.2f} "
-        f"at {PROTOCOL.headline_bps:.0f} bps on develop+validate, while the inverted sign — long "
-        f"contangoed — posts {inverse_sharpe:.2f}, against the benchmark's "
+        f"at {PROTOCOL.headline_bps:.0f} bps on develop+validate, while the inverted sign (long "
+        f"contangoed) posts {inverse_sharpe:.2f}, against the benchmark's "
         f"{trend['sharpe']:.2f}. The literature convention stays in the tables.\n\n"
         "Provisional reading: a sign flip of that size is not a measurement artifact to average "
-        "away, and what it means is M3 (carry) / M4 (commodity term structure) territory — so "
+        "away, and what it means is M3 (carry) / M4 (commodity term structure) territory, so "
         "it waits for the canon rather than being resolved by picking the profitable sign.\n"
     )
     print(tables.to_string(index=False))

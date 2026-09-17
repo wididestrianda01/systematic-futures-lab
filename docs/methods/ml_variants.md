@@ -1,7 +1,7 @@
 # ML variants — 6a `ml_defaults` and 6b `ml_tuned`
 
 **Source.** M5 (Deflated Sharpe Ratio), M6 (CSCV / probability of backtest overfitting), M7
-(López de Prado, purged and embargoed cross-validation — **partially gated**: the purchased chapters
+(López de Prado, purged and embargoed cross-validation; **partially gated**: the purchased chapters
 are not yet read). The implementation follows the published CV mechanism rather than a
 library splitter, so the leakage argument is inspectable.
 
@@ -13,10 +13,10 @@ pruned TPE search per fold on an inner validation block that is itself purged an
 fold's test block (trials = folds x trials = 100, counted whether or not a fold's search was later
 skipped for lack of data).
 
-**Construction.** `ml.features` builds the tidy `(date, symbol)` feature table — trailing returns over
+**Construction.** `ml.features` builds the tidy `(date, symbol)` feature table: trailing returns over
 five windows, realized vol over two windows and their ratio, distance from two moving averages, the
 cross-sectional rank of 12-month momentum, the basis level and its basis rank, and the seasonality
-score — every value as-of t. `ml.features.forward_label` is the one deliberately forward-looking
+score, every value as-of t. `ml.features.forward_label` is the one deliberately forward-looking
 object and is never a model input. `ml.cv.purged_walk_forward` builds expanding-train, contiguous-test
 folds, purges training dates whose label window reaches into the test block, and embargoes a further
 buffer after every earlier test block; `leakage_violations` re-derives both mechanisms from the fold
@@ -37,7 +37,7 @@ no fold predicts, which is why coverage is reported with the numbers.
 The pre-declared rule (`results/decision/DECISION_RULE.md`, written before these numbers existed): a
 variant wins only if its decision-window DSR after costs beats the benchmark's. Applied in
 develop+validate both clear it; applied to the single out-of-sample read both fail it
-(`results/out_of_sample/OOT.md`). The robustness read — each variant re-measured on its own covered dates —
+(`results/out_of_sample/OOT.md`). The robustness read, each variant re-measured on its own covered dates,
 agrees with the verdict on both windows, and the run asserts that agreement before either read is
 reported.
 
@@ -48,9 +48,9 @@ reported.
 2. **Coverage.** Folds that cannot be fitted leave flat days, which dilute Sharpe by roughly the
    square root of coverage (46.5% for 6b in develop+validate). This is why the primary read is
    reported beside the like-for-like read and why both are committed.
-3. **Search.** 6b's DSR is deflated by 100 configurations, so its decision-read margin over 6a is not free
-   — the deflation is the price of having searched at all.
-4. **Deliberate gap.** M6's own diagnostic — the probability of backtest overfitting via CSCV — is
+3. **Search.** 6b's DSR is deflated by 100 configurations, so its decision-read margin over 6a is
+   not free: the deflation is the price of having searched at all.
+4. **Deliberate gap.** M6's own diagnostic, the probability of backtest overfitting via CSCV, is
    *not* computed in this project. The multiple-testing discipline rests on the trial-count deflation
    and the touched-once out-of-sample window. Recorded as a gap, not papered over.
 5. **Unread plumbing.** M7's CPCV variants (ch. 12) are unimplemented, and the gate on the purchased
@@ -59,7 +59,7 @@ reported.
 **Monitoring.** Rolling Sharpe of out-of-fold predictions; coverage; rolling turnover and the
 cost-to-gross ratio; feature drift (basis-rank and momentum-rank dispersion are the cheapest
 sentinels); and a hard retest trigger on any change to the feature set, label horizon, fold geometry,
-search space or the model class — under RTS 6 framing each of those is a material change, and the
+search space or the model class; under RTS 6 framing each of those is a material change, and the
 protocol has to be re-run rather than patched.
 
 **Open questions (the memo's, canon-gated).** Why the decision read's winners fail out of time, and what the

@@ -3,7 +3,7 @@
 One document per family in the comparison set: what the signal is and where it comes from, how it is
 constructed here, what it cost to trade, what the committed evidence shows on both evaluation
 windows, how it fails, and what would trigger a retest. These are the model-governance artifacts of
-the lab — the document a desk keeps for a live signal, written for the signals this project ran.
+the lab: the document a desk keeps for a live signal, written for the signals this project ran.
 
 Shared machinery, stated here once and true of every doc below:
 
@@ -12,21 +12,21 @@ Shared machinery, stated here once and true of every doc below:
   then clipped to ±1 notional. No family carries its own sizing. Sizing per symbol is not sizing per
   book: realized book volatility is 0.9–3.0% in develop+validate and 1.5–4.6% out of time, so these
   comparisons are like-for-like in rule and cost, not in delivered risk.
-- **Accounting**: every family crosses `engine.run` — the one pipeline seam (ADR 0001). `run`
+- **Accounting**: every family crosses `engine.run`, the one pipeline seam (ADR 0001). `run`
   reports Sharpe, Sortino, max drawdown, turnover and the Deflated Sharpe Ratio at 0/2/5/10 bps per
-  side on traded notional. Turnover is **book-level** — mean daily traded notional per unit of
-  capital, the same base the charge is taken on — so `turnover × bps × 252 × 1e-4` is the annual
+  side on traded notional. Turnover is **book-level**: mean daily traded notional per unit of
+  capital, the same base the charge is taken on, so `turnover × bps × 252 × 1e-4` is the annual
   return a cost level costs. Sharpe is annualized at √252 in both windows as a convention; the frozen
   panel carries 309.6 sessions per year before 2022 and 258.4 after, so the two windows' Sharpe
   levels are not strictly comparable.
-- **Rolls are not charged**: `traded_notional` is the change in *held exposure*, so a contract roll —
-  which leaves the exposure unchanged while trading two sides of that symbol's notional — costs
+- **Rolls are not charged**: `traded_notional` is the change in *held exposure*, so a contract roll,
+  which leaves the exposure unchanged while trading two sides of that symbol's notional, costs
   nothing in the model, and the held path carries a position across a symbol's non-quoting sessions
   the same way. Measured on the committed panel at the roll calendar's dates, roll trades would add
   0.016/day of book turnover to the baseline's 0.007 (≈2.3× its charged trading) and 0.012/day to
   carry's 0.176 (≈7%), so the understatement is largest exactly where the charged base is smallest:
   the families' ranking is unaffected, the low-turnover cost drag is understated.
-- **Headline cost level**: 2 bps/side — the level a decision is read at.
+- **Headline cost level**: 2 bps/side, the level a decision is read at.
 - **Windows**: develop+validate 2010-01-01 → 2021-12-31 (the families and decision tables);
   out-of-sample 2022-01-03 → 2024-03-28, read once by `scripts/build_out_of_sample.py`.
 - **Evidence provenance**: `results/families/tables.csv`, `results/decision/tables.csv`,
@@ -43,6 +43,6 @@ Shared machinery, stated here once and true of every doc below:
 | Seasonality (standalone + tilt) | [seasonality.md](seasonality.md) | S4 — Baltas & Kosowski; plan revision |
 | ML variants 6a / 6b | [ml_variants.md](ml_variants.md) | M5, M6, M7 |
 
-Interpretation — why a family behaved as it did, and what the out-of-sample reversal means — belongs
+Interpretation (why a family behaved as it did, and what the out-of-sample reversal means) belongs
 to the findings memo behind the reading canon, not to these docs. Where something is
 still open, the doc says so rather than reaching for an explanation.

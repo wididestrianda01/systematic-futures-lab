@@ -35,7 +35,7 @@ three active legs (front, successor, prior) with contract identifiers. The roll 
 \emph{observed} from the leg data rather than estimated; the continuous series is built by ratio
 back-adjustment (at each roll, the new-to-old front ratio on the prior session rescales earlier
 closes), with the invariant that the continuous series' daily return equals the held contract's own
-return on every session including roll days --- pinned by test at floating-point tolerance. The basis
+return on every session including roll days, pinned by test at floating-point tolerance. The basis
 series is computed from raw closes as $\text{close(next)}/\text{close(front)}-1$. Every derived file
 is SHA-256-gated by a committed manifest; ingest fails on drift.
 
@@ -63,13 +63,13 @@ One accounting path (\texttt{engine.run}) for every family and every parameter s
 $[-1,1]$ per symbol per day, a shared sizing overlay that scales \emph{each symbol} to a 10\% annualized
 volatility target with $\pm1$ notional caps applied identically, a linear cost charge of $b$ basis points
 per side on traded notional, and metrics reported at $b \in \{0,2,5,10\}$ with $b=2$ the headline level a
-decision is read at. Turnover is book-level --- mean daily traded notional per unit of capital, the base
-the charge is taken on --- so $b$ costs $\text{turnover} \times b \times 252 \times 10^{-4}$ of annual
+decision is read at. Turnover is book-level: mean daily traded notional per unit of capital, the base
+the charge is taken on, so $b$ costs $\text{turnover} \times b \times 252 \times 10^{-4}$ of annual
 return. Sharpe is annualized at $\sqrt{252}$ in both windows as a stated convention: the frozen panel
 carries 309.6 sessions per year before 2022 and 258.4 after, so the two windows' Sharpe \emph{levels} are
 not strictly comparable, while the DSR the rule reads is a probability and is unaffected. Sizing per
-symbol is not sizing per book --- realized book volatility runs 0.9--3.0\% in develop+validate and
-1.5--4.6\% out of time --- so the families are like-for-like in rule and cost, not in delivered risk.
+symbol is not sizing per book: realized book volatility runs 0.9--3.0\% in develop+validate and
+1.5--4.6\% out of time, so the families are like-for-like in rule and cost, not in delivered risk.
 A signal formed with data through day $t$ drives the position held from $t$ to $t+1$; a regression test
 fails on a look-ahead implementation and passes on the correct convention. Develop 2010--2019 and
 validate 2020--2021 form the decision window; the out-of-sample window 2022--2024Q1 is read exactly
@@ -137,10 +137,10 @@ leaves the baseline, XS momentum and the tuned variant positive, while the out-o
 XS momentum, seasonality, the trend benchmark and the tilt. Trend and the tilt flip sign between gross
 and the headline level; both ML variants stay positive on both, at a cost of most of their signal.
 \item \textbf{A null model is a real competitor.} Vol-targeted buy-and-hold earns 0.408 at $2\bps$ on
-book turnover of 0.007 --- the diversification return, which any signal must beat before claiming edge.
+book turnover of 0.007, which is the diversification return any signal must beat before claiming edge.
 \item \textbf{The ML result is the honest one.} In-window winners (DSR 0.9989 / 0.9999 against the
 benchmark's 0.3726), out-of-time failures (0.5433 / 0.0261 against 0.7966). The in-window advantage is
-concentrated in 2015--2019 and 2020--2021 --- the periods the benchmark lost money --- while 6a was
+concentrated in 2015--2019 and 2020--2021, the periods the benchmark lost money, while 6a was
 $-0.80$ in 2010--2014 and 6b had no coverage there at all. Out of time, cost consumes 6a's signal:
 0.759 gross, 0.072 net, book turnover 0.199 per day.
 \item \textbf{Purge and embargo guarantee no label leakage, not generalisation.} The folds are clean
@@ -164,7 +164,7 @@ three, so what generalised was cross-sectional selection, not exposure.
 
 \section{Limitations}
 One universe (16 CME roots), one out-of-sample window, one read. The cost model is linear and
-constant --- no market impact, no bid/ask, no volume-dependent slippage. M6's CSCV
+constant: no market impact, no bid/ask, no volume-dependent slippage. M6's CSCV
 probability-of-backtest-overfitting diagnostic is not implemented; the multiple-testing discipline is
 the trial-count DSR deflation plus the single out-of-sample read. Two SHOULD readings (S5, S9) and
 the M7 book chapters are not read: the interpretation resting on them is marked as

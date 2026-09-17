@@ -29,4 +29,4 @@ Read in the order below; commit a one-paragraph personal note per paper to
 | S5 | Daniel & Moskowitz 2016 — Momentum Crashes | the findings | risk framing for the OOT window (2022 → 2024Q1) |
 | S9 | Fung & Hsieh 2001 — Trend Followers | the findings | CTA lineage for the memo's industry framing |
 
-Note: no canonical "roll mechanics" paper exists — the canon carries it via M3 + M4.
+Note: no canonical "roll mechanics" paper exists: the canon carries it via M3 + M4.

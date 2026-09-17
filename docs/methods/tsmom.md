@@ -24,7 +24,7 @@ family as the literature's 1/3/12-month core.
 
 **Failure modes (documented, mechanical).** Cost is the first: book turnover of 0.103/day flips
 develop+validate Sharpe from +0.20 gross to -0.085 at 2 bps, and the same turnover takes 0.23 of
-Sharpe out of the out-of-sample window. The second is the payoff shape M1 names — the strategy is
+Sharpe out of the out-of-sample window. The second is the payoff shape M1 names: the strategy is
 straddle-like, strongest in sustained moves and weakest in sharp reversals, so a sideways,
 frequent-reversal regime is its worst case. Third, short sleeves are execution-sensitive: M2's
 one-month signal largely disappears with a one-month execution lag while the 12-month sleeve barely
@@ -45,7 +45,7 @@ Three of them matter here:
 - The paper's risk and Sharpe claims reproduce on free data: the diversified factor comes out at
   13.7% annualised volatility and gross Sharpe 1.20 over 1985–2009, against the paper's stated 12%
   and "greater than one".
-- The 2010–2016 sub-window — the regime this family's out-of-sample read sits inside — comes out at
+- The 2010–2016 sub-window, the regime this family's out-of-sample read sits inside, comes out at
   0.58 gross / 0.56 net, bracketing the 0.41 *net* figure Hurst, Ooi & Pedersen publish for the same
   regime. This family's weak OOT numbers are therefore the published regime and the cost model, not
   an implementation failure.
