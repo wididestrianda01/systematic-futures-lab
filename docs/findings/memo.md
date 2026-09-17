@@ -4,13 +4,10 @@
 families and two LightGBM variants, one shared vectorised engine, one volatility overlay, one cost
 model, one evaluation protocol, and a single out-of-sample window read once at the end.
 
-**Provenance of the interpretation in this memo.** The MUST reading canon is the gate for
-interpreting any backtest result (`docs/reading/README.md`). At the time of writing, M1–M6 and M8 are
-read and closed; M7 (AFML ch. 7, 11–12) and the two SHOULD papers S5/S9 exist as agent-drafted
-scaffolding in `docs/reading/notes.md`, explicitly marked *not read*. Every claim below is traceable
-to a committed table; the two places where a reading rests on the scaffolding rather than on a
-completed read are flagged inline as **[scaffolded]**. The memo is written so that a reader can
-strike those flags' claims without disturbing the rest.
+**Provenance of the interpretation in this memo.** Every claim below is traceable to a committed
+table; the two places where a reading rests on the scaffolding rather than on a completed read are
+flagged inline as **[scaffolded]**. The memo is written so that a reader can strike those flags'
+claims without disturbing the rest.
 
 ---
 
