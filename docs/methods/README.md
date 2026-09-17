@@ -41,8 +41,8 @@ Shared machinery, stated here once and true of every doc below:
 | Cross-sectional momentum | [xs_momentum.md](xs_momentum.md) | S3 — Asness, Moskowitz & Pedersen |
 | Carry | [carry.md](carry.md) | M3 — Koijen, Moskowitz, Pedersen & Vrugt |
 | Seasonality (standalone + tilt) | [seasonality.md](seasonality.md) | S4 — Baltas & Kosowski; plan revision |
-| ML variants 6a / 6b | [ml_variants.md](ml_variants.md) | M5, M6, M7 |
+| ML variants 6a / 6b | [ml_variants.md](ml_variants.md) | M5, M6 |
 
 Interpretation (why a family behaved as it did, and what the out-of-sample reversal means) belongs
-to the findings memo behind the reading canon, not to these docs. Where something is
+to the findings memo, not to these docs. Where something is
 still open, the doc says so rather than reaching for an explanation.

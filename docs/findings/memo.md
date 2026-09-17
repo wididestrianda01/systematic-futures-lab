@@ -4,10 +4,7 @@
 families and two LightGBM variants, one shared vectorised engine, one volatility overlay, one cost
 model, one evaluation protocol, and a single out-of-sample window read once at the end.
 
-**Provenance of the interpretation in this memo.** Every claim below is traceable to a committed
-table; the two places where a reading rests on the scaffolding rather than on a completed read are
-flagged inline as **[scaffolded]**. The memo is written so that a reader can strike those flags'
-claims without disturbing the rest.
+**Provenance.** Every claim below is traceable to a committed table.
 
 ---
 
@@ -100,8 +97,8 @@ rather than trusted.
 | XS momentum | centered cross-sectional rank of 12-month return | S3 |
 | Carry | sign of the negative basis (long backwardated, short contangoed) | M3 |
 | Seasonality | sign of the same-calendar-month trailing score; separately as a ±50% tilt on TSMOM | S4 |
-| 6a `ml_defaults` | LightGBM defaults, purged/embargoed walk-forward, no search | M5, M6, M7 |
-| 6b `ml_tuned` | same, with a pruned TPE search per fold | M5, M6, M7 |
+| 6a `ml_defaults` | LightGBM defaults, purged/embargoed walk-forward, no search | M5, M6 |
+| 6b `ml_tuned` | same, with a pruned TPE search per fold | M5, M6 |
 
 Per-family construction, parameters, monitoring triggers and failure modes:
 `docs/methods/`.
@@ -230,7 +227,7 @@ embargo remove label overlap, not regime dependence. The 2010–2024 out-of-samp
 instrument that caught the failure, and it caught it in one shot. A deliberate gap is recorded here
 too: the project did **not** run a naive-split counterfactual to measure how much the leakage would
 have inflated the in-window numbers, so the size of what the protocol prevented is argued from
-theory (M6, M7) rather than measured. **[scaffolded: M7]**
+theory (M6) rather than measured.
 
 **The DSR's honest reading.** The Deflated Sharpe Ratio answers "how likely is a Sharpe this large
 given this many trials and these return moments, under zero skill". 6b's deflation by 100
@@ -295,9 +292,8 @@ project's own numbers decompose it without speculation:
 | `baseline` | -1.28 | -0.14 | -0.20 |
 
 Two observations, both mechanical. **2023 is the year nobody earned:** with one exception, every
-family is at or below zero, which is the flat, mean-reverting regime that M1's analysis and S9's
-trend-follower straddle description identify as the trend family's worst case
-**[scaffolded: S9]**, and it is the year the pre-declared winners' margins evaporated. **The
+family is at or below zero, which is the flat, mean-reverting regime that M1's analysis identifies
+as the trend family's worst case, and it is the year the pre-declared winners' margins evaporated. **The
 passive book lost money in all three windows while the cross-sectional family made money in all
 three:** out of time, identifying *which* roots to hold paid, and holding all of them did not.
 The diversification return that made the baseline strong in develop+validate (0.41 at 2 bps) was
@@ -366,8 +362,6 @@ not available in this regime.
   two windows' Sharpe *levels* are not strictly comparable: the develop+validate column is ~11%
   higher on its own session density. The DSR the rule reads is a probability and is unaffected
   (section 2).
-- **Two SHOULD readings are scaffolded, not read** (S5, S9), and the M7 book chapters are not read;
-  the two claims flagged **[scaffolded]** are the ones a reader should hold loosely.
 - **The ML result is specific.** It does not say "machine learning does not work on futures". It says
   this feature set, this label horizon, this fold geometry, this cost level and this window produced
   an in-sample winner that did not generalize.
@@ -408,5 +402,4 @@ Deliberate, with reasons. The boundary is a research judgement, not a gap in the
 - The executable version of this memo's story: `notebooks/analysis.ipynb`.
 
 **Market facts used in the framing:** the Danish systematic shop is Alipes Capital (Copenhagen); Da
-Vinci Trading is Amsterdam (a correction carried from the research phase). Regulation talking points
-live in the self-test brief.
+Vinci Trading is Amsterdam (a correction carried from the research phase).

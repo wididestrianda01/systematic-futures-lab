@@ -25,4 +25,4 @@ each variant's selection actually evaluated: 6a searched none
 skipped for lack of data.
 
 **Scope.** One comparison set, one accounting path, two reads of it. The applied
-outcome is `DECISION.md`; the interpretation stays for later (M7-gated).
+outcome is `DECISION.md`; the interpretation stays for later.

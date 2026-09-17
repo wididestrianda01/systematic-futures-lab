@@ -1,6 +1,6 @@
 """The hand-typed numbers in the docs are the committed tables' values, at the precision they print.
 
-The condensed report's two tables, the memo's three and the self-test's quoted rows are transcribed by
+The condensed report's two tables and the memo's three are transcribed by
 hand from `results/{families,decision,out_of_sample}/tables.csv`. This test is what keeps them from drifting when the tables
 are regenerated — the drift the 2026-09-17 sanity check found (15 memo cells, 3 report cells) is what
 it fails on. Comparison is exact at the precision the document prints: `0.746` and a table value of

@@ -88,7 +88,7 @@ each variant's selection actually evaluated: 6a searched none
 skipped for lack of data.
 
 **Scope.** One comparison set, one accounting path, two reads of it. The applied
-outcome is `DECISION.md`; the interpretation stays for later (M7-gated).
+outcome is `DECISION.md`; the interpretation stays for later.
 """
 
 
@@ -124,7 +124,7 @@ def outcome_doc(primary: dict, sensitivity: dict[str, dict]) -> str:
         "because the two reads disagreeing must stop the run rather than be written up.\n\n"
         "Interpretation (what the purged/embargoed folds and the DSR deflation actually "
         "changed versus a naive same-window split, and where the variants overfit) is left for later, "
-        "gated by the M7 reading canon. Deliberately not written here.\n"
+        "to the findings memo. Deliberately not written here.\n"
     )
 
 

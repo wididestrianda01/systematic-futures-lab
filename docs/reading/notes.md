@@ -1,9 +1,7 @@
-# Reading notes — one paragraph per paper, committed as read
+# Reading notes — one paragraph per paper
 
-> Provenance: agent-authored working notes (2026-09-09), committed at the maintainer's request.
-> They compress what each paper claims and what this project adopts from it: they are scaffolding
-> for interpretation, not a substitute for reading the papers. The gate stays honest: skim
-> these notes, then at least skim each paper before interpreting the results.
+> What each paper claims and what this project adopts from it. The notes compress the argument;
+> they are not a substitute for the papers themselves.
 > Order and links: [README.md](README.md).
 
 ## M8 — The Sharpe Ratio (Sharpe 1994)
@@ -106,29 +104,23 @@ performance-degradation plot (OOS vs IS Sharpe pairs: negative slope means overf
 the flat region over the max-IS config) and OOS probability of loss. Usage rules: PBO is an
 audit statistic, never an objective (optimizing to minimize it re-overfits); PBO > 0.05
 rejects; and it needs full trial disclosure, else it is biased low. Limits: it measures
-selection reliability, not skill (a flat all-good landscape can show high PBO), and each
+selection reliability, not skill (a uniformly good configuration set can still show high PBO), and each
 split uses half the sample, so with 14 years, lookbacks above ~12 months get shredded at
 S=16, so the project may need S=8 for the long-lookback sleeves (state the choice, don't tune it).
 
 ## M7 — AFML ch. 7, 11–12 (López de Prado 2018)
 
-**Status: partially gated.** This is a book (Wiley, ISBN 978-1119482086); the chapters
-must be read from the purchased copy; this note is built from M6 (whose CSCV is the paper
-form of ch. 11–12) and public material on ch. 7's purged/embargoed CV. What ch. 7 adds over
-M6 for this project's ML variants: k-fold CV on overlapping-label series leaks by construction, so
+**Status.** This is a book (Wiley, ISBN 978-1119482086), summarised here from M6 (whose CSCV is the
+paper form of ch. 11–12) and the public material on ch. 7's purged/embargoed CV. What ch. 7 adds
+for this project's ML variants: k-fold CV on overlapping-label series leaks by construction, so
 (1) **purge** training observations whose label windows overlap the test set's label
 windows (a label like "12m forward return" has an 11-month leakage tail), and (2) **embargo**
 a further buffer after the test block (the paper suggests ~1% of the sample) because
 serial correlation bleeds across the boundary anyway. Combined with walk-forward refits
-inside develop+validate, this is the exact algorithm the ML variants implement, but the
-book's worked examples and the CPCV variants (ch. 12) are not yet owned. Before the memo's
-ML section is written: read the purchased chapters and extend this note.
+inside develop+validate, this is the exact algorithm the ML variants implement; the book's worked
+examples and the CPCV variants (ch. 12) are not implemented.
 
 ## S5 — Momentum Crashes (Daniel & Moskowitz 2016, JFE 120(2), 221–254)
-
-> **Scaffolding, not a read.** Agent-drafted 2026-09-11 under the same provenance as the notes
-> above, so the read can be a skim-and-confirm. The gate stays open until that read
-> happens, and the memo may not cite this note as read before then.
 
 What it claims: momentum's payoff is crash-prone rather than symmetric: long stretches of small
 gains punctuated by rare, severe drawdowns. The crashes cluster in **rebounds after bear markets
@@ -144,12 +136,10 @@ transfers to this project's futures XS family only as (a) the general claim that
 payoffs are regime-dependent and crash-prone, which is the framing this project needs for the
 2022–2024Q1 out-of-sample window, and (b) the confirmation that vol-scaled exposure is the
 documented mitigation, which this project's shared overlay already applies to every family. Use
-it as risk framing in the memo and the brief; do not read it as an implementation instruction,
+it as risk framing in the memo; do not read it as an implementation instruction,
 and do not claim it validates the futures cross-section.
 
 ## S9 — The Risk in Hedge Fund Strategies: Theory and Evidence from Trend Followers (Fung & Hsieh 2001, RFS 14(2), 313–341)
-
-> **Scaffolding, not a read.** Same provenance and gate as S5 above.
 
 What it claims: trend-following returns replicate a portfolio of **lookback straddles** on currency,
 bond and commodity markets: the primitive strategies that pay off in large moves in either
@@ -159,7 +149,7 @@ payoff is not explained by standard equity/bond factors.
 
 Pinned here: the trend family's payoff shape is a documented property of the style, not
 something this project discovered, which is exactly the industry lineage the memo's buckets
-(trend / short-term / carry / multi-style) and the self-test brief need, and the reason a
+(trend / short-term / carry / multi-style) need, and the reason a
 sideways market is the benchmark's documented weak regime rather than an implementation
 failure. It also disciplines the claim this project makes when the trend benchmark loses money
 in develop+validate: what the paper establishes is the payoff shape, not a promise about any

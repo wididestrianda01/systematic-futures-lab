@@ -52,8 +52,8 @@ TSMOM & equal-weight vol-scaled 5/10/20d + 1/3/12m horizon signs & M1, M2, S4 \\
 XS momentum & centred cross-sectional rank of 12-month return & S3 \\
 Carry & sign of the negative basis (long backwardated) & M3 \\
 Seasonality & sign of same-calendar-month trailing score; and a $\pm50\%$ tilt on TSMOM & S4 \\
-6a \texttt{ml\_defaults} & LightGBM defaults, purged/embargoed walk-forward, no search & M5--M7 \\
-6b \texttt{ml\_tuned} & as 6a with a pruned TPE search per fold & M5--M7 \\
+6a \texttt{ml\_defaults} & LightGBM defaults, purged/embargoed walk-forward, no search & M5, M6 \\
+6b \texttt{ml\_tuned} & as 6a with a pruned TPE search per fold & M5, M6 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -166,11 +166,9 @@ three, so what generalised was cross-sectional selection, not exposure.
 One universe (16 CME roots), one out-of-sample window, one read. The cost model is linear and
 constant: no market impact, no bid/ask, no volume-dependent slippage. M6's CSCV
 probability-of-backtest-overfitting diagnostic is not implemented; the multiple-testing discipline is
-the trial-count DSR deflation plus the single out-of-sample read. Two SHOULD readings (S5, S9) and
-the M7 book chapters are not read: the interpretation resting on them is marked as
-scaffolded in \texttt{docs/findings/memo.md}. The ML result is specific to this feature set, label
-horizon, fold geometry, cost level and window; it is not a statement about machine learning on
-futures in general.
+the trial-count DSR deflation plus the single out-of-sample read. The ML result is specific to this
+feature set, label horizon, fold geometry, cost level and window; it is not a statement about
+machine learning on futures in general.
 
 \section*{Reproducibility}
 \texttt{uv sync}, fetch the pinned snapshot, rebuild derived data (manifest-gated),

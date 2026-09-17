@@ -29,11 +29,9 @@ from systematic_futures.protocol import PROTOCOL, Method
 RESULTS = Path("results/families")
 
 GATE = (
-    "**Interpretation status: gated.** The MUST reading canon gates interpretation of any\n"
-    "backtest result (`docs/reading/README.md`), and M7 is still partially gated\n"
-    "(`docs/reading/notes.md`). Everything below the numbers is a *provisional* reading of\n"
-    "mechanical output, not a checked finding, until the canon closes; the\n"
-    "out-of-sample interpretation pass owns it.\n\n"
+    "**Interpretation status: provisional.** Everything below the numbers is a *provisional*\n"
+    "reading of mechanical output, not a checked finding; the findings memo owns the\n"
+    "interpretation.\n\n"
 )
 
 

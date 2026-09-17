@@ -99,8 +99,7 @@ def outcome_doc(primary: dict, sensitivity: dict[str, dict], meta: pd.DataFrame)
         f"({PROTOCOL.splits} x {PROTOCOL.n_trials} = {PROTOCOL.splits * PROTOCOL.n_trials}).\n\n"
         "**Reading.** What the OOT numbers mean (regime attribution, the trend drought the "
         "benchmark carries into 2022, what the ML variants generalized) is interpretation, and "
-        "it stays with the memo behind the reading canon and the "
-        "interpretation pass. Deliberately not written here.\n\n"
+        "it stays with the findings memo. Deliberately not written here.\n\n"
         "Robustness read (`tables_like_for_like.csv`): the verdict is asserted identical on both "
         "reads before this file is written.\n"
     )

@@ -13,4 +13,4 @@ Benchmark `tsmom`: Sharpe -0.08, DSR 0.3726.
 
 Robustness read (`tables_like_for_like.csv`, each variant on its own covered dates): the verdict is identical on both reads. That agreement is asserted in the harness, not asserted here, because the two reads disagreeing must stop the run rather than be written up.
 
-Interpretation (what the purged/embargoed folds and the DSR deflation actually changed versus a naive same-window split, and where the variants overfit) is left for later, gated by the M7 reading canon. Deliberately not written here.
+Interpretation (what the purged/embargoed folds and the DSR deflation actually changed versus a naive same-window split, and where the variants overfit) is left for later, to the findings memo. Deliberately not written here.

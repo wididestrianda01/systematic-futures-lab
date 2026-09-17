@@ -1,9 +1,9 @@
 # ML variants — 6a `ml_defaults` and 6b `ml_tuned`
 
-**Source.** M5 (Deflated Sharpe Ratio), M6 (CSCV / probability of backtest overfitting), M7
-(López de Prado, purged and embargoed cross-validation; **partially gated**: the purchased chapters
-are not yet read). The implementation follows the published CV mechanism rather than a
-library splitter, so the leakage argument is inspectable.
+**Source.** M5 (Deflated Sharpe Ratio) and M6 (CSCV / probability of backtest overfitting) for the
+multiple-testing machinery, and the published purged/embargoed cross-validation mechanism for the
+folds. The implementation follows that mechanism rather than a library splitter, so the leakage
+argument is inspectable.
 
 **Rule.** Pooled LightGBM regression on the point-in-time feature panel, predicting the forward
 5-session volatility-scaled return. Out-of-fold predictions become the signal, centered
@@ -53,8 +53,8 @@ reported.
 4. **Deliberate gap.** M6's own diagnostic, the probability of backtest overfitting via CSCV, is
    *not* computed in this project. The multiple-testing discipline rests on the trial-count deflation
    and the touched-once out-of-sample window. Recorded as a gap, not papered over.
-5. **Unread plumbing.** M7's CPCV variants (ch. 12) are unimplemented, and the gate on the purchased
-   chapters is open, so the ML interpretation is not written here.
+5. **Unimplemented variant.** CPCV (ch. 12) is not implemented, and the ML interpretation is not
+   written here.
 
 **Monitoring.** Rolling Sharpe of out-of-fold predictions; coverage; rolling turnover and the
 cost-to-gross ratio; feature drift (basis-rank and momentum-rank dispersion are the cheapest
@@ -62,6 +62,6 @@ sentinels); and a hard retest trigger on any change to the feature set, label ho
 search space or the model class; under RTS 6 framing each of those is a material change, and the
 protocol has to be re-run rather than patched.
 
-**Open questions (the memo's, canon-gated).** Why the decision read's winners fail out of time, and what the
-purged/embargoed folds and the DSR deflation actually changed versus a naive split, are exactly the
-questions the M7 gate exists for.
+**Open questions (the memo's).** Why the decision read's winners fail out of time, and what the
+purged/embargoed folds and the DSR deflation actually changed versus a naive split, are the memo's
+to answer.

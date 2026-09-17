@@ -58,5 +58,5 @@ Three of them matter here:
   regime and Sharpe reference, not a level target.
 
 **Open questions.** The 2010–2019 weakness is the family's most interesting number and it is a
-reading, owed to the memo (M1/M2, plus S5 for crash framing once read). The suite of sleeves was
+reading, owed to the memo (M1/M2). The suite of sleeves was
 adopted before these numbers, and is not re-tuned here.
