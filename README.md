@@ -145,7 +145,7 @@ continuous series ──▶ basis (raw front/next) ──▶ signals ──▶ s
 - `decision.py` — the pre-declared rule and its guard, written once so the phases cannot drift apart.
 - `scripts/` — thin runners; `notebooks/` — explanations. Logic lives in the package, arguments live
   in the runners.
-- CI runs the test suite (114 tests) on every push.
+- CI runs the test suite (123 tests) on every push.
 
 ## Where the interpretation lives
 
@@ -174,7 +174,7 @@ uv run python scripts/carry_frequency_diagnostic.py  # results/out_of_sample/car
 uv run python scripts/build_report_figures.py        # docs/report/figures/equity.pdf
 uv run python scripts/fetch_replication.py           # data/replication/, the MOP subset
 uv run python scripts/build_mop_replication.py       # results/replication/ - external checks
-uv run pytest                             # 114 tests
+uv run pytest                             # 123 tests
 uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb
 (cd docs/report && rm -f report.aux report.log report.out && \
    pdflatex -interaction=nonstopmode report.tex)   # report.pdf, reproducible from a clean build

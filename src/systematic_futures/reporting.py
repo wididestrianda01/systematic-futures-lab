@@ -1,15 +1,39 @@
-"""The rendered documents: how a rule's outcome and a table's numbers are written down.
+"""The reporting path: the rendered outcome of a rule, and the attribution the docs quote.
 
 The rule itself is `decision.verdict`, and the prose a phase pre-declared stays in the phase script —
-this module owns the *derived* text, the parts a reader would otherwise have to trust: the markdown
-body of the outcome table and the sentence that reports which variants won, both rendered from the same
-read of the same numbers that `DECISION.md` and `OOT.md` commit. The notebook renders from here too, so
-a verdict cannot be written three ways.
+this module owns the *derived* text and the *derived* numbers: the markdown body of the outcome table
+and the sentence that reports which variants won, rendered from the same read of the same numbers that
+`DECISION.md` and `OOT.md` commit, and the bucketed Sharpe attribution the report and the memo quote
+(`sharpes_by_bucket`). The notebook and the tests render and derive from here, so a verdict or a
+bucket number cannot be written two ways.
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
+
+import pandas as pd
+
+from systematic_futures.engine.metrics import sharpe
+
+Bucket = Callable[[pd.DataFrame], pd.Series]
+
+
+def sharpes_by_bucket(curves: pd.DataFrame, bucket: Bucket) -> pd.DataFrame:
+    """Annualized Sharpe per method per bucket of the committed return series — one row per method.
+
+    `curves` is the committed long frame (`window`, `method`, `date`, `ret`); `bucket` labels each row
+    the way a reader sees it (a calendar year, a sub-period). The metric is the engine's
+    (`engine.metrics.sharpe`), imported rather than restated, so a bucket figure the docs quote is the
+    same arithmetic as the table it sits beside (ADR 0001). A bucket without two observations is NaN,
+    which is how a variant with no coverage in a sub-period reads.
+    """
+    labelled = curves.assign(bucket=bucket(curves))
+    return (
+        labelled.groupby(["method", "bucket"], observed=True)["ret"]
+        .apply(lambda returns: sharpe(returns.dropna()))
+        .unstack()
+    )
 
 
 def family_names(variants: Sequence[str], labels: Mapping[str, str]) -> str:
