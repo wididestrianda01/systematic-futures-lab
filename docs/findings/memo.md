@@ -400,6 +400,3 @@ Deliberate, with reasons. The boundary is a research judgement, not a gap in the
   carry frequency diagnostic `results/out_of_sample/carry_frequency.csv`
   (`scripts/carry_frequency_diagnostic.py`).
 - The executable version of this memo's story: `notebooks/analysis.ipynb`.
-
-**Market facts used in the framing:** the Danish systematic shop is Alipes Capital (Copenhagen); Da
-Vinci Trading is Amsterdam (a correction carried from the research phase).
